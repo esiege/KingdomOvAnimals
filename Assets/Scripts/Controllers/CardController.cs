@@ -122,6 +122,8 @@ public class CardController : MonoBehaviour
     public void AddOffensiveAbility(IAbility ability)
     {
         offensiveAbilities.Add(ability);
+
+
     }
 
     public void AddDefensiveAbility(IAbility ability)
