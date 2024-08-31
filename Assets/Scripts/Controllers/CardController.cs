@@ -9,6 +9,9 @@ public class CardController : MonoBehaviour
     public int manaCost;
     public int health;
 
+    // Owner reference
+    public PlayerController owningPlayer;
+
     // Status Effects
     public bool hasSummoningSickness;
     public bool isFrozen;

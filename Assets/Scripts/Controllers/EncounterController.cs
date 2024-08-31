@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class EncounterController : MonoBehaviour
@@ -27,6 +28,10 @@ public class EncounterController : MonoBehaviour
     // Maximum hand size
     public int maxHandSize = 5;
 
+    // Card Positions in Hand
+    public List<GameObject> player1CardPositions; // Positions where player 1's cards will be placed in hand
+    public List<GameObject> player2CardPositions; // Positions where player 2's cards will be placed in hand
+
     // Initialization method
     void Start()
     {
@@ -50,7 +55,23 @@ public class EncounterController : MonoBehaviour
         player1Hand = new List<CardController>();
         player2Hand = new List<CardController>();
 
-        StartTurn();
+        // Start with both players drawing 3 cards with a delay
+        StartCoroutine(DrawInitialCards());
+    }
+
+    // Coroutine to draw 3 cards for each player with a 1-second delay
+    private IEnumerator DrawInitialCards()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            DrawCard(player1);
+            yield return new WaitForSeconds(1f);
+
+            DrawCard(player2);
+            yield return new WaitForSeconds(1f);
+        }
+
+        StartTurn(); // Start the first turn after drawing initial cards
     }
 
     // Method to start a player's turn
@@ -75,6 +96,7 @@ public class EncounterController : MonoBehaviour
     private void DrawCard(PlayerController player)
     {
         List<CardController> currentHand = player == player1 ? player1Hand : player2Hand;
+        List<GameObject> currentCardPositions = player == player1 ? player1CardPositions : player2CardPositions;
 
         if (currentHand.Count >= maxHandSize)
         {
@@ -88,9 +110,12 @@ public class EncounterController : MonoBehaviour
             CardController drawnCard = player.deck[0];
             player.deck.RemoveAt(0); // Remove the card from the deck
 
+            // Set the owning player on the card
+            drawnCard.owningPlayer = player;
+
             // Add the card to the player's hand at the appropriate position
             int handPositionIndex = currentHand.Count; // Use the next available position
-            player.AddCardToHand(drawnCard, handPositionIndex);
+            AddCardToHand(drawnCard, handPositionIndex, currentCardPositions);
 
             currentHand.Add(drawnCard); // Add the card to the hand list
 
@@ -102,20 +127,24 @@ public class EncounterController : MonoBehaviour
         }
     }
 
-    // Method to make a card in hand interactable (hover, select, drag)
-    public void MakeCardInteractable(CardController card, PlayerController player)
+    // Method to add a card to the player's hand and position it
+    private void AddCardToHand(CardController newCard, int handPositionIndex, List<GameObject> cardPositions)
     {
-        // Enable the card to be draggable
-        DraggableCard draggable = card.gameObject.AddComponent<DraggableCard>();
-        draggable.encounterController = this;
-        draggable.owningPlayer = player;
+        if (handPositionIndex < cardPositions.Count)
+        {
+            // Instantiate a new instance of the card prefab
+            GameObject cardObject = Instantiate(newCard.gameObject, cardPositions[handPositionIndex].transform.position, Quaternion.identity);
 
-        // Enable hover effect
-        HoverableCard hoverable = card.gameObject.AddComponent<HoverableCard>();
-        hoverable.SetHoverEffect();
+            // Set the instantiated card's parent to the hand UI container (optional)
+            cardObject.transform.SetParent(cardPositions[handPositionIndex].transform);
+        }
+        else
+        {
+            Debug.LogError("Hand position index is out of range.");
+        }
     }
 
-    // Method to play a card (called when a card is dragged onto the board)
+    // Method to play a card (called when a card is played)
     public void PlayCard(CardController card, PlayerController player)
     {
         List<CardController> playerBoard = player == player1 ? player1Board : player2Board;

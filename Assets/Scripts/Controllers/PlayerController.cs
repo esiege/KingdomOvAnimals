@@ -19,9 +19,6 @@ public class PlayerController : MonoBehaviour
     public TextMeshProUGUI currentStageText;
     public GameObject deckUIContainer; // UI container for displaying the player's deck
 
-    // Card Positions in Hand
-    public List<GameObject> cardPositions; // Positions where cards will be placed in hand
-
     // Initialization method
     public void InitializePlayer(int health)
     {
@@ -55,31 +52,6 @@ public class PlayerController : MonoBehaviour
         {
             GameObject cardUI = Instantiate(card.gameObject, deckUIContainer.transform);
             cardUI.GetComponent<CardController>().UpdateCardUI(); // Update UI for each card
-        }
-    }
-
-    // Method to add a card to the player's hand and position it
-    public void AddCardToHand(CardController newCard, int handPositionIndex)
-    {
-        if (handPositionIndex < cardPositions.Count)
-        {
-            // Instantiate a new instance of the card prefab
-            GameObject cardObject = Instantiate(newCard.gameObject, cardPositions[handPositionIndex].transform.position, Quaternion.identity);
-
-            // Set the instantiated card's parent to the hand UI container (optional)
-            cardObject.transform.SetParent(cardPositions[handPositionIndex].transform);
-
-            // Add the card to the hand and update its UI
-            deck.Add(newCard);
-            newCard.UpdateCardUI();
-
-            // Enable interaction on the card
-            EncounterController encounterController = FindObjectOfType<EncounterController>();
-            encounterController.MakeCardInteractable(newCard, this);
-        }
-        else
-        {
-            Debug.LogError("Hand position index is out of range.");
         }
     }
 
