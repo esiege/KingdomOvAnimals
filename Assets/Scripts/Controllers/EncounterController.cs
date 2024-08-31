@@ -59,10 +59,10 @@ public class EncounterController : MonoBehaviour
         for (int i = 0; i < 3; i++)
         {
             DrawCard(player1);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.1f);
 
             DrawCard(player2);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.1f);
         }
 
         StartTurn(); // Start the first turn after drawing initial cards

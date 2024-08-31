@@ -12,10 +12,13 @@ public class HoverHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     private bool isMovingToHoverPosition;
     private bool isMovingBack;
 
-    public void Initialize(HandController controller, CardController card, Vector3 originalPos, Vector3 hoverOffset, float speed)
+    public int CardIndex { get; private set; } // Index of the card in the hand
+
+    public void Initialize(HandController controller, CardController card, int index, Vector3 originalPos, Vector3 hoverOffset, float speed)
     {
         handController = controller;
         cardController = card;
+        CardIndex = index; // Store the index of the card
         parentTransform = transform.parent; // Use the parent transform for movement
         originalPosition = originalPos;
         targetHoverPosition = originalPosition + hoverOffset;
@@ -49,12 +52,11 @@ public class HoverHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        // Set this card as the focused card
-        handController.SetFocusedCard(this);
+        // Request focus from the HandController, passing the card index
+        handController.SetFocusedCard(this, CardIndex);
         StartHovering();
     }
 
-    // We must implement OnPointerExit even if we don't use it
     public void OnPointerExit(PointerEventData eventData)
     {
         // No action needed here as the focus logic is handled in SetFocusedCard

@@ -866,6 +866,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6954905213354747064}
   - component: {fileID: 5595670865049852882}
+  - component: {fileID: 9115997060235066434}
   m_Layer: 0
   m_Name: Card
   m_TagString: Untagged
@@ -904,6 +905,7 @@ MonoBehaviour:
   cardName: 
   manaCost: 0
   health: 0
+  owningPlayer: {fileID: 0}
   hasSummoningSickness: 0
   isFrozen: 0
   isBuried: 0
@@ -911,6 +913,32 @@ MonoBehaviour:
   cardNameText: {fileID: 1921485626100312740}
   manaCostText: {fileID: 6954905213415872053}
   healthText: {fileID: 6954905212005981105}
+--- !u!61 &9115997060235066434
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6954905213354747065}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 2, y: 3}
+  m_EdgeRadius: 0
 --- !u!1 &6954905213415872059
 GameObject:
   m_ObjectHideFlags: 0

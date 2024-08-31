@@ -35,7 +35,7 @@ public class HandController : MonoBehaviour
 
             // Add the HoverHandler to manage focus changes
             HoverHandler hoverHandler = cardObject.AddComponent<HoverHandler>();
-            hoverHandler.Initialize(this, card, cardPositions[positionIndex].transform.localPosition, hoverOffset, transitionSpeed);
+            hoverHandler.Initialize(this, card, positionIndex, cardPositions[positionIndex].transform.localPosition, hoverOffset, transitionSpeed);
         }
         else
         {
@@ -64,16 +64,20 @@ public class HandController : MonoBehaviour
         return hand;
     }
 
-    // Set a card as the focused card
-    public void SetFocusedCard(HoverHandler newFocusedCardHandler)
+    // Set a card as the focused card based on its index
+    public void SetFocusedCard(HoverHandler newFocusedCardHandler, int cardIndex)
     {
-        // Unfocus the previously focused card
-        if (focusedCardHandler != null && focusedCardHandler != newFocusedCardHandler)
+        // Only set the new card as focused if it has a higher index than the current focused card
+        if (focusedCardHandler == null || cardIndex > focusedCardHandler.CardIndex)
         {
-            focusedCardHandler.ReturnToOriginalPosition();
-        }
+            // Unfocus the previously focused card
+            if (focusedCardHandler != null && focusedCardHandler != newFocusedCardHandler)
+            {
+                focusedCardHandler.ReturnToOriginalPosition();
+            }
 
-        // Set the new focused card
-        focusedCardHandler = newFocusedCardHandler;
+            // Set the new focused card
+            focusedCardHandler = newFocusedCardHandler;
+        }
     }
 }
