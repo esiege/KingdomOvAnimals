@@ -8,6 +8,10 @@ public class EncounterController : MonoBehaviour
     public PlayerController player1;
     public PlayerController player2;
 
+    // Hand Controllers for both players
+    public HandController player1HandController;
+    public HandController player2HandController;
+
     // Turn Management
     private PlayerController currentPlayer;
     private bool isPlayer1Turn;
@@ -16,10 +20,6 @@ public class EncounterController : MonoBehaviour
     public List<CardController> player1Board;
     public List<CardController> player2Board;
 
-    // Hands (cards in hand)
-    public List<CardController> player1Hand;
-    public List<CardController> player2Hand;
-
     // Mana Tracking
     public int player1Mana;
     public int player2Mana;
@@ -27,10 +27,6 @@ public class EncounterController : MonoBehaviour
 
     // Maximum hand size
     public int maxHandSize = 5;
-
-    // Card Positions in Hand
-    public List<GameObject> player1CardPositions; // Positions where player 1's cards will be placed in hand
-    public List<GameObject> player2CardPositions; // Positions where player 2's cards will be placed in hand
 
     // Initialization method
     void Start()
@@ -49,11 +45,9 @@ public class EncounterController : MonoBehaviour
         isPlayer1Turn = true;
         currentPlayer = player1;
 
-        // Clear the boards and hands
+        // Clear the boards
         player1Board = new List<CardController>();
         player2Board = new List<CardController>();
-        player1Hand = new List<CardController>();
-        player2Hand = new List<CardController>();
 
         // Start with both players drawing 3 cards with a delay
         StartCoroutine(DrawInitialCards());
@@ -65,10 +59,10 @@ public class EncounterController : MonoBehaviour
         for (int i = 0; i < 3; i++)
         {
             DrawCard(player1);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.1f);
 
             DrawCard(player2);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.1f);
         }
 
         StartTurn(); // Start the first turn after drawing initial cards
@@ -95,10 +89,9 @@ public class EncounterController : MonoBehaviour
     // Method to draw a card for the passed-in player
     private void DrawCard(PlayerController player)
     {
-        List<CardController> currentHand = player == player1 ? player1Hand : player2Hand;
-        List<GameObject> currentCardPositions = player == player1 ? player1CardPositions : player2CardPositions;
+        HandController handController = player == player1 ? player1HandController : player2HandController;
 
-        if (currentHand.Count >= maxHandSize)
+        if (handController.GetHand().Count >= maxHandSize)
         {
             Debug.Log($"{player.name} cannot draw more cards. Hand is full.");
             return; // Hand is full, cannot draw more cards
@@ -113,11 +106,8 @@ public class EncounterController : MonoBehaviour
             // Set the owning player on the card
             drawnCard.owningPlayer = player;
 
-            // Add the card to the player's hand at the appropriate position
-            int handPositionIndex = currentHand.Count; // Use the next available position
-            AddCardToHand(drawnCard, handPositionIndex, currentCardPositions);
-
-            currentHand.Add(drawnCard); // Add the card to the hand list
+            // Add the card to the player's hand using the HandController
+            handController.AddCardToHand(drawnCard);
 
             Debug.Log($"{player.name} draws {drawnCard.cardName}.");
         }
@@ -127,34 +117,18 @@ public class EncounterController : MonoBehaviour
         }
     }
 
-    // Method to add a card to the player's hand and position it
-    private void AddCardToHand(CardController newCard, int handPositionIndex, List<GameObject> cardPositions)
-    {
-        if (handPositionIndex < cardPositions.Count)
-        {
-            // Instantiate a new instance of the card prefab
-            GameObject cardObject = Instantiate(newCard.gameObject, cardPositions[handPositionIndex].transform.position, Quaternion.identity);
-
-            // Set the instantiated card's parent to the hand UI container (optional)
-            cardObject.transform.SetParent(cardPositions[handPositionIndex].transform);
-        }
-        else
-        {
-            Debug.LogError("Hand position index is out of range.");
-        }
-    }
-
     // Method to play a card (called when a card is played)
     public void PlayCard(CardController card, PlayerController player)
     {
         List<CardController> playerBoard = player == player1 ? player1Board : player2Board;
-        List<CardController> playerHand = player == player1 ? player1Hand : player2Hand;
+        HandController handController = player == player1 ? player1HandController : player2HandController;
         int playerMana = player == player1 ? player1Mana : player2Mana;
 
         if (playerMana >= card.manaCost)
         {
             playerBoard.Add(card);
-            playerHand.Remove(card); // Remove the card from hand when played
+            handController.RemoveCardFromHand(card); // Remove the card from hand when played
+
             if (player == player1)
             {
                 player1Mana -= card.manaCost;
