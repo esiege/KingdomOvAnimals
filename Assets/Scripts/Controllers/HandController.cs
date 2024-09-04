@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,6 +13,9 @@ public class HandController : MonoBehaviour
     // Currently focused card
     private HoverHandler focusedCardHandler;
 
+    // Hovered cards list
+    private List<HoverHandler> hoveredCards;
+
     // Hover effect offset and transition speed
     public Vector3 hoverOffset = new Vector3(0, 1f, 0);
     public float transitionSpeed = 5f;
@@ -19,6 +23,13 @@ public class HandController : MonoBehaviour
     void Awake()
     {
         hand = new List<CardController>();
+        hoveredCards = new List<HoverHandler>();
+    }
+
+    void Start()
+    {
+        // Start the periodic focus check
+        StartCoroutine(CheckFocusedCard());
     }
 
     // Add a card to the hand at a specific position
@@ -64,20 +75,64 @@ public class HandController : MonoBehaviour
         return hand;
     }
 
-    // Set a card as the focused card based on its index
-    public void SetFocusedCard(HoverHandler newFocusedCardHandler, int cardIndex)
+    // Add a card to the hovered list
+    public void AddHoveredCard(HoverHandler hoverHandler)
     {
-        // Only set the new card as focused if it has a higher index than the current focused card
-        if (focusedCardHandler == null || cardIndex > focusedCardHandler.CardIndex)
+        if (!hoveredCards.Contains(hoverHandler))
         {
-            // Unfocus the previously focused card
-            if (focusedCardHandler != null && focusedCardHandler != newFocusedCardHandler)
+            hoveredCards.Add(hoverHandler);
+        }
+    }
+
+    // Remove a card from the hovered list
+    public void RemoveHoveredCard(HoverHandler hoverHandler)
+    {
+        Debug.Log("removed");
+        if (hoveredCards.Contains(hoverHandler))
+        {
+            hoveredCards.Remove(hoverHandler);
+        }
+    }
+
+    // Periodically check which card should be focused
+    private IEnumerator CheckFocusedCard()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(0.5f);
+
+            HoverHandler cardToFocus = null;
+            int highestIndex = -1;
+
+            //Debug.Log(hoveredCards.Count);
+
+            // Find the card with the highest index
+            foreach (var hoverHandler in hoveredCards)
             {
-                focusedCardHandler.ReturnToOriginalPosition();
+                if (hoverHandler.CardIndex > highestIndex)
+                {
+                    highestIndex = hoverHandler.CardIndex;
+                    cardToFocus = hoverHandler;
+                }
             }
 
-            // Set the new focused card
-            focusedCardHandler = newFocusedCardHandler;
+            // Update the focused card
+            if (cardToFocus != focusedCardHandler)
+            {
+                // Unfocus the previously focused card
+                if (focusedCardHandler != null)
+                {
+                    focusedCardHandler.ReturnToOriginalPosition();
+                }
+
+                // Set the new focused card
+                focusedCardHandler = cardToFocus;
+
+                if (focusedCardHandler != null)
+                {
+                    focusedCardHandler.StartHovering();
+                }
+            }
         }
     }
 }

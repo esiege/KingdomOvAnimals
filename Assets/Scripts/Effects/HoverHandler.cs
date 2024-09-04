@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class HoverHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
@@ -52,14 +53,13 @@ public class HoverHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        // Request focus from the HandController, passing the card index
-        handController.SetFocusedCard(this, CardIndex);
-        StartHovering();
+        Debug.Log("entered");
+        handController.AddHoveredCard(this);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        // No action needed here as the focus logic is handled in SetFocusedCard
+        handController.RemoveHoveredCard(this);
     }
 
     public void StartHovering()
