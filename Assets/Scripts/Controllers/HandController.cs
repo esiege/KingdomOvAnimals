@@ -16,6 +16,8 @@ public class HandController : MonoBehaviour
     // Hovered cards list
     private List<HoverHandler> hoveredCards;
 
+    public EncounterController encounterController;
+
     // Hover effect offset and transition speed
     private Vector3 hoverOffset = new Vector3(0, 1.8f, 0);
     public float transitionSpeed = 5f;
@@ -143,7 +145,6 @@ public class HandController : MonoBehaviour
         lineRenderer.SetPosition(0, activeCardPosition);
     }
 
-    // Handle mouse drag event to update the line
     private void OnMouseDrag()
     {
         if (activeCard != null)
@@ -153,12 +154,48 @@ public class HandController : MonoBehaviour
             mousePosition.z = 0; // Ensure the line stays in the 2D plane
             lineRenderer.SetPosition(1, mousePosition);
 
-            // Keep the card frozen at its original position
-            activeCard.transform.position = activeCardPosition;  // Lock the card in place
+            // Raycast to detect the object under the mouse
+            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+            if (hit.collider != null)
+            {
+                GameObject hitObject = hit.collider.gameObject;
+
+                Debug.Log(hitObject.name);
+
+                if (hitObject.name.StartsWith("FreeSlot"))
+                {
+                    // Keep the line as is when dragging over a free slot
+                    lineRenderer.startColor = Color.white;
+                    lineRenderer.endColor = Color.white;
+                }
+                else if (hitObject.GetComponent<CardController>() != null)
+                {
+                    CardController targetCard = hitObject.GetComponent<CardController>();
+
+                    if (targetCard.owningPlayer == encounterController.currentPlayer) // Friendly card
+                    {
+                        // Change the line to green if dragging over a friendly card
+                        lineRenderer.startColor = Color.green;
+                        lineRenderer.endColor = Color.green;
+                    }
+                    else // Enemy card
+                    {
+                        // Change the line to red if dragging over an enemy card
+                        lineRenderer.startColor = Color.red;
+                        lineRenderer.endColor = Color.red;
+                    }
+                }
+            }
+            else
+            {
+                // Reset the line color to white if no specific target is hit
+                lineRenderer.startColor = Color.white;
+                lineRenderer.endColor = Color.white;
+            }
         }
     }
 
-    // Handle mouse up event to deactivate the card and trigger action
+
     private void OnMouseUp()
     {
         if (activeCard != null)
@@ -169,22 +206,41 @@ public class HandController : MonoBehaviour
             {
                 GameObject hitObject = hit.collider.gameObject;
 
-                // Compare the object names
+                // Check if the hit object is a FreeSlot
                 if (hitObject.name.StartsWith("FreeSlot"))
                 {
                     Debug.Log("Card played on free slot!");
-                    hand.Remove(activeCard);  // Remove the card from the hand
-                    Destroy(activeCard.gameObject);  // Simulate playing the card by destroying it
+
+                    // Set the card's parent to the hitObject (free slot)
+                    activeCard.transform.SetParent(hitObject.transform);
+
+                    // Center the card on the free slot's position
+                    activeCard.transform.position = hitObject.transform.position;
+
+                    // Optionally reset local position if needed (e.g., if you have offsets)
+                    activeCard.transform.localPosition = Vector3.zero;
+
+                    // Rename the slot from FreeSlot-X to FriendlyUnit-X
+                    string newName = hitObject.name.Replace("FreeSlot", "FriendlyUnit");
+                    hitObject.name = newName;
+
+                    Debug.Log($"Slot renamed to {newName}");
                 }
-                else if (hitObject.name.StartsWith("Enemy"))
+                else if (hitObject.GetComponent<CardController>() != null) // If the hit object is another card
                 {
-                    Debug.Log("Card offense action triggered on enemy!");
-                    // Placeholder: Simulate offense action
-                }
-                else if (hitObject.name.StartsWith("Friendly"))
-                {
-                    Debug.Log("Card defense action triggered on friendly!");
-                    // Placeholder: Simulate defense action
+                    CardController targetCard = hitObject.GetComponent<CardController>();
+
+                    // Check if the current player is the owner of the target card
+                    if (targetCard.owningPlayer == encounterController.currentPlayer) // currentPlayer refers to the player whose turn it is
+                    {
+                        Debug.Log("Defense action triggered!");
+                        // Placeholder: Trigger defense action here
+                    }
+                    else
+                    {
+                        Debug.Log("Offense action triggered!");
+                        // Placeholder: Trigger offense action here
+                    }
                 }
             }
 
@@ -194,6 +250,9 @@ public class HandController : MonoBehaviour
             lineRenderer.enabled = false;
         }
     }
+
+
+
 
 
     // Get the list of cards in the hand

@@ -13,7 +13,7 @@ public class EncounterController : MonoBehaviour
     public HandController player2HandController;
 
     // Turn Management
-    private PlayerController currentPlayer;
+    public PlayerController currentPlayer;
     private bool isPlayer1Turn;
 
     // Board State
