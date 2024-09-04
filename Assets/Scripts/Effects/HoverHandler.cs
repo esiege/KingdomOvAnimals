@@ -1,8 +1,7 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
-public class HoverHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class HoverHandler : MonoBehaviour
 {
     private HandController handController;
     private CardController cardController;
@@ -12,6 +11,8 @@ public class HoverHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     private float transitionSpeed;
     private bool isMovingToHoverPosition;
     private bool isMovingBack;
+    private bool isHovered; // Flag to track if currently hovered
+    private Camera mainCamera; // Reference to the main camera
 
     public int CardIndex { get; private set; } // Index of the card in the hand
 
@@ -24,10 +25,13 @@ public class HoverHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         originalPosition = originalPos;
         targetHoverPosition = originalPosition + hoverOffset;
         transitionSpeed = speed;
+        mainCamera = Camera.main; // Cache the main camera for raycasting
     }
 
     void Update()
     {
+        HandleHoverDetection();
+
         // Move towards the hover position
         if (isMovingToHoverPosition)
         {
@@ -51,15 +55,40 @@ public class HoverHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         }
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
+    // Handle hover detection using Raycasting for 2D
+    void HandleHoverDetection()
     {
-        Debug.Log("entered");
-        handController.AddHoveredCard(this);
-    }
+        // Convert mouse position to world space
+        Vector2 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
 
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        handController.RemoveHoveredCard(this);
+        if (hit.collider != null)
+        {
+            if (hit.transform == transform)
+            {
+                if (!isHovered) // Mouse just entered
+                {
+                    isHovered = true;
+                    StartHovering();
+                    handController.AddHoveredCard(this);
+                    Debug.Log("Mouse entered the card");
+                }
+            }
+            else if (isHovered) // Mouse exited
+            {
+                isHovered = false;
+                ReturnToOriginalPosition();
+                handController.RemoveHoveredCard(this);
+                Debug.Log("Mouse exited the card");
+            }
+        }
+        else if (isHovered) // Mouse exited
+        {
+            isHovered = false;
+            ReturnToOriginalPosition();
+            handController.RemoveHoveredCard(this);
+            Debug.Log("Mouse exited the card");
+        }
     }
 
     public void StartHovering()

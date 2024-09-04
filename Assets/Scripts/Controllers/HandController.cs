@@ -17,7 +17,8 @@ public class HandController : MonoBehaviour
     private List<HoverHandler> hoveredCards;
 
     // Hover effect offset and transition speed
-    public Vector3 hoverOffset = new Vector3(0, 1f, 0);
+    private Vector3 hoverOffset = new Vector3(0, 2f, 0);
+    private Vector3 hoverInset = new Vector3(0, 0.2f, 0);
     public float transitionSpeed = 5f;
 
     void Awake()
@@ -87,7 +88,6 @@ public class HandController : MonoBehaviour
     // Remove a card from the hovered list
     public void RemoveHoveredCard(HoverHandler hoverHandler)
     {
-        Debug.Log("removed");
         if (hoveredCards.Contains(hoverHandler))
         {
             hoveredCards.Remove(hoverHandler);
