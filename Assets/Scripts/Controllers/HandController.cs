@@ -18,7 +18,7 @@ public class HandController : MonoBehaviour
 
     // Hover effect offset and transition speed
     private Vector3 hoverOffset = new Vector3(0, 1.8f, 0);
-    private float transitionSpeed = 25f;
+    public float transitionSpeed = 5f;
 
     // Z-axis increment for rendering cards above one another
     public float zIncrement = 0.1f;
@@ -158,17 +158,43 @@ public class HandController : MonoBehaviour
         }
     }
 
-    // Handle mouse up event to deactivate the card
+    // Handle mouse up event to deactivate the card and trigger action
     private void OnMouseUp()
     {
         if (activeCard != null)
         {
+            // Raycast to detect the release target
+            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+            if (hit.collider != null)
+            {
+                GameObject hitObject = hit.collider.gameObject;
+
+                // Compare the object names
+                if (hitObject.name.StartsWith("FreeSlot"))
+                {
+                    Debug.Log("Card played on free slot!");
+                    hand.Remove(activeCard);  // Remove the card from the hand
+                    Destroy(activeCard.gameObject);  // Simulate playing the card by destroying it
+                }
+                else if (hitObject.name.StartsWith("Enemy"))
+                {
+                    Debug.Log("Card offense action triggered on enemy!");
+                    // Placeholder: Simulate offense action
+                }
+                else if (hitObject.name.StartsWith("Friendly"))
+                {
+                    Debug.Log("Card defense action triggered on friendly!");
+                    // Placeholder: Simulate defense action
+                }
+            }
+
             // Deactivate the card and remove the line
             activeCard.GetComponent<HoverHandler>().enabled = true;  // Re-enable hover effects after drag
             activeCard = null;
             lineRenderer.enabled = false;
         }
     }
+
 
     // Get the list of cards in the hand
     public List<CardController> GetHand()

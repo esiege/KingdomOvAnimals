@@ -100,7 +100,6 @@ public class HoverHandler : MonoBehaviour
                     isHovered = true;
                     StartHovering();
                     handController.AddHoveredCard(this);
-                    Debug.Log("Mouse entered the card");
                 }
             }
             else if (isHovered) // Mouse exited
@@ -108,7 +107,6 @@ public class HoverHandler : MonoBehaviour
                 isHovered = false;
                 ReturnToOriginalPosition();
                 handController.RemoveHoveredCard(this);
-                Debug.Log("Mouse exited the card");
             }
         }
         else if (isHovered) // Mouse exited
@@ -116,7 +114,6 @@ public class HoverHandler : MonoBehaviour
             isHovered = false;
             ReturnToOriginalPosition();
             handController.RemoveHoveredCard(this);
-            Debug.Log("Mouse exited the card");
         }
     }
 
