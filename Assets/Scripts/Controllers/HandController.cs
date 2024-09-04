@@ -18,15 +18,27 @@ public class HandController : MonoBehaviour
 
     // Hover effect offset and transition speed
     private Vector3 hoverOffset = new Vector3(0, 1.8f, 0);
-    public float transitionSpeed = 5f;
+    private float transitionSpeed = 15f;
 
     // Z-axis increment for rendering cards above one another
     public float zIncrement = 0.1f;
+
+    // Variables for active card interaction
+    private CardController activeCard;
+    private Vector3 activeCardPosition;
+    private LineRenderer lineRenderer;
 
     void Awake()
     {
         hand = new List<CardController>();
         hoveredCards = new List<HoverHandler>();
+
+        // Initialize LineRenderer for drawing the line between card and mouse
+        lineRenderer = gameObject.AddComponent<LineRenderer>();
+        lineRenderer.positionCount = 2;
+        lineRenderer.startWidth = 0.05f;
+        lineRenderer.endWidth = 0.05f;
+        lineRenderer.enabled = false;
     }
 
     void Start()
@@ -35,21 +47,64 @@ public class HandController : MonoBehaviour
         StartCoroutine(CheckFocusedCard());
     }
 
+    void Update()
+    {
+        HandleMouseInput();
+    }
+
+    // Handle mouse input manually using Input.GetMouseButton
+    private void HandleMouseInput()
+    {
+        if (Input.GetMouseButtonDown(0)) // Left mouse button clicked
+        {
+            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+            if (hit.collider != null)
+            {
+                CardController clickedCard = hit.collider.GetComponent<CardController>();
+                if (clickedCard != null && hand.Contains(clickedCard))
+                {
+                    OnCardMouseDown(clickedCard);
+                }
+            }
+        }
+
+        if (Input.GetMouseButton(0)) // Mouse is held down
+        {
+            OnMouseDrag();
+        }
+
+        if (Input.GetMouseButtonUp(0)) // Mouse button released
+        {
+            OnMouseUp();
+        }
+    }
+
     // Add a card to the hand at a specific position
     public void AddCardToHand(CardController card)
     {
         if (hand.Count < cardPositions.Count)
         {
             int positionIndex = hand.Count;
-            hand.Add(card);
 
-            // Instantiate and position the card in the hand
+            // Instantiate the card and position it in the hand
             GameObject cardObject = Instantiate(card.gameObject, cardPositions[positionIndex].transform.position, Quaternion.identity);
             cardObject.transform.SetParent(cardPositions[positionIndex].transform);
 
+            // Retrieve the CardController of the instantiated object
+            CardController instantiatedCard = cardObject.GetComponent<CardController>();
+
+            // Add the instantiated card to the hand list
+            hand.Add(instantiatedCard);
+
+            // Add a BoxCollider2D if not present (for click detection)
+            if (cardObject.GetComponent<BoxCollider2D>() == null)
+            {
+                cardObject.AddComponent<BoxCollider2D>();
+            }
+
             // Add the HoverHandler to manage focus changes
             HoverHandler hoverHandler = cardObject.AddComponent<HoverHandler>();
-            hoverHandler.Initialize(this, card, positionIndex, cardPositions[positionIndex].transform.localPosition, hoverOffset, transitionSpeed);
+            hoverHandler.Initialize(this, instantiatedCard, positionIndex, cardPositions[positionIndex].transform.localPosition, hoverOffset, transitionSpeed);
 
             // Arrange the cards in hand to adjust Z positions
             ArrangeCardsInHand();
@@ -60,6 +115,39 @@ public class HandController : MonoBehaviour
         }
     }
 
+
+    // Handle mouse down event for activating a card
+    private void OnCardMouseDown(CardController card)
+    {
+        // Activate the card and freeze its position
+        activeCard = card;
+        activeCardPosition = card.transform.position;
+        lineRenderer.enabled = true;
+        lineRenderer.SetPosition(0, activeCardPosition);
+    }
+
+    // Handle mouse drag event to update the line
+    private void OnMouseDrag()
+    {
+        if (activeCard != null)
+        {
+            // Update the line to follow the mouse position
+            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            mousePosition.z = 0; // Ensure the line stays in the 2D plane
+            lineRenderer.SetPosition(1, mousePosition);
+        }
+    }
+
+    // Handle mouse up event to deactivate the card
+    private void OnMouseUp()
+    {
+        if (activeCard != null)
+        {
+            // Deactivate the card and remove the line
+            activeCard = null;
+            lineRenderer.enabled = false;
+        }
+    }
     // Remove a card from the hand
     public void RemoveCardFromHand(CardController card)
     {
