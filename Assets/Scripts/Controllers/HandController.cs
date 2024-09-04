@@ -17,9 +17,11 @@ public class HandController : MonoBehaviour
     private List<HoverHandler> hoveredCards;
 
     // Hover effect offset and transition speed
-    private Vector3 hoverOffset = new Vector3(0, 2f, 0);
-    private Vector3 hoverInset = new Vector3(0, 0.2f, 0);
+    private Vector3 hoverOffset = new Vector3(0, 1.8f, 0);
     public float transitionSpeed = 5f;
+
+    // Z-axis increment for rendering cards above one another
+    public float zIncrement = 0.1f;
 
     void Awake()
     {
@@ -48,6 +50,9 @@ public class HandController : MonoBehaviour
             // Add the HoverHandler to manage focus changes
             HoverHandler hoverHandler = cardObject.AddComponent<HoverHandler>();
             hoverHandler.Initialize(this, card, positionIndex, cardPositions[positionIndex].transform.localPosition, hoverOffset, transitionSpeed);
+
+            // Arrange the cards in hand to adjust Z positions
+            ArrangeCardsInHand();
         }
         else
         {
@@ -62,7 +67,9 @@ public class HandController : MonoBehaviour
         {
             hand.Remove(card);
             Destroy(card.gameObject);
-            // Optional: You can add logic to rearrange the remaining cards
+
+            // Arrange the remaining cards in hand to adjust Z positions
+            ArrangeCardsInHand();
         }
         else
         {
@@ -104,8 +111,6 @@ public class HandController : MonoBehaviour
             HoverHandler cardToFocus = null;
             int highestIndex = -1;
 
-            //Debug.Log(hoveredCards.Count);
-
             // Find the card with the highest index
             foreach (var hoverHandler in hoveredCards)
             {
@@ -133,6 +138,26 @@ public class HandController : MonoBehaviour
                     focusedCardHandler.StartHovering();
                 }
             }
+        }
+    }
+
+    // Arrange the Z position of cards in hand based on their index
+    private void ArrangeCardsInHand()
+    {
+        for (int i = 0; i < hand.Count; i++)
+        {
+            CardController card = hand[i];
+            GameObject cardObject = card.gameObject;
+
+            // Calculate the Z position for each card
+            float zPosition = zIncrement * i; // Increment Z value based on index
+
+            // Set the Z position of the card's parent transform (or card itself)
+            Vector3 cardPosition = cardObject.transform.localPosition;
+            cardPosition.z = zPosition; // Apply calculated Z position
+            cardObject.transform.localPosition = cardPosition;
+
+            Debug.Log($"Card {i} placed at Z position: {zPosition}");
         }
     }
 }
