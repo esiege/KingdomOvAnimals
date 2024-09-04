@@ -18,7 +18,7 @@ public class HandController : MonoBehaviour
 
     // Hover effect offset and transition speed
     private Vector3 hoverOffset = new Vector3(0, 1.8f, 0);
-    private float transitionSpeed = 15f;
+    private float transitionSpeed = 25f;
 
     // Z-axis increment for rendering cards above one another
     public float zIncrement = 0.1f;
@@ -115,39 +115,6 @@ public class HandController : MonoBehaviour
         }
     }
 
-
-    // Handle mouse down event for activating a card
-    private void OnCardMouseDown(CardController card)
-    {
-        // Activate the card and freeze its position
-        activeCard = card;
-        activeCardPosition = card.transform.position;
-        lineRenderer.enabled = true;
-        lineRenderer.SetPosition(0, activeCardPosition);
-    }
-
-    // Handle mouse drag event to update the line
-    private void OnMouseDrag()
-    {
-        if (activeCard != null)
-        {
-            // Update the line to follow the mouse position
-            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mousePosition.z = 0; // Ensure the line stays in the 2D plane
-            lineRenderer.SetPosition(1, mousePosition);
-        }
-    }
-
-    // Handle mouse up event to deactivate the card
-    private void OnMouseUp()
-    {
-        if (activeCard != null)
-        {
-            // Deactivate the card and remove the line
-            activeCard = null;
-            lineRenderer.enabled = false;
-        }
-    }
     // Remove a card from the hand
     public void RemoveCardFromHand(CardController card)
     {
@@ -162,6 +129,44 @@ public class HandController : MonoBehaviour
         else
         {
             Debug.LogWarning("Attempted to remove a card that is not in the hand.");
+        }
+    }
+
+    // Handle mouse down event for activating a card
+    private void OnCardMouseDown(CardController card)
+    {
+        // Activate the card and freeze its position at the current point
+        activeCard = card;
+        activeCardPosition = card.transform.position;  // Freeze card in place
+        card.GetComponent<HoverHandler>().enabled = false;  // Disable hover effect when active
+        lineRenderer.enabled = true;
+        lineRenderer.SetPosition(0, activeCardPosition);
+    }
+
+    // Handle mouse drag event to update the line
+    private void OnMouseDrag()
+    {
+        if (activeCard != null)
+        {
+            // Update the line to follow the mouse position
+            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            mousePosition.z = 0; // Ensure the line stays in the 2D plane
+            lineRenderer.SetPosition(1, mousePosition);
+
+            // Keep the card frozen at its original position
+            activeCard.transform.position = activeCardPosition;  // Lock the card in place
+        }
+    }
+
+    // Handle mouse up event to deactivate the card
+    private void OnMouseUp()
+    {
+        if (activeCard != null)
+        {
+            // Deactivate the card and remove the line
+            activeCard.GetComponent<HoverHandler>().enabled = true;  // Re-enable hover effects after drag
+            activeCard = null;
+            lineRenderer.enabled = false;
         }
     }
 
