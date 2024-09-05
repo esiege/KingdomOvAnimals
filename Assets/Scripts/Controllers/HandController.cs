@@ -29,6 +29,7 @@ public class HandController : MonoBehaviour
     private CardController activeCard;
     private Vector3 activeCardPosition;
     private LineRenderer lineRenderer;
+    public Material lineMaterial;
 
     void Awake()
     {
@@ -41,6 +42,7 @@ public class HandController : MonoBehaviour
         lineRenderer.startWidth = 0.05f;
         lineRenderer.endWidth = 0.05f;
         lineRenderer.enabled = false;
+        lineRenderer.material = lineMaterial;
     }
 
     void Start()
@@ -160,13 +162,11 @@ public class HandController : MonoBehaviour
             {
                 GameObject hitObject = hit.collider.gameObject;
 
-                Debug.Log(hitObject.name);
-
                 if (hitObject.name.StartsWith("FreeSlot"))
                 {
-                    // Keep the line as is when dragging over a free slot
-                    lineRenderer.startColor = Color.white;
-                    lineRenderer.endColor = Color.white;
+                    // Keep the line white when dragging over a free slot
+                    lineRenderer.startColor = Color.yellow;
+                    lineRenderer.endColor = Color.yellow;
                 }
                 else if (hitObject.GetComponent<CardController>() != null)
                 {
@@ -188,12 +188,15 @@ public class HandController : MonoBehaviour
             }
             else
             {
-                // Reset the line color to white if no specific target is hit
-                lineRenderer.startColor = Color.white;
-                lineRenderer.endColor = Color.white;
+                // No hit object - set the line color to dark gray
+                Color darkGray = new Color(0.3f, 0.3f, 0.3f);  // Dark gray color
+                lineRenderer.startColor = darkGray;
+                lineRenderer.endColor = darkGray;
             }
         }
     }
+
+
 
 
     private void OnMouseUp()
