@@ -12,6 +12,11 @@ public class CardController : MonoBehaviour
     // Owner reference
     public PlayerController owningPlayer;
 
+    // Card status tracking
+    public bool isInHand = true; 
+    public bool isActive = false;
+    public bool isInPlay = false;
+
     // Status Effects
     public bool hasSummoningSickness;
     public bool isFrozen;

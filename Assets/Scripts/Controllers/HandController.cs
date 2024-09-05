@@ -64,10 +64,17 @@ public class HandController : MonoBehaviour
             RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
             if (hit.collider != null)
             {
+                // Get the CardController component from the clicked card
                 CardController clickedCard = hit.collider.GetComponent<CardController>();
+
+                // Check if the clicked card is in the player's hand before making it active
                 if (clickedCard != null && hand.Contains(clickedCard))
                 {
                     OnCardMouseDown(clickedCard);
+                }
+                else
+                {
+                    Debug.Log("Card cannot be made active because it is not in the player's hand.");
                 }
             }
         }
@@ -137,6 +144,7 @@ public class HandController : MonoBehaviour
     }
 
     // Handle mouse down event for activating a card
+
     private void OnCardMouseDown(CardController card)
     {
         // Activate the card and freeze its position at the current point
@@ -145,114 +153,170 @@ public class HandController : MonoBehaviour
         card.GetComponent<HoverHandler>().enabled = false;  // Disable hover effect when active
         lineRenderer.enabled = true;
         lineRenderer.SetPosition(0, activeCardPosition);
+
+        // Update the card's status
+        activeCard.isActive = true;  // The card is now in an active state
     }
+
 
     private void OnMouseDrag()
     {
-        if (activeCard != null)
+        if (activeCard == null) return;
+
+        // Update the line to follow the mouse position
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePosition.z = 0;
+        lineRenderer.SetPosition(1, mousePosition);
+
+        // Raycast to detect the object under the mouse
+        RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+        if (hit.collider == null)
         {
-            // Update the line to follow the mouse position
-            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mousePosition.z = 0; // Ensure the line stays in the 2D plane
-            lineRenderer.SetPosition(1, mousePosition);
+            SetLineColor(activeCard.isInPlay ? new Color(0.3f, 0.3f, 0.3f) : Color.white); // Dark gray if in play, white otherwise
+            return;
+        }
 
-            // Raycast to detect the object under the mouse
-            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-            if (hit.collider != null)
+        GameObject hitObject = hit.collider.gameObject;
+        if (hitObject.name.StartsWith("FreeSlot"))
+        {
+            show_addCardToEncounter(activeCard);  // Dragging over a free slot
+        }
+        else if (hitObject.TryGetComponent(out CardController targetCard))
+        {
+            if (targetCard.owningPlayer == encounterController.currentPlayer)
             {
-                GameObject hitObject = hit.collider.gameObject;
-
-                if (hitObject.name.StartsWith("FreeSlot"))
-                {
-                    // Keep the line white when dragging over a free slot
-                    lineRenderer.startColor = Color.yellow;
-                    lineRenderer.endColor = Color.yellow;
-                }
-                else if (hitObject.GetComponent<CardController>() != null)
-                {
-                    CardController targetCard = hitObject.GetComponent<CardController>();
-
-                    if (targetCard.owningPlayer == encounterController.currentPlayer) // Friendly card
-                    {
-                        // Change the line to green if dragging over a friendly card
-                        lineRenderer.startColor = Color.green;
-                        lineRenderer.endColor = Color.green;
-                    }
-                    else // Enemy card
-                    {
-                        // Change the line to red if dragging over an enemy card
-                        lineRenderer.startColor = Color.red;
-                        lineRenderer.endColor = Color.red;
-                    }
-                }
+                show_useCardAbilityDefensive(targetCard);  // Dragging over a friendly (owned) card
             }
             else
             {
-                // No hit object - set the line color to dark gray
-                Color darkGray = new Color(0.3f, 0.3f, 0.3f);  // Dark gray color
-                lineRenderer.startColor = darkGray;
-                lineRenderer.endColor = darkGray;
+                show_useCardAbilityOffensive(targetCard);  // Dragging over an enemy card
             }
         }
     }
+
+    // Called when the card is dragged over a free slot
+    private void show_addCardToEncounter(CardController card)
+    {
+        SetLineColor(activeCard.isInPlay ? new Color(0.3f, 0.3f, 0.3f) : Color.yellow);  // Dark gray if in play, yellow otherwise
+        Debug.Log($"Card {card.cardName} is being added to the encounter.");
+        // Implement your logic here for adding the card to the encounter
+    }
+    private void addCardToEncounter(CardController card, GameObject hitObject)
+    {
+        if (activeCard.isInPlay)
+            return;
+
+        Debug.Log("Card played on free slot!");
+
+        // Set the card's parent to the hitObject (free slot)
+        card.transform.SetParent(hitObject.transform);
+
+        // Center the card on the free slot's position
+        card.transform.position = hitObject.transform.position;
+
+        // Optionally reset local position if needed (e.g., if you have offsets)
+        card.transform.localPosition = Vector3.zero;
+
+        // Rename the slot from FreeSlot-X to FriendlyUnit-X
+        string newName = hitObject.name.Replace("FreeSlot", "FriendlyUnit");
+        hitObject.name = newName;
+
+        Debug.Log($"Slot renamed to {newName}");
+
+        // Update card's status: it's now in play
+        card.isInPlay = true;
+        card.isActive = false;
+        card.isInHand = false;
+    }
+
+
+
+
+
+    // Called when the card is dragged over a friendly (owned) card
+    private void show_useCardAbilityDefensive(CardController targetCard)
+    {
+        SetLineColor(activeCard.isInPlay ? Color.cyan : Color.green);  // Teal if in play, green otherwise
+        Debug.Log($"Using defensive ability of {activeCard.cardName} on {targetCard.cardName}.");
+        // Implement the logic here for using the defensive ability
+    }
+    private void useCardAbilityDefensive(CardController targetCard)
+    {
+        Debug.Log("Defense action triggered!");
+
+        // Placeholder for actual defensive action logic
+        // Example: targetCard.BoostDefense(); (if you have such a method)
+    }
+
+
+    // Called when the card is dragged over an enemy card
+    private void show_useCardAbilityOffensive(CardController targetCard)
+    {
+        SetLineColor(activeCard.isInPlay ? new Color(1.0f, 0.5f, 0.0f) : Color.red);  // Orange if in play, red otherwise
+        Debug.Log($"Using offensive ability of {activeCard.cardName} on {targetCard.cardName}.");
+        // Implement the logic here for using the offensive ability
+    }
+    private void useCardAbilityOffensive(CardController targetCard)
+    {
+        Debug.Log("Offense action triggered!");
+
+        // Placeholder for actual offensive action logic
+        // Example: activeCard.Attack(targetCard); (if you have such a method)
+    }
+
+
+    // Helper method to set both start and end color of the line renderer
+    private void SetLineColor(Color color)
+    {
+        lineRenderer.startColor = color;
+        lineRenderer.endColor = color;
+    }
+
 
 
 
 
     private void OnMouseUp()
     {
-        if (activeCard != null)
+        if (activeCard == null) return;
+
+        // Raycast to detect the release target
+        RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+        if (hit.collider != null)
         {
-            // Raycast to detect the release target
-            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-            if (hit.collider != null)
+            GameObject hitObject = hit.collider.gameObject;
+
+            // Check if the hit object is a FreeSlot
+            if (hitObject.name.StartsWith("FreeSlot"))
             {
-                GameObject hitObject = hit.collider.gameObject;
-
-                // Check if the hit object is a FreeSlot
-                if (hitObject.name.StartsWith("FreeSlot"))
-                {
-                    Debug.Log("Card played on free slot!");
-
-                    // Set the card's parent to the hitObject (free slot)
-                    activeCard.transform.SetParent(hitObject.transform);
-
-                    // Center the card on the free slot's position
-                    activeCard.transform.position = hitObject.transform.position;
-
-                    // Optionally reset local position if needed (e.g., if you have offsets)
-                    activeCard.transform.localPosition = Vector3.zero;
-
-                    // Rename the slot from FreeSlot-X to FriendlyUnit-X
-                    string newName = hitObject.name.Replace("FreeSlot", "FriendlyUnit");
-                    hitObject.name = newName;
-
-                    Debug.Log($"Slot renamed to {newName}");
-                }
-                else if (hitObject.GetComponent<CardController>() != null) // If the hit object is another card
-                {
-                    CardController targetCard = hitObject.GetComponent<CardController>();
-
-                    // Check if the current player is the owner of the target card
-                    if (targetCard.owningPlayer == encounterController.currentPlayer) // currentPlayer refers to the player whose turn it is
-                    {
-                        Debug.Log("Defense action triggered!");
-                        // Placeholder: Trigger defense action here
-                    }
-                    else
-                    {
-                        Debug.Log("Offense action triggered!");
-                        // Placeholder: Trigger offense action here
-                    }
-                }
+                addCardToEncounter(activeCard, hitObject);
             }
+            else if (hitObject.GetComponent<CardController>() != null) // If the hit object is another card
+            {
+                CardController targetCard = hitObject.GetComponent<CardController>();
 
-            // Deactivate the card and remove the line
-            activeCard.GetComponent<HoverHandler>().enabled = true;  // Re-enable hover effects after drag
-            activeCard = null;
-            lineRenderer.enabled = false;
+                if (targetCard.owningPlayer == encounterController.currentPlayer) // Friendly card
+                {
+                    useCardAbilityDefensive(targetCard);
+                }
+                else // Enemy card
+                {
+                    useCardAbilityOffensive(targetCard);
+                }
+
+                // Update card's status: it's still in hand, but not active anymore
+                activeCard.isInPlay = false;
+                activeCard.isActive = false;
+                activeCard.isInHand = true;
+            }
         }
+
+        // Deactivate the card and remove the line
+        activeCard.GetComponent<HoverHandler>().enabled = true;
+        activeCard = null;
+        lineRenderer.enabled = false;
     }
+
 
 
 
