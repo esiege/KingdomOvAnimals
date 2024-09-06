@@ -53,8 +53,6 @@ public class HandController : MonoBehaviour
             var clickedCard = hit.collider.GetComponent<CardController>();
             if (clickedCard != null && hand.Contains(clickedCard))
                 OnCardMouseDown(clickedCard);
-            else
-                Debug.Log("Card cannot be made active because it is not in the player's hand.");
         }
     }
 

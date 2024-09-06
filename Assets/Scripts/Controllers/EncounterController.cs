@@ -86,6 +86,15 @@ public class EncounterController : MonoBehaviour
         DrawCard(currentPlayer);
     }
 
+    public void endTurn()
+    {
+        // Toggle the current player's turn
+        isPlayer1Turn = !isPlayer1Turn;
+
+        Debug.Log("Turn ended. It is now " + (isPlayer1Turn ? "Player 1's" : "Player 2's") + " turn.");
+        // You can add additional logic here to trigger start of the next turn
+    }
+
     // Method to draw a card for the passed-in player
     private void DrawCard(PlayerController player)
     {
