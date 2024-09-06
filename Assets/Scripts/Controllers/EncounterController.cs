@@ -20,10 +20,7 @@ public class EncounterController : MonoBehaviour
     public List<CardController> player1Board;
     public List<CardController> player2Board;
 
-    // Mana Tracking
-    public int player1Mana;
-    public int player2Mana;
-    public int manaIncrementPerTurn = 1;
+    public int turnNumber = 1;
 
     // Maximum hand size
     public int maxHandSize = 5;
@@ -37,9 +34,6 @@ public class EncounterController : MonoBehaviour
     // Method to initialize the encounter
     public void InitializeEncounter()
     {
-        // Set starting mana
-        player1Mana = 1;
-        player2Mana = 1;
 
         // Initialize turn order
         isPlayer1Turn = true;
@@ -74,28 +68,33 @@ public class EncounterController : MonoBehaviour
         if (isPlayer1Turn)
         {
             currentPlayer = player1;
-            player1Mana += manaIncrementPerTurn;
+
+            player1.maxMana += 1;
+            player1.currentMana = player1.maxMana;
         }
         else
         {
             currentPlayer = player2;
-            player2Mana += manaIncrementPerTurn;
+
+            player2.maxMana += 1;
+            player2.currentMana = player2.maxMana;
         }
 
-        // Allow the current player to draw a card and play
         DrawCard(currentPlayer);
+
+
     }
 
     public void endTurn()
     {
-        // Toggle the current player's turn
         isPlayer1Turn = !isPlayer1Turn;
+        turnNumber++;
 
-        Debug.Log("Turn ended. It is now " + (isPlayer1Turn ? "Player 1's" : "Player 2's") + " turn.");
-        // You can add additional logic here to trigger start of the next turn
+        Debug.Log("Turn ended. It is now " + (isPlayer1Turn ? "Player 1's" : "Player 2's") + " turn: " + turnNumber);
+
+        StartTurn();
     }
 
-    // Method to draw a card for the passed-in player
     private void DrawCard(PlayerController player)
     {
         HandController handController = player == player1 ? player1HandController : player2HandController;
@@ -131,21 +130,13 @@ public class EncounterController : MonoBehaviour
     {
         List<CardController> playerBoard = player == player1 ? player1Board : player2Board;
         HandController handController = player == player1 ? player1HandController : player2HandController;
-        int playerMana = player == player1 ? player1Mana : player2Mana;
 
-        if (playerMana >= card.manaCost)
+        if (currentPlayer.currentMana >= card.manaCost)
         {
             playerBoard.Add(card);
             handController.RemoveCardFromHand(card); // Remove the card from hand when played
 
-            if (player == player1)
-            {
-                player1Mana -= card.manaCost;
-            }
-            else
-            {
-                player2Mana -= card.manaCost;
-            }
+            currentPlayer.currentMana -= card.manaCost;
 
             // Additional logic for placing the card on the board, applying effects, etc.
             card.SetSummoningSickness(true); // Card cannot act until the next turn
