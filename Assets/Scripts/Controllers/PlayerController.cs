@@ -5,10 +5,16 @@ using System.Collections.Generic;
 public class PlayerController : MonoBehaviour
 {
     // Player Properties
+    public int currentHealth;
     public int maxHealth;
+
+    public int currentMana;
+    public int maxMana;
+
     public int currentLives;
-    public int maxLives = 3; // Default maximum lives
-    public List<CardController> deck; // Player's deck of cards
+    public int maxLives = 3; 
+
+    public List<CardController> deck; 
 
     // Overworld Progression
     public int currentStage;

@@ -46,6 +46,11 @@ public class CardController : MonoBehaviour
         offensiveAbilities = new List<IAbility>();
         defensiveAbilities = new List<IAbility>();
 
+
+        if (owningPlayer.name == "Opponent")
+        {
+        }
+
         UpdateCardUI(); // Update the UI after initialization
     }
 

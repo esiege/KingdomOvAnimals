@@ -17,6 +17,9 @@ public class HandController : MonoBehaviour
     public float zIncrement = 0.1f;
     public Material lineMaterial;
 
+    // Owner reference
+    public PlayerController owningPlayer;
+
     private Vector3 hoverOffset = new Vector3(0, 1.8f, 0);
 
     void Awake()
@@ -116,7 +119,12 @@ public class HandController : MonoBehaviour
         }
 
         GameObject hitObject = hit.collider.gameObject;
-        if (hitObject.name.StartsWith("FreeSlot"))
+
+        string slotName = "PlayerSlot";
+        if (owningPlayer.name == "Opponent")
+            slotName = "OpponentSlot";
+
+        if (hitObject.name.StartsWith(slotName))
             show_addCardToEncounter(activeCard);
         else if (hitObject.TryGetComponent(out CardController targetCard))
         {
@@ -140,9 +148,6 @@ public class HandController : MonoBehaviour
         card.transform.SetParent(hitObject.transform);
         card.transform.position = hitObject.transform.position;
         card.transform.localPosition = Vector3.zero;
-
-        hitObject.name = hitObject.name.Replace("FreeSlot", "FriendlyUnit");
-        Debug.Log($"Slot renamed to {hitObject.name}");
 
         card.isInPlay = true;
         card.isActive = false;
@@ -184,7 +189,12 @@ public class HandController : MonoBehaviour
         if (hit.collider != null)
         {
             GameObject hitObject = hit.collider.gameObject;
-            if (hitObject.name.StartsWith("FreeSlot"))
+
+            string slotName = "PlayerSlot";
+            if (owningPlayer.name == "Opponent")
+                slotName = "OpponentSlot";
+
+                if (hitObject.name.StartsWith(slotName))
                 addCardToEncounter(activeCard, hitObject);
             else if (hitObject.TryGetComponent(out CardController targetCard))
             {

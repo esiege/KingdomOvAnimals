@@ -30,9 +30,13 @@ public class HoverHandler : MonoBehaviour
         CardIndex = index; // Store the index of the card
         parentTransform = transform.parent; // Use the parent transform for movement
         originalPosition = originalPos;
-        targetHoverPosition = originalPosition + hoverOffset;
         transitionSpeed = speed;
         mainCamera = Camera.main; // Cache the main camera for raycasting
+
+        if (card.owningPlayer.name == "Opponent")
+            hoverOffset = new Vector3(hoverOffset.x, hoverOffset.y * -1, hoverOffset.z);
+
+        targetHoverPosition = originalPosition + hoverOffset;
 
         // Store the original Z position of the card
         originalZPosition = parentTransform.localPosition.z;
@@ -87,6 +91,12 @@ public class HoverHandler : MonoBehaviour
     // Handle hover detection using Raycasting for 2D
     void HandleHoverDetection()
     {
+        Vector3 screenPos = Input.mousePosition;
+        if (screenPos.x < 0 || screenPos.y < 0 || screenPos.x > Screen.width || screenPos.y > Screen.height)
+        {
+            return;
+        }
+
         // Convert mouse position to world space
         Vector2 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
