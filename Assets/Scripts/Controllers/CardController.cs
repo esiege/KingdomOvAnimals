@@ -53,37 +53,19 @@ public class CardController : MonoBehaviour
         if (healthText != null) healthText.text = health.ToString();
     }
 
-    // Property to set and update manaCost
-    public int ManaCost
-    {
-        get => manaCost;
-        set
-        {
-            manaCost = value;
-            if (manaCostText != null) manaCostText.text = manaCost.ToString();
-        }
-    }
-
-    // Property to set and update health
-    public int Health
-    {
-        get => health;
-        set
-        {
-            health = value;
-            if (healthText != null) healthText.text = health.ToString();
-        }
-    }
-
     // Method to manage health
     public void TakeDamage(int damage)
     {
         Debug.Log($"{cardName} takes {damage} damage. Current health: {health} -> {health - damage}");
 
-        Health -= damage; // Use property to automatically update UI
+        health -= damage;
         if (health <= 0)
         {
             DestroyCard();
+        }
+        else
+        {
+            UpdateCardUI();
         }
     }
 
@@ -91,7 +73,8 @@ public class CardController : MonoBehaviour
     {
         Debug.Log($"{cardName} heals {amount}. Current health: {health} -> {health + amount}");
 
-        Health += amount; // Use property to automatically update UI
+        health += amount;
+        UpdateCardUI();
     }
 
     // Methods to handle status effects
@@ -102,12 +85,11 @@ public class CardController : MonoBehaviour
     public void UnburyCard() => isBuried = false;
     public void SetDefending(bool status) => isDefending = status;
 
-    // Methods to activate abilities
+    // Methods to activate abilities on a CardController target
     public void ActivateOffensiveAbility(CardController target)
     {
         if (offensiveAbility != null)
         {
-            // Access the AbilityController from the child GameObject
             AbilityController abilityController = offensiveAbility.GetComponentInChildren<AbilityController>();
             if (abilityController != null)
             {
@@ -128,7 +110,47 @@ public class CardController : MonoBehaviour
     {
         if (supportAbility != null)
         {
-            // Access the AbilityController from the child GameObject
+            AbilityController abilityController = supportAbility.GetComponentInChildren<AbilityController>();
+            if (abilityController != null)
+            {
+                abilityController.Activate(target);
+            }
+            else
+            {
+                Debug.LogError("Support ability child does not have an AbilityController component.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Support ability is not set.");
+        }
+    }
+
+    // Methods to activate abilities on a PlayerController target
+    public void ActivateOffensiveAbility(PlayerController target)
+    {
+        if (offensiveAbility != null)
+        {
+            AbilityController abilityController = offensiveAbility.GetComponentInChildren<AbilityController>();
+            if (abilityController != null)
+            {
+                abilityController.Activate(target);
+            }
+            else
+            {
+                Debug.LogError("Offensive ability child does not have an AbilityController component.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Offensive ability is not set.");
+        }
+    }
+
+    public void ActivateDefensiveAbility(PlayerController target)
+    {
+        if (supportAbility != null)
+        {
             AbilityController abilityController = supportAbility.GetComponentInChildren<AbilityController>();
             if (abilityController != null)
             {

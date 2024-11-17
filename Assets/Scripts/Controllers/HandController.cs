@@ -202,6 +202,7 @@ public class HandController : MonoBehaviour
         card.isInHand = false;
     }
 
+    // Defensive: CardController target
     private void show_useCardAbilityDefensive(CardController targetCard)
     {
         if (targetCard == activeCard || !targetCard.isInPlay) return;
@@ -209,14 +210,30 @@ public class HandController : MonoBehaviour
         SetLineColor(activeCard.isInPlay ? Color.cyan : Color.green);
     }
 
+    // Defensive: PlayerController target
+    private void show_useCardAbilityDefensive(PlayerController targetPlayer)
+    {
+        SetLineColor(Color.green);
+        Debug.Log("Defensive ability targeting player.");
+    }
+
+    // Activate Defensive Ability: CardController target
     private void useCardAbilityDefensive(CardController targetCard)
     {
         if (targetCard == activeCard || !targetCard.isInPlay) return;
 
         activeCard.ActivateDefensiveAbility(targetCard);
-        Debug.Log("Defense action triggered!");
+        Debug.Log("Defense action triggered on card!");
     }
 
+    // Activate Defensive Ability: PlayerController target
+    private void useCardAbilityDefensive(PlayerController targetPlayer)
+    {
+        activeCard.ActivateDefensiveAbility(targetPlayer);
+        Debug.Log("Defense action triggered on player!");
+    }
+
+    // Offensive: CardController target
     private void show_useCardAbilityOffensive(CardController targetCard)
     {
         if (targetCard == activeCard || !targetCard.isInPlay) return;
@@ -224,12 +241,29 @@ public class HandController : MonoBehaviour
         SetLineColor(activeCard.isInPlay ? new Color(1.0f, 0.5f, 0.0f) : Color.red);
     }
 
+    // Offensive: PlayerController target
+    private void show_useCardAbilityOffensive(PlayerController targetPlayer)
+    {
+        SetLineColor(Color.red);
+        Debug.Log("Offensive ability targeting player.");
+    }
+
+    // Activate Offensive Ability: CardController target
     private void useCardAbilityOffensive(CardController targetCard)
     {
         if (targetCard == activeCard || !targetCard.isInPlay) return;
+
         activeCard.ActivateOffensiveAbility(targetCard);
-        Debug.Log("Offense action triggered!");
+        Debug.Log("Offense action triggered on card!");
     }
+
+    // Activate Offensive Ability: PlayerController target
+    private void useCardAbilityOffensive(PlayerController targetPlayer)
+    {
+        activeCard.ActivateOffensiveAbility(targetPlayer);
+        Debug.Log("Offense action triggered on player!");
+    }
+
 
     private void SetLineColor(Color color)
     {
@@ -249,14 +283,25 @@ public class HandController : MonoBehaviour
             if (owningPlayer.name == "Opponent")
                 slotName = "OpponentSlot";
 
-                if (hitObject.name.StartsWith(slotName))
+            // drag card to empty slot
+            if (hitObject.name.StartsWith(slotName))
                 addCardToEncounter(activeCard, hitObject);
+
+            // drag card on to another card
             else if (hitObject.TryGetComponent(out CardController targetCard))
             {
                 if (targetCard.owningPlayer == this.owningPlayer)
                     useCardAbilityDefensive(targetCard);
                 else
                     useCardAbilityOffensive(targetCard);
+            }
+            // drag card on to a player
+            else if (hitObject.TryGetComponent(out PlayerController targetPlayer))
+            {
+                if (targetPlayer == owningPlayer)
+                    useCardAbilityDefensive(targetPlayer);
+                else
+                    useCardAbilityOffensive(targetPlayer);
             }
         }
 

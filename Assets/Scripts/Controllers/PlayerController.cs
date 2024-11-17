@@ -12,23 +12,29 @@ public class PlayerController : MonoBehaviour
     public int maxMana;
 
     public int currentLives;
-    public int maxLives = 3; 
+    public int maxLives = 3;
 
-    public List<CardController> deck; 
+    public List<CardController> deck;
 
     // Overworld Progression
     public int currentStage;
 
     // UI Elements
+    public TextMeshProUGUI currentHealthText;
     public TextMeshProUGUI maxHealthText;
+    public TextMeshProUGUI currentManaText;
+    public TextMeshProUGUI maxManaText;
     public TextMeshProUGUI currentLivesText;
     public TextMeshProUGUI currentStageText;
     public GameObject deckUIContainer; // UI container for displaying the player's deck
 
     // Initialization method
-    public void InitializePlayer(int health)
+    public void InitializePlayer(int health, int mana)
     {
         maxHealth = health;
+        currentHealth = health;
+        maxMana = mana;
+        currentMana = mana;
         currentLives = maxLives;
         currentStage = 1; // Start at the first stage
         deck = new List<CardController>();
@@ -39,9 +45,12 @@ public class PlayerController : MonoBehaviour
     // Method to update the player's UI elements
     public void UpdatePlayerUI()
     {
-        maxHealthText.text = $"Max Health: {maxHealth}";
-        currentLivesText.text = $"Lives: {currentLives}";
-        currentStageText.text = $"Stage: {currentStage}";
+        if (currentHealthText != null) currentHealthText.text = $"{currentHealth}";
+        if (maxHealthText != null) maxHealthText.text = $"Max Health: {maxHealth}";
+        if (currentManaText != null) currentManaText.text = $"Mana: {currentMana}/{maxMana}";
+        if (maxManaText != null) maxManaText.text = $"Max Mana: {maxMana}";
+        if (currentLivesText != null) currentLivesText.text = $"Lives: {currentLives}/{maxLives}";
+        if (currentStageText != null) currentStageText.text = $"Stage: {currentStage}";
 
         UpdateDeckUI();
     }
@@ -49,16 +58,62 @@ public class PlayerController : MonoBehaviour
     // Method to update the deck UI
     private void UpdateDeckUI()
     {
-        foreach (Transform child in deckUIContainer.transform)
+    }
+
+    // Method to manage health
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        if (currentHealth <= 0)
         {
-            Destroy(child.gameObject); // Clear existing UI
+            currentHealth = 0;
+            LoseLife();
         }
 
-        foreach (CardController card in deck)
+        UpdatePlayerUI();
+    }
+
+    public void Heal(int amount)
+    {
+        currentHealth += amount;
+        if (currentHealth > maxHealth)
         {
-            GameObject cardUI = Instantiate(card.gameObject, deckUIContainer.transform);
-            cardUI.GetComponent<CardController>().UpdateCardUI(); // Update UI for each card
+            currentHealth = maxHealth;
         }
+
+        UpdatePlayerUI();
+    }
+
+    // Method to manage mana
+    public void SpendMana(int amount)
+    {
+        if (currentMana >= amount)
+        {
+            currentMana -= amount;
+        }
+        else
+        {
+            Debug.LogError("Not enough mana!");
+        }
+
+        UpdatePlayerUI();
+    }
+
+    public void RegainMana(int amount)
+    {
+        currentMana += amount;
+        if (currentMana > maxMana)
+        {
+            currentMana = maxMana;
+        }
+
+        UpdatePlayerUI();
+    }
+
+    public void ResetMana()
+    {
+        currentMana = maxMana;
+        UpdatePlayerUI();
     }
 
     // Method to manage player lives
@@ -71,6 +126,11 @@ public class PlayerController : MonoBehaviour
         {
             // Handle player defeat (e.g., end the game, restart, etc.)
             HandlePlayerDefeat();
+        }
+        else
+        {
+            Debug.Log("Player lost a life! Reviving...");
+            currentHealth = maxHealth; // Reset health for the next life
         }
     }
 
@@ -105,10 +165,33 @@ public class PlayerController : MonoBehaviour
         UpdatePlayerUI();
     }
 
+    // Method to remove a card from the player's deck
+    public void RemoveCardFromDeck(CardController card)
+    {
+        if (deck.Contains(card))
+        {
+            deck.Remove(card);
+            UpdatePlayerUI();
+        }
+        else
+        {
+            Debug.LogWarning("Attempted to remove a card that is not in the deck.");
+        }
+    }
+
     // Method to increase max health
     public void IncreaseMaxHealth(int amount)
     {
         maxHealth += amount;
+        currentHealth += amount; // Increase current health proportionally
+        UpdatePlayerUI();
+    }
+
+    // Method to increase max mana
+    public void IncreaseMaxMana(int amount)
+    {
+        maxMana += amount;
+        currentMana = maxMana; // Reset current mana to the new maximum
         UpdatePlayerUI();
     }
 }

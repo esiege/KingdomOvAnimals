@@ -2,6 +2,9 @@
 
 public abstract class AbilityController : MonoBehaviour
 {
-    // Method to be implemented by derived classes
+    // Activate ability on a CardController target
     public abstract void Activate(CardController target);
+
+    // Overloaded: Activate ability on a PlayerController target
+    public abstract void Activate(PlayerController target);
 }

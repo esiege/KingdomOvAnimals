@@ -2,17 +2,33 @@
 
 public class HealAbility : AbilityController
 {
-    public int healAmount = 3; // Amount of health this ability restores
+    public int healAmount = 5; // The amount of health to restore
 
+    // Activate ability on a CardController
     public override void Activate(CardController target)
     {
-        if (target == null)
+        if (target != null)
         {
-            Debug.LogError("No target provided for HealAbility.");
-            return;
+            Debug.Log($"Healing {target.cardName} for {healAmount} health.");
+            target.Heal(healAmount);
         }
+        else
+        {
+            Debug.LogError("No target CardController provided for HealAbility.");
+        }
+    }
 
-        Debug.Log($"{gameObject.name} heals {healAmount} health for {target.cardName}.");
-        target.Heal(healAmount);
+    // Activate ability on a PlayerController
+    public override void Activate(PlayerController target)
+    {
+        if (target != null)
+        {
+            Debug.Log($"Healing player {target.name} for {healAmount} health.");
+            target.Heal(healAmount);
+        }
+        else
+        {
+            Debug.LogError("No target PlayerController provided for HealAbility.");
+        }
     }
 }
