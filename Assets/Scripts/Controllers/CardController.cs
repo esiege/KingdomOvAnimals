@@ -23,8 +23,8 @@ public class CardController : MonoBehaviour
     public bool isDefending;
 
     // Ability GameObjects
-    public GameObject offensiveAbility; // GameObject with an AbilityController component
-    public GameObject defensiveAbility; // GameObject with an AbilityController component
+    public GameObject offensiveAbility; // GameObject with an AbilityController on a child
+    public GameObject supportAbility; // GameObject with an AbilityController on a child
 
     // UI Elements
     public TextMeshProUGUI cardNameText;
@@ -53,21 +53,45 @@ public class CardController : MonoBehaviour
         if (healthText != null) healthText.text = health.ToString();
     }
 
+    // Property to set and update manaCost
+    public int ManaCost
+    {
+        get => manaCost;
+        set
+        {
+            manaCost = value;
+            if (manaCostText != null) manaCostText.text = manaCost.ToString();
+        }
+    }
+
+    // Property to set and update health
+    public int Health
+    {
+        get => health;
+        set
+        {
+            health = value;
+            if (healthText != null) healthText.text = health.ToString();
+        }
+    }
+
     // Method to manage health
     public void TakeDamage(int damage)
     {
-        health -= damage;
+        Debug.Log($"{cardName} takes {damage} damage. Current health: {health} -> {health - damage}");
+
+        Health -= damage; // Use property to automatically update UI
         if (health <= 0)
         {
             DestroyCard();
         }
-        UpdateCardUI();
     }
 
     public void Heal(int amount)
     {
-        health += amount;
-        UpdateCardUI();
+        Debug.Log($"{cardName} heals {amount}. Current health: {health} -> {health + amount}");
+
+        Health += amount; // Use property to automatically update UI
     }
 
     // Methods to handle status effects
@@ -81,31 +105,48 @@ public class CardController : MonoBehaviour
     // Methods to activate abilities
     public void ActivateOffensiveAbility(CardController target)
     {
-        if (offensiveAbility != null && offensiveAbility.TryGetComponent(out AbilityController abilityController))
+        if (offensiveAbility != null)
         {
-            abilityController.Activate(target);
+            // Access the AbilityController from the child GameObject
+            AbilityController abilityController = offensiveAbility.GetComponentInChildren<AbilityController>();
+            if (abilityController != null)
+            {
+                abilityController.Activate(target);
+            }
+            else
+            {
+                Debug.LogError("Offensive ability child does not have an AbilityController component.");
+            }
         }
         else
         {
-            Debug.LogError("Offensive ability is not set or does not have an AbilityController.");
+            Debug.LogError("Offensive ability is not set.");
         }
     }
 
     public void ActivateDefensiveAbility(CardController target)
     {
-        if (defensiveAbility != null && defensiveAbility.TryGetComponent(out AbilityController abilityController))
+        if (supportAbility != null)
         {
-            abilityController.Activate(target);
+            // Access the AbilityController from the child GameObject
+            AbilityController abilityController = supportAbility.GetComponentInChildren<AbilityController>();
+            if (abilityController != null)
+            {
+                abilityController.Activate(target);
+            }
+            else
+            {
+                Debug.LogError("Support ability child does not have an AbilityController component.");
+            }
         }
         else
         {
-            Debug.LogError("Defensive ability is not set or does not have an AbilityController.");
+            Debug.LogError("Support ability is not set.");
         }
     }
 
     private void DestroyCard()
     {
-        // Perform any additional cleanup here
         Debug.Log($"{cardName} has been destroyed.");
         Destroy(gameObject);
     }
