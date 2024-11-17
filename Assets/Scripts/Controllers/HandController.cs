@@ -174,7 +174,7 @@ public class HandController : MonoBehaviour
         else if (hitObject.TryGetComponent(out CardController targetCard))
         {
 
-            if (targetCard.owningPlayer == encounterController.currentPlayer)
+            if (targetCard.owningPlayer == this.owningPlayer)
                 show_useCardAbilityDefensive(targetCard);
             else
                 show_useCardAbilityOffensive(targetCard);
@@ -253,7 +253,7 @@ public class HandController : MonoBehaviour
                 addCardToEncounter(activeCard, hitObject);
             else if (hitObject.TryGetComponent(out CardController targetCard))
             {
-                if (targetCard.owningPlayer == encounterController.currentPlayer)
+                if (targetCard.owningPlayer == this.owningPlayer)
                     useCardAbilityDefensive(targetCard);
                 else
                     useCardAbilityOffensive(targetCard);
