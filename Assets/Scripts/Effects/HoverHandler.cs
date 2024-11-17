@@ -21,7 +21,7 @@ public class HoverHandler : MonoBehaviour
     private int[] originalSpriteSortingOrders; // Array to store original sorting orders of each SpriteRenderer
 
 
-    public int CardIndex { get; private set; } // Index of the card in the hand
+    public int CardIndex; // Index of the card in the hand
 
     public void Initialize(HandController controller, CardController card, int index, Vector3 originalPos, Vector3 hoverOffset, float speed)
     {

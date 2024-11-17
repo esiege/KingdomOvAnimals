@@ -65,6 +65,8 @@ public class HandController : MonoBehaviour
         }
 
         int positionIndex = hand.Count;
+
+        // Instantiate the card and position it correctly in the hand
         GameObject cardObject = Instantiate(card.gameObject, cardPositions[positionIndex].transform.position, Quaternion.identity);
         cardObject.transform.SetParent(cardPositions[positionIndex].transform);
 
@@ -77,19 +79,56 @@ public class HandController : MonoBehaviour
         HoverHandler hoverHandler = cardObject.AddComponent<HoverHandler>();
         hoverHandler.Initialize(this, instantiatedCard, positionIndex, cardPositions[positionIndex].transform.localPosition, hoverOffset, transitionSpeed);
 
+        // Re-arrange the cards in hand to ensure proper positioning
         ArrangeCardsInHand();
     }
 
     public void RemoveCardFromHand(CardController card)
     {
-        if (hand.Remove(card))
+        int removedIndex = hand.IndexOf(card);  // Get the index of the card being removed
+        if (removedIndex >= 0)
         {
+            // Remove the card from the hand
+            hand.RemoveAt(removedIndex);
+
+            // Destroy the card's GameObject to ensure it is removed from the scene
             Destroy(card.gameObject);
+
+            // Re-arrange the cards to ensure the gaps are filled
             ArrangeCardsInHand();
         }
         else
+        {
             Debug.LogWarning("Attempted to remove a card that is not in the hand.");
+        }
     }
+
+    // Method to arrange the cards in hand and update their positions
+    private void ArrangeCardsInHand()
+    {
+        for (int i = 0; i < hand.Count; i++)
+        {
+            GameObject cardObject = hand[i].gameObject;
+
+            // Move the card to its new position based on the current index
+            cardObject.transform.SetParent(cardPositions[i].transform);
+            cardObject.transform.localPosition = Vector3.zero;  // Reset the local position within the slot
+
+            // Adjust Z position so the cards appear stacked correctly
+            Vector3 cardPosition = cardObject.transform.localPosition;
+            cardPosition.z = zIncrement * i;
+            cardObject.transform.localPosition = cardPosition;
+
+            // Update any other logic associated with the card (like hover behavior)
+            HoverHandler hoverHandler = cardObject.GetComponent<HoverHandler>();
+            if (hoverHandler != null)
+            {
+                hoverHandler.CardIndex = i;  // Ensure the hover handler has the correct index
+            }
+        }
+    }
+
+
 
     private void OnCardMouseDown(CardController card)
     {
@@ -105,27 +144,36 @@ public class HandController : MonoBehaviour
     {
         if (activeCard == null) return;
 
+
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePosition.z = 0;
         lineRenderer.SetPosition(1, mousePosition);
 
         RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+        SetLineColor(activeCard.isInPlay ? new Color(0.3f, 0.3f, 0.3f) : Color.white);
         if (hit.collider == null)
         {
-            SetLineColor(activeCard.isInPlay ? new Color(0.3f, 0.3f, 0.3f) : Color.white);
             return;
         }
 
         GameObject hitObject = hit.collider.gameObject;
 
+
         string slotName = "PlayerSlot";
         if (owningPlayer.name == "Opponent")
             slotName = "OpponentSlot";
 
+
+        if (activeCard.owningPlayer != encounterController.currentPlayer)
+            return;
+
         if (hitObject.name.StartsWith(slotName))
+        {
             show_addCardToEncounter(activeCard);
+        }
         else if (hitObject.TryGetComponent(out CardController targetCard))
         {
+
             if (targetCard.owningPlayer == encounterController.currentPlayer)
                 show_useCardAbilityDefensive(targetCard);
             else
@@ -135,6 +183,8 @@ public class HandController : MonoBehaviour
 
     private void show_addCardToEncounter(CardController card)
     {
+        if (activeCard.isInPlay) return;
+
         SetLineColor(activeCard.isInPlay ? new Color(0.3f, 0.3f, 0.3f) : Color.yellow);
         Debug.Log($"Card {card.cardName} is being added to the encounter.");
     }
@@ -154,23 +204,30 @@ public class HandController : MonoBehaviour
 
     private void show_useCardAbilityDefensive(CardController targetCard)
     {
+        if (targetCard == activeCard || !targetCard.isInPlay) return;
+
         SetLineColor(activeCard.isInPlay ? Color.cyan : Color.green);
-        Debug.Log($"Using defensive ability of {activeCard.cardName} on {targetCard.cardName}.");
     }
 
     private void useCardAbilityDefensive(CardController targetCard)
     {
+        if (targetCard == activeCard || !targetCard.isInPlay) return;
+
+        activeCard.ActivateDefensiveAbility(targetCard);
         Debug.Log("Defense action triggered!");
     }
 
     private void show_useCardAbilityOffensive(CardController targetCard)
     {
+        if (targetCard == activeCard || !targetCard.isInPlay) return;
+
         SetLineColor(activeCard.isInPlay ? new Color(1.0f, 0.5f, 0.0f) : Color.red);
-        Debug.Log($"Using offensive ability of {activeCard.cardName} on {targetCard.cardName}.");
     }
 
     private void useCardAbilityOffensive(CardController targetCard)
     {
+        if (targetCard == activeCard || !targetCard.isInPlay) return;
+        activeCard.ActivateOffensiveAbility(targetCard);
         Debug.Log("Offense action triggered!");
     }
 
@@ -200,10 +257,6 @@ public class HandController : MonoBehaviour
                     useCardAbilityDefensive(targetCard);
                 else
                     useCardAbilityOffensive(targetCard);
-
-                activeCard.isInPlay = false;
-                activeCard.isActive = false;
-                activeCard.isInHand = true;
             }
         }
 
@@ -252,14 +305,4 @@ public class HandController : MonoBehaviour
         }
     }
 
-    private void ArrangeCardsInHand()
-    {
-        for (int i = 0; i < hand.Count; i++)
-        {
-            GameObject cardObject = hand[i].gameObject;
-            Vector3 cardPosition = cardObject.transform.localPosition;
-            cardPosition.z = zIncrement * i;
-            cardObject.transform.localPosition = cardPosition;
-        }
-    }
 }

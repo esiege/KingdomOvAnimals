@@ -1,6 +1,5 @@
 using UnityEngine;
-using TMPro; // Required for TextMeshPro components
-using System.Collections.Generic;
+using TMPro;
 
 public class CardController : MonoBehaviour
 {
@@ -13,7 +12,7 @@ public class CardController : MonoBehaviour
     public PlayerController owningPlayer;
 
     // Card status tracking
-    public bool isInHand = true; 
+    public bool isInHand = true;
     public bool isActive = false;
     public bool isInPlay = false;
 
@@ -23,9 +22,9 @@ public class CardController : MonoBehaviour
     public bool isBuried;
     public bool isDefending;
 
-    // List of active abilities
-    private List<IAbility> offensiveAbilities;
-    private List<IAbility> defensiveAbilities;
+    // Ability GameObjects
+    public GameObject offensiveAbility; // GameObject with an AbilityController component
+    public GameObject defensiveAbility; // GameObject with an AbilityController component
 
     // UI Elements
     public TextMeshProUGUI cardNameText;
@@ -43,23 +42,15 @@ public class CardController : MonoBehaviour
         isBuried = false;
         isDefending = false;
 
-        offensiveAbilities = new List<IAbility>();
-        defensiveAbilities = new List<IAbility>();
-
-
-        if (owningPlayer.name == "Opponent")
-        {
-        }
-
-        UpdateCardUI(); // Update the UI after initialization
+        UpdateCardUI();
     }
 
     // Method to update the card's UI elements
     public void UpdateCardUI()
     {
-        cardNameText.text = cardName;
-        manaCostText.text = manaCost.ToString();
-        healthText.text = health.ToString();
+        if (cardNameText != null) cardNameText.text = cardName;
+        if (manaCostText != null) manaCostText.text = manaCost.ToString();
+        if (healthText != null) healthText.text = health.ToString();
     }
 
     // Method to manage health
@@ -70,87 +61,52 @@ public class CardController : MonoBehaviour
         {
             DestroyCard();
         }
-        UpdateCardUI(); // Update UI after taking damage
+        UpdateCardUI();
     }
 
     public void Heal(int amount)
     {
         health += amount;
-        UpdateCardUI(); // Update UI after healing
+        UpdateCardUI();
     }
 
     // Methods to handle status effects
-    public void SetSummoningSickness(bool status)
-    {
-        hasSummoningSickness = status;
-    }
+    public void SetSummoningSickness(bool status) => hasSummoningSickness = status;
+    public void FreezeCard() => isFrozen = true;
+    public void UnfreezeCard() => isFrozen = false;
+    public void BuryCard() => isBuried = true;
+    public void UnburyCard() => isBuried = false;
+    public void SetDefending(bool status) => isDefending = status;
 
-    public void FreezeCard()
+    // Methods to activate abilities
+    public void ActivateOffensiveAbility(CardController target)
     {
-        isFrozen = true;
-    }
-
-    public void UnfreezeCard()
-    {
-        isFrozen = false;
-    }
-
-    public void BuryCard()
-    {
-        isBuried = true;
-    }
-
-    public void UnburyCard()
-    {
-        isBuried = false;
-    }
-
-    public void SetDefending(bool status)
-    {
-        isDefending = status;
-    }
-
-    // Method to activate offensive abilities
-    public void ActivateOffensiveAbility(int index, CardController target)
-    {
-        if (index >= 0 && index < offensiveAbilities.Count)
+        if (offensiveAbility != null && offensiveAbility.TryGetComponent(out AbilityController abilityController))
         {
-            offensiveAbilities[index].Activate(target);
+            abilityController.Activate(target);
+        }
+        else
+        {
+            Debug.LogError("Offensive ability is not set or does not have an AbilityController.");
         }
     }
 
-    // Method to activate defensive abilities
-    public void ActivateDefensiveAbility(int index, CardController target)
+    public void ActivateDefensiveAbility(CardController target)
     {
-        if (index >= 0 && index < defensiveAbilities.Count)
+        if (defensiveAbility != null && defensiveAbility.TryGetComponent(out AbilityController abilityController))
         {
-            defensiveAbilities[index].Activate(target);
+            abilityController.Activate(target);
+        }
+        else
+        {
+            Debug.LogError("Defensive ability is not set or does not have an AbilityController.");
         }
     }
 
-    // Method to add abilities
-    public void AddOffensiveAbility(IAbility ability)
-    {
-        offensiveAbilities.Add(ability);
-
-
-    }
-
-    public void AddDefensiveAbility(IAbility ability)
-    {
-        defensiveAbilities.Add(ability);
-    }
-
-    // Method to destroy the card
     private void DestroyCard()
     {
         // Perform any additional cleanup here
+        Debug.Log($"{cardName} has been destroyed.");
         Destroy(gameObject);
     }
-}
-
-// Interface for abilities
-public interface IAbility
-{
-    void Activate(CardController target);
 }
