@@ -70,19 +70,17 @@ public class EncounterController : MonoBehaviour
             currentPlayer = player1;
 
             player1.maxMana += 1;
-            player1.currentMana = player1.maxMana;
+            player1.RefillMana();
         }
         else
         {
             currentPlayer = player2;
 
             player2.maxMana += 1;
-            player2.currentMana = player2.maxMana;
+            player2.RefillMana();
         }
 
         DrawCard(currentPlayer);
-
-
     }
 
     public void endTurn()

@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviour
     {
         if (currentHealthText != null) currentHealthText.text = $"{currentHealth}";
         if (maxHealthText != null) maxHealthText.text = $"Max Health: {maxHealth}";
-        if (currentManaText != null) currentManaText.text = $"Mana: {currentMana}/{maxMana}";
+        if (currentManaText != null) currentManaText.text = $"{currentMana}";
         if (maxManaText != null) maxManaText.text = $"Max Mana: {maxMana}";
         if (currentLivesText != null) currentLivesText.text = $"Lives: {currentLives}/{maxLives}";
         if (currentStageText != null) currentStageText.text = $"Stage: {currentStage}";
@@ -96,6 +96,12 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("Not enough mana!");
         }
 
+        UpdatePlayerUI();
+    }
+    // Method to manage mana
+    public void RefillMana()
+    {
+        currentMana = maxMana;
         UpdatePlayerUI();
     }
 

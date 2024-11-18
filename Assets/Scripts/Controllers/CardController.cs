@@ -14,10 +14,12 @@ public class CardController : MonoBehaviour
     // Card status tracking
     public bool isInHand = true;
     public bool isActive = false;
+    public bool isUsed = false;
+    public bool isFlipped = false;
     public bool isInPlay = false;
 
     // Status Effects
-    public bool hasSummoningSickness;
+    public bool hasSummoningSickness = true;
     public bool isFrozen;
     public bool isBuried;
     public bool isDefending;
