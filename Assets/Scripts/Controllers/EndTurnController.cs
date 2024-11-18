@@ -8,6 +8,6 @@ public class EndTurnController : MonoBehaviour
     private void OnMouseDown()
     {
         // Call the endTurn method in the EncounterController
-        encounterController.endTurn();
+        encounterController.EndTurn();
     }
 }

@@ -76,8 +76,8 @@ public class HandController : MonoBehaviour
         if (cardObject.GetComponent<BoxCollider2D>() == null)
             cardObject.AddComponent<BoxCollider2D>();
 
-        HoverHandler hoverHandler = cardObject.AddComponent<HoverHandler>();
-        hoverHandler.Initialize(this, instantiatedCard, positionIndex, cardPositions[positionIndex].transform.localPosition, hoverOffset, transitionSpeed);
+        //HoverHandler hoverHandler = cardObject.AddComponent<HoverHandler>();
+        //hoverHandler.Initialize(this, instantiatedCard, positionIndex, cardPositions[positionIndex].transform.localPosition, hoverOffset, transitionSpeed);
 
         // Re-arrange the cards in hand to ensure proper positioning
         ArrangeCardsInHand();
@@ -116,6 +116,13 @@ public class HandController : MonoBehaviour
             cardPosition.z = zIncrement * i;
             cardObject.transform.localPosition = cardPosition;
 
+            // Set the sorting order for layering
+            SpriteRenderer spriteRenderer = cardObject.GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.sortingOrder = hand.Count - i; // Higher sortingOrder for leftmost card
+            }
+
             // Update any other logic associated with the card (like hover behavior)
             HoverHandler hoverHandler = cardObject.GetComponent<HoverHandler>();
             if (hoverHandler != null)
@@ -127,11 +134,12 @@ public class HandController : MonoBehaviour
 
 
 
+
     private void OnCardMouseDown(CardController card)
     {
         activeCard = card;
         activeCardPosition = card.transform.position;
-        card.GetComponent<HoverHandler>().enabled = false;
+        //card.GetComponent<HoverHandler>().enabled = false;
         lineRenderer.enabled = true;
         lineRenderer.SetPosition(0, activeCardPosition);
         activeCard.isActive = true;
@@ -206,9 +214,11 @@ public class HandController : MonoBehaviour
         card.isInPlay = true;
         card.isActive = false;
         card.isInHand = false;
-        card.hasSummoningSickness = true;
+        card.SetSummoningSickness(true);
+        card.UnflipCard();
 
         RemoveCardFromHand(card);
+        encounterController.currentPlayer.AddCardToBoard(card);
     }
 
     // Defensive: CardController target
@@ -224,21 +234,16 @@ public class HandController : MonoBehaviour
         SetLineColor(Color.green);
     }
 
+
+
+
+
+
+
     // Activate Defensive Ability: CardController target
     private void useCardAbilityDefensive(CardController targetCard)
     {
-        if (targetCard == activeCard || !targetCard.isInPlay) return;
-
-        if (activeCard.isInPlay && activeCard.hasSummoningSickness) return;
-        if (activeCard.isInPlay && activeCard.isUsed) return;
-        if (!activeCard.isInPlay && encounterController.currentPlayer.currentMana < activeCard.manaCost) return;
-
-        //todo check if it can be targeted - activeCard.CheckAbilityTarget(targetCard)
-
-        if (activeCard.isInPlay)
-            activeCard.isUsed = true;
-        else
-            encounterController.currentPlayer.SpendMana(activeCard.manaCost);
+        if (!CanActivateAbility(targetCard)) return;
 
         activeCard.ActivateDefensiveAbility(targetCard);
         Debug.Log("Defense action triggered on card!");
@@ -247,20 +252,92 @@ public class HandController : MonoBehaviour
     // Activate Defensive Ability: PlayerController target
     private void useCardAbilityDefensive(PlayerController targetPlayer)
     {
-        if (activeCard.isInPlay && activeCard.hasSummoningSickness) return;
-        if (activeCard.isInPlay && activeCard.isUsed) return;
-        if (!activeCard.isInPlay && encounterController.currentPlayer.currentMana < activeCard.manaCost) return;
-
-        //todo check if it can be targeted - activeCard.CheckAbilityTarget(targetCard)
-
-        if (activeCard.isInPlay)
-            activeCard.isUsed = true;
-        else
-            encounterController.currentPlayer.SpendMana(activeCard.manaCost);
+        if (!CanActivateAbility(targetPlayer)) return;
 
         activeCard.ActivateDefensiveAbility(targetPlayer);
         Debug.Log("Defense action triggered on player!");
     }
+
+    // Activate Offensive Ability: CardController target
+    private void useCardAbilityOffensive(CardController targetCard)
+    {
+        if (!CanActivateAbility(targetCard)) return;
+
+        activeCard.ActivateOffensiveAbility(targetCard);
+        Debug.Log("Offense action triggered on card!");
+    }
+
+    // Activate Offensive Ability: PlayerController target
+    private void useCardAbilityOffensive(PlayerController targetPlayer)
+    {
+        if (!CanActivateAbility(targetPlayer)) return;
+
+        activeCard.ActivateOffensiveAbility(targetPlayer);
+        Debug.Log("Offense action triggered on player!");
+    }
+
+    // Helper method to validate and prepare ability activation
+    private bool CanActivateAbility(object target)
+    {
+        if (target == activeCard)
+        {
+            Debug.LogWarning("Cannot target the active card itself.");
+            return false;
+        }
+
+        if (target is CardController targetCard && !targetCard.isInPlay)
+        {
+            Debug.LogWarning("Cannot target a card that is not in play.");
+            return false;
+        }
+
+        if (activeCard.isInPlay && activeCard.hasSummoningSickness)
+        {
+            Debug.LogWarning("Cannot activate ability: Card has summoning sickness.");
+            return false;
+        }
+
+        if (activeCard.isInPlay && activeCard.isTapped)
+        {
+            Debug.LogWarning("Cannot activate ability: Card is already tapped.");
+            return false;
+        }
+
+        if (!activeCard.isInPlay && activeCard.isFlipped)
+        {
+            Debug.LogWarning("Cannot activate ability: Card is already flipped.");
+            return false;
+        }
+
+        if (!activeCard.isInPlay && encounterController.currentPlayer.currentMana < activeCard.manaCost)
+        {
+            Debug.LogWarning($"Not enough mana to activate ability. Current Mana: {encounterController.currentPlayer.currentMana}, Required: {activeCard.manaCost}");
+            return false;
+        }
+
+        // Example for checking target validity (expand as needed)
+        // if (!activeCard.CheckAbilityTarget(target))
+        // {
+        //     Debug.LogWarning("Target is invalid for this ability.");
+        //     return false;
+        // }
+
+        if (activeCard.isInPlay)
+        {
+            activeCard.TapCard();
+        }
+        else
+        {
+            activeCard.FlipCard();
+            encounterController.currentPlayer.SpendMana(activeCard.manaCost);
+        }
+
+        return true;
+    }
+
+
+
+
 
     // Offensive: CardController target
     private void show_useCardAbilityOffensive(CardController targetCard)
@@ -275,44 +352,6 @@ public class HandController : MonoBehaviour
         SetLineColor(Color.red);
     }
 
-    // Activate Offensive Ability: CardController target
-    private void useCardAbilityOffensive(CardController targetCard)
-    {
-        if (targetCard == activeCard || !targetCard.isInPlay) return;
-
-        if (activeCard.isInPlay && activeCard.hasSummoningSickness) return;
-        if (activeCard.isInPlay && activeCard.isUsed) return;
-        if (!activeCard.isInPlay && encounterController.currentPlayer.currentMana < activeCard.manaCost) return;
-
-        //todo check if it can be targeted - activeCard.CheckAbilityTarget(targetCard)
-
-        if (activeCard.isInPlay)
-            activeCard.isUsed = true;
-        else
-            encounterController.currentPlayer.SpendMana(activeCard.manaCost);
-
-        activeCard.ActivateOffensiveAbility(targetCard);
-        Debug.Log("Offense action triggered on card!");
-    }
-
-    // Activate Offensive Ability: PlayerController target
-    private void useCardAbilityOffensive(PlayerController targetPlayer)
-    {
-        if (activeCard.isInPlay && activeCard.hasSummoningSickness) return;
-        if (activeCard.isInPlay && activeCard.isUsed) return;
-        if (!activeCard.isInPlay && encounterController.currentPlayer.currentMana < activeCard.manaCost) return;
-
-        //todo check if it can be targeted - activeCard.CheckAbilityTarget(targetCard)
-
-        if (activeCard.isInPlay)
-            activeCard.isUsed = true;
-        else
-            encounterController.currentPlayer.SpendMana(activeCard.manaCost);
-
-        activeCard.ActivateOffensiveAbility(targetPlayer);
-        Debug.Log("Offense action triggered on player!");
-    }
-
 
     private void SetLineColor(Color color)
     {
@@ -324,7 +363,10 @@ public class HandController : MonoBehaviour
         if (activeCard == null) return;
 
         RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-        if (hit.collider != null)
+        if (encounterController.currentPlayer != owningPlayer)
+        {
+        }
+        else if (hit.collider != null)
         {
             GameObject hitObject = hit.collider.gameObject;
 
@@ -354,7 +396,7 @@ public class HandController : MonoBehaviour
             }
         }
 
-        activeCard.GetComponent<HoverHandler>().enabled = true;
+        //activeCard.GetComponent<HoverHandler>().enabled = true;
         activeCard = null;
         lineRenderer.enabled = false;
     }

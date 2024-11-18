@@ -16,9 +16,6 @@ public class EncounterController : MonoBehaviour
     public PlayerController currentPlayer;
     private bool isPlayer1Turn;
 
-    // Board State
-    public List<CardController> player1Board;
-    public List<CardController> player2Board;
 
     public int turnNumber = 1;
 
@@ -34,14 +31,12 @@ public class EncounterController : MonoBehaviour
     // Method to initialize the encounter
     public void InitializeEncounter()
     {
-
         // Initialize turn order
         isPlayer1Turn = true;
         currentPlayer = player1;
 
-        // Clear the boards
-        player1Board = new List<CardController>();
-        player2Board = new List<CardController>();
+        player1.ShuffleDeck();
+        player2.ShuffleDeck();
 
         // Start with both players drawing 3 cards with a delay
         StartCoroutine(DrawInitialCards());
@@ -71,6 +66,7 @@ public class EncounterController : MonoBehaviour
 
             player1.maxMana += 1;
             player1.RefillMana();
+            player1.ResetBoard();
         }
         else
         {
@@ -78,12 +74,14 @@ public class EncounterController : MonoBehaviour
 
             player2.maxMana += 1;
             player2.RefillMana();
+            player2.ResetBoard();
         }
+
 
         DrawCard(currentPlayer);
     }
 
-    public void endTurn()
+    public void EndTurn()
     {
         isPlayer1Turn = !isPlayer1Turn;
         turnNumber++;
@@ -123,82 +121,4 @@ public class EncounterController : MonoBehaviour
         }
     }
 
-    // Method to play a card (called when a card is played)
-    public void PlayCard(CardController card, PlayerController player)
-    {
-        List<CardController> playerBoard = player == player1 ? player1Board : player2Board;
-        HandController handController = player == player1 ? player1HandController : player2HandController;
-
-        if (currentPlayer.currentMana >= card.manaCost)
-        {
-            playerBoard.Add(card);
-            handController.RemoveCardFromHand(card); // Remove the card from hand when played
-
-            currentPlayer.currentMana -= card.manaCost;
-
-            // Additional logic for placing the card on the board, applying effects, etc.
-            card.SetSummoningSickness(true); // Card cannot act until the next turn
-        }
-        else
-        {
-            Debug.Log($"{player.name} does not have enough mana to play {card.cardName}.");
-        }
-    }
-
-    // Method to end the current player's turn
-    public void EndTurn()
-    {
-        ResolveBoardState();
-
-        // Switch turn
-        isPlayer1Turn = !isPlayer1Turn;
-
-        StartTurn();
-    }
-
-    // Method to resolve the board state after each turn
-    private void ResolveBoardState()
-    {
-        // Logic to resolve card interactions, such as combat
-        // This could include attacking, triggering abilities, etc.
-
-        // Example: Basic combat resolution
-        if (player1Board.Count > 0 && player2Board.Count > 0)
-        {
-            CardController player1Card = player1Board[0]; // Assuming front-most card for simplicity
-            CardController player2Card = player2Board[0]; // Assuming front-most card for simplicity
-
-            // Resolve damage between the front cards
-            player1Card.TakeDamage(player2Card.health);
-            player2Card.TakeDamage(player1Card.health);
-
-            // Check if any cards should be removed from the board
-            if (player1Card.health <= 0)
-            {
-                player1Board.Remove(player1Card);
-                Destroy(player1Card.gameObject); // Remove the card from the game
-            }
-            if (player2Card.health <= 0)
-            {
-                player2Board.Remove(player2Card);
-                Destroy(player2Card.gameObject); // Remove the card from the game
-            }
-        }
-    }
-
-    // Method to check if the encounter is over
-    private void CheckEncounterOutcome()
-    {
-        // Logic to determine if either player has lost all their cards or life, ending the encounter
-        if (player1Board.Count == 0 || player2.currentLives <= 0)
-        {
-            Debug.Log("Player 2 wins the encounter!");
-            // Handle Player 2 victory
-        }
-        else if (player2Board.Count == 0 || player1.currentLives <= 0)
-        {
-            Debug.Log("Player 1 wins the encounter!");
-            // Handle Player 1 victory
-        }
-    }
 }

@@ -11,13 +11,9 @@ public class PlayerController : MonoBehaviour
     public int currentMana;
     public int maxMana;
 
-    public int currentLives;
-    public int maxLives = 3;
+    public List<CardController> deck = new List<CardController>();
+    public List<CardController> board = new List<CardController>();
 
-    public List<CardController> deck;
-
-    // Overworld Progression
-    public int currentStage;
 
     // UI Elements
     public TextMeshProUGUI currentHealthText;
@@ -29,16 +25,8 @@ public class PlayerController : MonoBehaviour
     public GameObject deckUIContainer; // UI container for displaying the player's deck
 
     // Initialization method
-    public void InitializePlayer(int health, int mana)
+    public void Awake()
     {
-        maxHealth = health;
-        currentHealth = health;
-        maxMana = mana;
-        currentMana = mana;
-        currentLives = maxLives;
-        currentStage = 1; // Start at the first stage
-        deck = new List<CardController>();
-
         UpdatePlayerUI();
     }
 
@@ -46,14 +34,62 @@ public class PlayerController : MonoBehaviour
     public void UpdatePlayerUI()
     {
         if (currentHealthText != null) currentHealthText.text = $"{currentHealth}";
-        if (maxHealthText != null) maxHealthText.text = $"Max Health: {maxHealth}";
         if (currentManaText != null) currentManaText.text = $"{currentMana}";
-        if (maxManaText != null) maxManaText.text = $"Max Mana: {maxMana}";
-        if (currentLivesText != null) currentLivesText.text = $"Lives: {currentLives}/{maxLives}";
-        if (currentStageText != null) currentStageText.text = $"Stage: {currentStage}";
 
         UpdateDeckUI();
     }
+
+    public void ResetBoard()
+    {
+        // Reset summoning sickness and tapped status for cards on the board
+        foreach (CardController card in board)
+        {
+            card.SetSummoningSickness(false);
+            card.UntapCard();
+        }
+    }
+
+
+    // Method to add a card to the board state
+    public void AddCardToBoard(CardController card)
+    {
+        if (card == null)
+        {
+            Debug.LogError("Attempted to add a null card to the board.");
+            return;
+        }
+
+        if (board.Contains(card))
+        {
+            Debug.LogWarning($"{card.cardName} is already on the board.");
+            return;
+        }
+
+        board.Add(card);
+        Debug.Log($"{card.cardName} has been added to the board.");
+    }
+
+    // Method to remove a card from the board state (e.g., when it dies)
+    public void RemoveCardFromBoard(CardController card)
+    {
+        if (card == null)
+        {
+            Debug.LogError("Attempted to remove a null card from the board.");
+            return;
+        }
+
+        if (!board.Contains(card))
+        {
+            Debug.LogWarning($"{card.cardName} is not on the board.");
+            return;
+        }
+
+        board.Remove(card);
+        Debug.Log($"{card.cardName} has been removed from the board.");
+
+        Destroy(card.gameObject);
+    }
+
 
     // Method to update the deck UI
     private void UpdateDeckUI()
@@ -67,7 +103,7 @@ public class PlayerController : MonoBehaviour
         if (currentHealth <= 0)
         {
             currentHealth = 0;
-            LoseLife();
+            // game over!
         }
 
         UpdatePlayerUI();
@@ -98,6 +134,20 @@ public class PlayerController : MonoBehaviour
 
         UpdatePlayerUI();
     }
+
+    public void ShuffleDeck()
+    {
+        for (int i = 0; i < deck.Count; i++)
+        {
+            int randomIndex = Random.Range(0, deck.Count);
+            // Swap current card with a card at a random index
+            CardController temp = deck[i];
+            deck[i] = deck[randomIndex];
+            deck[randomIndex] = temp;
+        }
+        Debug.Log("Deck shuffled!");
+    }
+
     // Method to manage mana
     public void RefillMana()
     {
@@ -122,56 +172,14 @@ public class PlayerController : MonoBehaviour
         UpdatePlayerUI();
     }
 
-    // Method to manage player lives
-    public void LoseLife()
-    {
-        currentLives--;
-        UpdatePlayerUI();
+    
 
-        if (currentLives <= 0)
-        {
-            // Handle player defeat (e.g., end the game, restart, etc.)
-            HandlePlayerDefeat();
-        }
-        else
-        {
-            Debug.Log("Player lost a life! Reviving...");
-            currentHealth = maxHealth; // Reset health for the next life
-        }
-    }
-
-    public void GainLife()
-    {
-        if (currentLives < maxLives)
-        {
-            currentLives++;
-            UpdatePlayerUI();
-        }
-    }
-
-    // Method to handle player defeat
-    private void HandlePlayerDefeat()
-    {
-        Debug.Log("Player defeated! Game over.");
-        // Implement game over logic here
-    }
-
-    // Method to progress to the next stage
-    public void ProgressToNextStage()
-    {
-        currentStage++;
-        UpdatePlayerUI();
-        // Implement logic for transitioning to the next stage
-    }
-
-    // Method to add a card to the player's deck
     public void AddCardToDeck(CardController newCard)
     {
         deck.Add(newCard);
         UpdatePlayerUI();
     }
 
-    // Method to remove a card from the player's deck
     public void RemoveCardFromDeck(CardController card)
     {
         if (deck.Contains(card))
@@ -185,15 +193,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // Method to increase max health
-    public void IncreaseMaxHealth(int amount)
-    {
-        maxHealth += amount;
-        currentHealth += amount; // Increase current health proportionally
-        UpdatePlayerUI();
-    }
+   
 
-    // Method to increase max mana
+
+
     public void IncreaseMaxMana(int amount)
     {
         maxMana += amount;

@@ -14,7 +14,7 @@ public class CardController : MonoBehaviour
     // Card status tracking
     public bool isInHand = true;
     public bool isActive = false;
-    public bool isUsed = false;
+    public bool isTapped = false;
     public bool isFlipped = false;
     public bool isInPlay = false;
 
@@ -33,18 +33,14 @@ public class CardController : MonoBehaviour
     public TextMeshProUGUI manaCostText;
     public TextMeshProUGUI healthText;
 
-    // Initialization method
-    public void InitializeCard(string name, int cost, int initialHealth)
-    {
-        cardName = name;
-        manaCost = cost;
-        health = initialHealth;
-        hasSummoningSickness = true;
-        isFrozen = false;
-        isBuried = false;
-        isDefending = false;
+    // Card Visuals
+    public SpriteRenderer cardSpriteRenderer; // SpriteRenderer for the card image
 
+    // Initialization method
+    public void Start()
+    {
         UpdateCardUI();
+        UpdateVisualEffects(); // Update visuals on load
     }
 
     // Method to update the card's UI elements
@@ -55,6 +51,33 @@ public class CardController : MonoBehaviour
         if (healthText != null) healthText.text = health.ToString();
     }
 
+    // Update card's visual effects based on status
+    public void UpdateVisualEffects()
+    {
+        if (cardSpriteRenderer == null)
+        {
+            Debug.LogWarning("Card SpriteRenderer is not assigned.");
+            return;
+        }
+
+        // Reset to default color
+        cardSpriteRenderer.color = Color.white;
+
+        // Apply color tints based on status
+        if (hasSummoningSickness)
+        {
+            cardSpriteRenderer.color = new Color(0.8f, 0.8f, 0.0f, 1.0f); // Yellowish tint for summoning sickness
+        }
+        else if (isTapped)
+        {
+            cardSpriteRenderer.color = new Color(0.5f, 0.5f, 0.5f, 1.0f); // Gray tint for tapped
+        }
+        else if (isFlipped)
+        {
+            cardSpriteRenderer.color = new Color(0.0f, 0.5f, 0.8f, 1.0f); // Blueish tint for flipped
+        }
+    }
+
     // Method to manage health
     public void TakeDamage(int damage)
     {
@@ -63,7 +86,7 @@ public class CardController : MonoBehaviour
         health -= damage;
         if (health <= 0)
         {
-            DestroyCard();
+            owningPlayer.RemoveCardFromBoard(this);
         }
         else
         {
@@ -80,12 +103,60 @@ public class CardController : MonoBehaviour
     }
 
     // Methods to handle status effects
-    public void SetSummoningSickness(bool status) => hasSummoningSickness = status;
-    public void FreezeCard() => isFrozen = true;
-    public void UnfreezeCard() => isFrozen = false;
-    public void BuryCard() => isBuried = true;
-    public void UnburyCard() => isBuried = false;
-    public void SetDefending(bool status) => isDefending = status;
+    public void SetSummoningSickness(bool status)
+    {
+        hasSummoningSickness = status;
+        UpdateVisualEffects();
+    }
+
+    public void TapCard()
+    {
+        isTapped = true;
+        UpdateVisualEffects();
+    }
+
+    public void UntapCard()
+    {
+        isTapped = false;
+        UpdateVisualEffects();
+    }
+
+    public void FlipCard()
+    {
+        isFlipped = true;
+        UpdateVisualEffects();
+    }
+
+    public void UnflipCard()
+    {
+        isFlipped = false;
+        UpdateVisualEffects();
+    }
+
+    public void FreezeCard()
+    {
+        isFrozen = true;
+    }
+
+    public void UnfreezeCard()
+    {
+        isFrozen = false;
+    }
+
+    public void BuryCard()
+    {
+        isBuried = true;
+    }
+
+    public void UnburyCard()
+    {
+        isBuried = false;
+    }
+
+    public void SetDefending(bool status)
+    {
+        isDefending = status;
+    }
 
     // Methods to activate abilities on a CardController target
     public void ActivateOffensiveAbility(CardController target)
@@ -167,11 +238,5 @@ public class CardController : MonoBehaviour
         {
             Debug.LogError("Support ability is not set.");
         }
-    }
-
-    private void DestroyCard()
-    {
-        Debug.Log($"{cardName} has been destroyed.");
-        Destroy(gameObject);
     }
 }
