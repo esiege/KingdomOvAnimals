@@ -16,7 +16,6 @@ public class EncounterController : MonoBehaviour
     public PlayerController currentPlayer;
     private bool isPlayer1Turn;
 
-
     public int turnNumber = 1;
 
     // Maximum hand size

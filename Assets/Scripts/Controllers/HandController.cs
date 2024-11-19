@@ -211,11 +211,11 @@ public class HandController : MonoBehaviour
         card.transform.position = hitObject.transform.position;
         card.transform.localPosition = Vector3.zero;
 
-        card.isInPlay = true;
         card.isActive = false;
         card.isInHand = false;
         card.SetSummoningSickness(true);
         card.UnflipCard();
+        card.EnterPlay();
 
         RemoveCardFromHand(card);
         encounterController.currentPlayer.AddCardToBoard(card);

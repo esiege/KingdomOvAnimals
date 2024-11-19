@@ -25,8 +25,8 @@ public class CardController : MonoBehaviour
     public bool isDefending;
 
     // Ability GameObjects
-    public GameObject offensiveAbility; // GameObject with an AbilityController on a child
-    public GameObject supportAbility; // GameObject with an AbilityController on a child
+    public GameObject offensiveAbility;
+    public GameObject supportAbility; 
 
     // UI Elements
     public TextMeshProUGUI cardNameText;
@@ -34,7 +34,10 @@ public class CardController : MonoBehaviour
     public TextMeshProUGUI healthText;
 
     // Card Visuals
-    public SpriteRenderer cardSpriteRenderer; // SpriteRenderer for the card image
+    public GameObject summoningSicknessIcon;
+    public GameObject tappedIcon;
+    public GameObject flippedIcon;
+
 
     // Initialization method
     public void Start()
@@ -52,31 +55,63 @@ public class CardController : MonoBehaviour
     }
 
     // Update card's visual effects based on status
+    // Update card's visual effects based on status
     public void UpdateVisualEffects()
     {
-        if (cardSpriteRenderer == null)
+        // Determine which view is active and find the CardImage SpriteRenderer
+        Transform currentView = isInPlay
+            ? transform.Find("Canvas/Condensed")
+            : transform.Find("Canvas/Full");
+
+        if (currentView == null)
         {
-            Debug.LogWarning("Card SpriteRenderer is not assigned.");
+            Debug.LogWarning("Active view (Condensed or Full) is missing.");
             return;
         }
 
-        // Reset to default color
-        cardSpriteRenderer.color = Color.white;
+        // Ensure the icons are assigned and toggle them based on status
+        if (summoningSicknessIcon != null)
+        {
+            summoningSicknessIcon.SetActive(hasSummoningSickness);
+        }
+        else
+        {
+            Debug.LogWarning("Summoning Sickness Icon is not assigned.");
+        }
 
-        // Apply color tints based on status
-        if (hasSummoningSickness)
+        if (tappedIcon != null)
         {
-            cardSpriteRenderer.color = new Color(0.8f, 0.8f, 0.0f, 1.0f); // Yellowish tint for summoning sickness
+            tappedIcon.SetActive(isTapped);
         }
-        else if (isTapped)
+        else
         {
-            cardSpriteRenderer.color = new Color(0.5f, 0.5f, 0.5f, 1.0f); // Gray tint for tapped
+            Debug.LogWarning("Tapped Icon is not assigned.");
         }
-        else if (isFlipped)
+
+        if (flippedIcon != null)
         {
-            cardSpriteRenderer.color = new Color(0.0f, 0.5f, 0.8f, 1.0f); // Blueish tint for flipped
+            flippedIcon.SetActive(isFlipped);
+        }
+        else
+        {
+            Debug.LogWarning("Flipped Icon is not assigned.");
+        }
+
+        // Toggle visibility of views
+        Transform condensedView = transform.Find("Canvas/Condensed");
+        Transform fullView = transform.Find("Canvas/Full");
+
+        if (condensedView != null)
+        {
+            condensedView.gameObject.SetActive(isInPlay); // Show condensed view if in play
+        }
+
+        if (fullView != null)
+        {
+            fullView.gameObject.SetActive(!isInPlay); // Show full view if not in play
         }
     }
+
 
     // Method to manage health
     public void TakeDamage(int damage)
@@ -153,6 +188,11 @@ public class CardController : MonoBehaviour
         isBuried = false;
     }
 
+    public void EnterPlay()
+    {
+        isInPlay = true;
+        UpdateVisualEffects();
+    }
     public void SetDefending(bool status)
     {
         isDefending = status;
