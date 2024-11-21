@@ -1,8 +1,30 @@
 ﻿using UnityEngine;
+using TMPro;
 
 public class DamageAbility : AbilityController
 {
     public int damageAmount = 5; // Amount of damage this ability deals
+
+    // UI Elements
+    public TextMeshProUGUI damageAmountText;
+
+    void Start()
+    {
+        UpdateUI(); // Initialize the UI with the damageAmount value
+    }
+
+    // Update the UI with the current damageAmount
+    public void UpdateUI()
+    {
+        if (damageAmountText != null)
+        {
+            damageAmountText.text = $"{damageAmount}";
+        }
+        else
+        {
+            Debug.LogWarning("DamageAmountText is not assigned in DamageAbility.");
+        }
+    }
 
     // Activate ability on a CardController
     public override void Activate(CardController target)

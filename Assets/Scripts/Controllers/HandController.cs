@@ -14,7 +14,7 @@ public class HandController : MonoBehaviour
     public List<GameObject> cardPositions;
     public EncounterController encounterController;
     public float transitionSpeed = 5f;
-    public float zIncrement = 0.1f;
+    public float zIncrement = 0.2f;
     public Material lineMaterial;
 
     // Owner reference
