@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 226886168841426153}
   - component: {fileID: 1526248541069168870}
   m_Layer: 0
-  m_Name: Cost
+  m_Name: Amount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -163,7 +163,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 13
+  m_SortingOrder: 111
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -1098,6 +1098,7 @@ GameObject:
   - component: {fileID: 4287685259586655555}
   - component: {fileID: 1631415180478802473}
   - component: {fileID: 2704030529723960761}
+  - component: {fileID: 5258021962298196721}
   m_Layer: 0
   m_Name: Card
   m_TagString: Untagged
@@ -1180,6 +1181,17 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 2, y: 3}
   m_EdgeRadius: 0
+--- !u!210 &5258021962298196721
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4287685259586655554}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 99
 --- !u!1 &4287685259897858757
 GameObject:
   m_ObjectHideFlags: 0
@@ -1243,7 +1255,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
-  m_SortingOrder: 16
+  m_SortingOrder: 111
   m_TargetDisplay: 0
 --- !u!114 &4287685259897858752
 MonoBehaviour:
@@ -2968,7 +2980,7 @@ GameObject:
   - component: {fileID: 5084353739344921294}
   - component: {fileID: 2219397531268883547}
   m_Layer: 0
-  m_Name: Cost
+  m_Name: Amount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
