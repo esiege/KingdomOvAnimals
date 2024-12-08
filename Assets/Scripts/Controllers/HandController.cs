@@ -47,14 +47,24 @@ public class HandController : MonoBehaviour
 
     private void HandleMouseDown()
     {
-        var hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-        if (hit.collider != null)
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePosition.z = 0; // Ensure the position stays in the 2D plane
+
+        // Get all colliders at the mouse position
+        Collider2D[] hits = Physics2D.OverlapPointAll(mousePosition);
+
+        // Check each collider for a CardController
+        foreach (var hit in hits)
         {
-            var clickedCard = hit.collider.GetComponent<CardController>();
+            var clickedCard = hit.GetComponent<CardController>();
             if (clickedCard != null && clickedCard.owningPlayer == encounterController.currentPlayer)
+            {
                 OnCardMouseDown(clickedCard);
+                return; // Stop once the correct CardController is found
+            }
         }
     }
+
 
     public void AddCardToHand(CardController card)
     {
