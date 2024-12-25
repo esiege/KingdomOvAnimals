@@ -18,7 +18,7 @@ public class CardController : MonoBehaviour
     public bool isTapped = false;
     public bool isFlipped = false;
     public bool isInPlay = false;
-    public bool isHighlighted;
+    public bool isHighlighted = false;
 
     // Status Effects
     public bool hasSummoningSickness = true;
@@ -40,7 +40,7 @@ public class CardController : MonoBehaviour
     public GameObject tappedIcon;
     public GameObject flippedIcon;
 
-    // card frames ( from different states)
+    // card frames (different states)
     public List<GameObject> standardFrames;
     public List<GameObject> highlightedFrames;
 
@@ -116,6 +116,17 @@ public class CardController : MonoBehaviour
             fullView.gameObject.SetActive(!isInPlay); // Show full view if not in play
         }
 
+        // Set active state for highlighted frames
+        foreach (var highlightedFrame in highlightedFrames)
+        {
+            highlightedFrame.SetActive(isHighlighted);
+        }
+
+        // Set active state for standard frames
+        foreach (var standardFrame in standardFrames)
+        {
+            standardFrame.SetActive(!isHighlighted);
+        }
 
 
     }
