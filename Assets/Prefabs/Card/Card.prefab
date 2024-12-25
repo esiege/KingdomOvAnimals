@@ -1246,6 +1246,7 @@ MonoBehaviour:
   isTapped: 0
   isFlipped: 0
   isInPlay: 0
+  isHighlighted: 0
   hasSummoningSickness: 0
   isFrozen: 0
   isBuried: 0
@@ -1258,6 +1259,10 @@ MonoBehaviour:
   summoningSicknessIcon: {fileID: 8610948879989911521}
   tappedIcon: {fileID: 8188743995264107024}
   flippedIcon: {fileID: 5583491570198933734}
+  standardFrames:
+  - {fileID: 4287685258855163093}
+  highlightedFrames:
+  - {fileID: 6249323391170487101}
 --- !u!61 &2704030529723960761
 BoxCollider2D:
   m_ObjectHideFlags: 0

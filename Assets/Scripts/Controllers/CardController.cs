@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System.Collections.Generic; // Add this line
 
 public class CardController : MonoBehaviour
 {
@@ -17,6 +18,7 @@ public class CardController : MonoBehaviour
     public bool isTapped = false;
     public bool isFlipped = false;
     public bool isInPlay = false;
+    public bool isHighlighted;
 
     // Status Effects
     public bool hasSummoningSickness = true;
@@ -38,6 +40,9 @@ public class CardController : MonoBehaviour
     public GameObject tappedIcon;
     public GameObject flippedIcon;
 
+    // card frames ( from different states)
+    public List<GameObject> standardFrames;
+    public List<GameObject> highlightedFrames;
 
     // Initialization method
     public void Start()
@@ -110,6 +115,9 @@ public class CardController : MonoBehaviour
         {
             fullView.gameObject.SetActive(!isInPlay); // Show full view if not in play
         }
+
+
+
     }
 
 
