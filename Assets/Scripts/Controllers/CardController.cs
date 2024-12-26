@@ -181,6 +181,18 @@ public class CardController : MonoBehaviour
         UpdateVisualEffects();
     }
 
+    public void HighlightCard()
+    {
+        isHighlighted = true;
+        UpdateVisualEffects();
+    }
+
+    public void UnHighlightCard()
+    {
+        isHighlighted = false;
+        UpdateVisualEffects();
+    }
+
     public void UnflipCard()
     {
         isFlipped = false;
