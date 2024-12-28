@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections.LowLevel.Unsafe;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class HandController : MonoBehaviour
@@ -167,6 +169,19 @@ public class HandController : MonoBehaviour
 
         return targets;
     }
+    public bool AllPlayerSlotsFull()
+    {
+        int cnt = 0;
+
+        if (GameObject.Find("PlayerSlot-1").GetComponentInChildren<CardController>() != null)
+            cnt++;
+        if (GameObject.Find("PlayerSlot-2").GetComponentInChildren<CardController>() != null)
+            cnt++;
+        if (GameObject.Find("PlayerSlot-3").GetComponentInChildren<CardController>() != null)
+            cnt++;
+
+        return cnt == 3;
+    }
 
     private void OnCardMouseDown(CardController card)
     {
@@ -184,12 +199,7 @@ public class HandController : MonoBehaviour
 
     public void VisualizeBoardTargets()
     {
-        foreach (var t in GetAllBoardTargets())
-        {
-            CardController c = t.GetComponentInChildren<CardController>();
-            if (c != null)
-                c.UnHighlightCard();
-        }
+
         List<GameObject> offensiveTargets = activeCard.offensiveAbility.GetComponentInChildren<DamageAbility>().GetHighlightTargets();
         foreach (var t in offensiveTargets)
         {
@@ -204,7 +214,7 @@ public class HandController : MonoBehaviour
             }
             else
             {
-                if (!activeCard.hasSummoningSickness && !activeCard.isTapped)
+                if (!activeCard.hasSummoningSickness && !activeCard.isTapped && activeCard != c)
                     c.HighlightCard();
             }
 
@@ -223,7 +233,7 @@ public class HandController : MonoBehaviour
             }
             else
             {
-                if (!activeCard.hasSummoningSickness && !activeCard.isTapped)
+                if (!activeCard.hasSummoningSickness && !activeCard.isTapped && activeCard != c)
                     c.HighlightCard();
             }
         }
@@ -245,7 +255,12 @@ public class HandController : MonoBehaviour
         {
             CardController c = t.GetComponentInChildren<CardController>();
             if (c != null && c.manaCost <= owningPlayer.currentMana && owningPlayer.name == "Player")
-                c.HighlightCard();
+            {
+                if ((activeCard != null && !activeCard.isFlipped) || !AllPlayerSlotsFull())
+                    c.HighlightCard();
+
+            }
+
         }
 
     }
@@ -316,6 +331,12 @@ public class HandController : MonoBehaviour
     private void addCardToEncounter(CardController card, GameObject hitObject)
     {
         if (activeCard.isInPlay) return;
+
+        if (hitObject.GetComponentInChildren<CardController>() != null)
+        {
+            Debug.Log($"Cannot add {card.cardName} to {hitObject.name}, slot is already occupied.");
+            return;
+        }
 
         if (encounterController.currentPlayer.currentMana < card.manaCost)
         {
