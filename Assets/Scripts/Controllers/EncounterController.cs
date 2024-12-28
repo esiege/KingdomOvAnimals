@@ -14,6 +14,7 @@ public class EncounterController : MonoBehaviour
 
     // Turn Management
     public PlayerController currentPlayer;
+    public PlayerController otherPlayer;
     private bool isPlayer1Turn;
 
     public int turnNumber = 1;
@@ -62,22 +63,36 @@ public class EncounterController : MonoBehaviour
         if (isPlayer1Turn)
         {
             currentPlayer = player1;
+            otherPlayer = player2;
 
             player1.maxMana += 1;
             player1.RefillMana();
             player1.ResetBoard();
+            DrawCard(currentPlayer);
+
+            player1HandController.HideAllBoardTargets();
+            player1HandController.VisualizeHandTargets();
+            player2HandController.HideAllBoardTargets();
+            player2HandController.HideHandTargets();
+
         }
         else
         {
             currentPlayer = player2;
+            otherPlayer = player1;
 
             player2.maxMana += 1;
             player2.RefillMana();
             player2.ResetBoard();
+            DrawCard(currentPlayer);
+
+            player2HandController.HideAllBoardTargets();
+            player2HandController.VisualizeHandTargets();
+            player1HandController.HideAllBoardTargets();
+            player1HandController.HideHandTargets();
         }
 
 
-        DrawCard(currentPlayer);
     }
 
     public void EndTurn()

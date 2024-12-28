@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using TMPro;
+using System.Collections.Generic;
 
 public class DamageAbility : AbilityController
 {
@@ -53,4 +54,16 @@ public class DamageAbility : AbilityController
             Debug.LogError("No target PlayerController provided for DamageAbility.");
         }
     }
+
+    public List<GameObject> GetHighlightTargets()
+    {
+        List<GameObject> targets = new List<GameObject>();
+
+        targets.Add(GameObject.Find("OpponentSlot-1"));
+        targets.Add(GameObject.Find("OpponentSlot-2"));
+        targets.Add(GameObject.Find("OpponentSlot-3"));
+
+        return targets;
+    }
+
 }

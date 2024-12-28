@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using TMPro;
+using System.Collections.Generic;
 
 public class HealAbility : AbilityController
 {
@@ -52,5 +53,16 @@ public class HealAbility : AbilityController
         {
             Debug.LogError("No target PlayerController provided for HealAbility.");
         }
+    }
+
+    public List<GameObject> GetHighlightTargets()
+    {
+        List<GameObject> targets = new List<GameObject>();
+
+        targets.Add(GameObject.Find("PlayerSlot-1"));
+        targets.Add(GameObject.Find("PlayerSlot-2"));
+        targets.Add(GameObject.Find("PlayerSlot-3"));
+
+        return targets;
     }
 }

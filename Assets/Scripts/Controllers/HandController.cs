@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class HandController : MonoBehaviour
 {
-    private List<CardController> hand = new List<CardController>();
+    private List<CardController> playerHand = new List<CardController>();
     private List<HoverHandler> hoveredCards = new List<HoverHandler>();
     private HoverHandler focusedCardHandler;
     private CardController activeCard;
@@ -31,7 +31,15 @@ public class HandController : MonoBehaviour
         lineRenderer.material = lineMaterial;
     }
 
-    void Start() => StartCoroutine(CheckFocusedCard());
+
+
+    void Start()
+    {
+        StartCoroutine(CheckFocusedCard());
+        VisualizeHandTargets();
+        HideAllBoardTargets();
+    }
+
 
     void Update() => HandleMouseInput();
 
@@ -68,20 +76,20 @@ public class HandController : MonoBehaviour
 
     public void AddCardToHand(CardController card)
     {
-        if (hand.Count >= cardPositions.Count)
+        if (playerHand.Count >= cardPositions.Count) //?
         {
             Debug.LogError("Hand is full. Cannot add more cards.");
             return;
         }
 
-        int positionIndex = hand.Count;
+        int positionIndex = playerHand.Count;
 
         // Instantiate the card and position it correctly in the hand
         GameObject cardObject = Instantiate(card.gameObject, cardPositions[positionIndex].transform.position, Quaternion.identity);
         cardObject.transform.SetParent(cardPositions[positionIndex].transform);
 
         CardController instantiatedCard = cardObject.GetComponent<CardController>();
-        hand.Add(instantiatedCard);
+        playerHand.Add(instantiatedCard);
 
         if (cardObject.GetComponent<BoxCollider2D>() == null)
             cardObject.AddComponent<BoxCollider2D>();
@@ -95,11 +103,11 @@ public class HandController : MonoBehaviour
 
     public void RemoveCardFromHand(CardController card)
     {
-        int removedIndex = hand.IndexOf(card);  // Get the index of the card being removed
+        int removedIndex = playerHand.IndexOf(card);  // Get the index of the card being removed
         if (removedIndex >= 0)
         {
             // Remove the card from the hand
-            hand.RemoveAt(removedIndex);
+            playerHand.RemoveAt(removedIndex);
 
             // Re-arrange the cards to ensure the gaps are filled
             ArrangeCardsInHand();
@@ -113,9 +121,9 @@ public class HandController : MonoBehaviour
     // Method to arrange the cards in hand and update their positions
     private void ArrangeCardsInHand()
     {
-        for (int i = 0; i < hand.Count; i++)
+        for (int i = 0; i < playerHand.Count; i++)
         {
-            GameObject cardObject = hand[i].gameObject;
+            GameObject cardObject = playerHand[i].gameObject;
 
             // Move the card to its new position based on the current index
             cardObject.transform.SetParent(cardPositions[i].transform);
@@ -130,7 +138,7 @@ public class HandController : MonoBehaviour
             SpriteRenderer spriteRenderer = cardObject.GetComponent<SpriteRenderer>();
             if (spriteRenderer != null)
             {
-                spriteRenderer.sortingOrder = hand.Count - i; // Higher sortingOrder for leftmost card
+                spriteRenderer.sortingOrder = playerHand.Count - i; // Higher sortingOrder for leftmost card
             }
 
             // Update any other logic associated with the card (like hover behavior)
@@ -143,7 +151,22 @@ public class HandController : MonoBehaviour
     }
 
 
+    public List<GameObject> GetAllBoardTargets()
+    {
+        List<GameObject> targets = new List<GameObject>();
 
+        targets.Add(GameObject.Find("OpponentSlot-1"));
+        targets.Add(GameObject.Find("OpponentSlot-2"));
+        targets.Add(GameObject.Find("OpponentSlot-3"));
+        targets.Add(GameObject.Find("PlayerSlot-1"));
+        targets.Add(GameObject.Find("PlayerSlot-2"));
+        targets.Add(GameObject.Find("PlayerSlot-3"));
+
+        //targets.Add(GameObject.Find("Player"));
+        //targets.Add(GameObject.Find("Opponent"));
+
+        return targets;
+    }
 
     private void OnCardMouseDown(CardController card)
     {
@@ -153,7 +176,92 @@ public class HandController : MonoBehaviour
         lineRenderer.enabled = true;
         lineRenderer.SetPosition(0, activeCardPosition);
         activeCard.isActive = true;
+        HideHandTargets();
+        VisualizeBoardTargets();
+
     }
+
+
+    public void VisualizeBoardTargets()
+    {
+        foreach (var t in GetAllBoardTargets())
+        {
+            CardController c = t.GetComponentInChildren<CardController>();
+            if (c != null)
+                c.UnHighlightCard();
+        }
+        List<GameObject> offensiveTargets = activeCard.offensiveAbility.GetComponentInChildren<DamageAbility>().GetHighlightTargets();
+        foreach (var t in offensiveTargets)
+        {
+            CardController c = t.GetComponentInChildren<CardController>();
+
+            if (c == null || owningPlayer.name != "Player") continue;
+
+            if (activeCard.isInHand)
+            {
+                if (!activeCard.isFlipped && activeCard.manaCost <= owningPlayer.currentMana)
+                    c.HighlightCard();
+            }
+            else
+            {
+                if (!activeCard.hasSummoningSickness && !activeCard.isTapped)
+                    c.HighlightCard();
+            }
+
+        }
+        List<GameObject> supportTargets = activeCard.supportAbility.GetComponentInChildren<HealAbility>().GetHighlightTargets();
+        foreach (var t in supportTargets)
+        {
+            CardController c = t.GetComponentInChildren<CardController>();
+
+            if (c == null || owningPlayer.name != "Player") continue;
+
+            if (activeCard.isInHand)
+            {
+                if (!activeCard.isFlipped && activeCard.manaCost <= owningPlayer.currentMana)
+                    c.HighlightCard();
+            }
+            else
+            {
+                if (!activeCard.hasSummoningSickness && !activeCard.isTapped)
+                    c.HighlightCard();
+            }
+        }
+    }
+
+    public void HideAllBoardTargets()
+    {
+        foreach (var t in GetAllBoardTargets())
+        {
+            CardController c = t.GetComponentInChildren<CardController>();
+            if (c != null)
+                c.UnHighlightCard();
+        }
+    }
+
+    public void VisualizeHandTargets()
+    {
+        foreach (var t in cardPositions)
+        {
+            CardController c = t.GetComponentInChildren<CardController>();
+            if (c != null && c.manaCost <= owningPlayer.currentMana && owningPlayer.name == "Player")
+                c.HighlightCard();
+        }
+
+    }
+    public void HideHandTargets()
+    {
+
+        foreach (var t in cardPositions)
+        {
+            CardController c = t.GetComponentInChildren<CardController>();
+            if (c != null)
+                c.UnHighlightCard();
+        }
+
+    }
+
+
 
     private void OnMouseDrag()
     {
@@ -409,9 +517,12 @@ public class HandController : MonoBehaviour
         //activeCard.GetComponent<HoverHandler>().enabled = true;
         activeCard = null;
         lineRenderer.enabled = false;
+
+        HideAllBoardTargets();
+        VisualizeHandTargets();
     }
 
-    public List<CardController> GetHand() => hand;
+    public List<CardController> GetHand() => playerHand;
 
     public void AddHoveredCard(HoverHandler hoverHandler)
     {
