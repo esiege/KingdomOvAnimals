@@ -38,8 +38,8 @@ public class HandController : MonoBehaviour
     void Start()
     {
         StartCoroutine(CheckFocusedCard());
-        VisualizeHandTargets();
-        HideAllBoardTargets();
+        VisualizePlayableHand();
+        HideBoardTargets();
     }
 
 
@@ -191,7 +191,7 @@ public class HandController : MonoBehaviour
         lineRenderer.enabled = true;
         lineRenderer.SetPosition(0, activeCardPosition);
         activeCard.isActive = true;
-        HideHandTargets();
+        HidePlayableHand();
         VisualizeBoardTargets();
 
     }
@@ -239,7 +239,7 @@ public class HandController : MonoBehaviour
         }
     }
 
-    public void HideAllBoardTargets()
+    public void HideBoardTargets()
     {
         foreach (var t in GetAllBoardTargets())
         {
@@ -249,7 +249,16 @@ public class HandController : MonoBehaviour
         }
     }
 
-    public void VisualizeHandTargets()
+    public void HidePlayableBoard()
+    {
+
+    }
+    public void VisualizePlayableBoard()
+    {
+
+    }
+
+    public void VisualizePlayableHand()
     {
         foreach (var t in cardPositions)
         {
@@ -264,7 +273,7 @@ public class HandController : MonoBehaviour
         }
 
     }
-    public void HideHandTargets()
+    public void HidePlayableHand()
     {
 
         foreach (var t in cardPositions)
@@ -539,8 +548,8 @@ public class HandController : MonoBehaviour
         activeCard = null;
         lineRenderer.enabled = false;
 
-        HideAllBoardTargets();
-        VisualizeHandTargets();
+        HideBoardTargets();
+        VisualizePlayableHand();
     }
 
     public List<CardController> GetHand() => playerHand;

@@ -70,10 +70,10 @@ public class EncounterController : MonoBehaviour
             player1.ResetBoard();
             DrawCard(currentPlayer);
 
-            player1HandController.HideAllBoardTargets();
-            player1HandController.VisualizeHandTargets();
-            player2HandController.HideAllBoardTargets();
-            player2HandController.HideHandTargets();
+            player1HandController.HideBoardTargets();
+            player1HandController.VisualizePlayableHand();
+            player2HandController.HideBoardTargets();
+            player2HandController.HidePlayableHand();
 
         }
         else
@@ -86,10 +86,10 @@ public class EncounterController : MonoBehaviour
             player2.ResetBoard();
             DrawCard(currentPlayer);
 
-            player2HandController.HideAllBoardTargets();
-            player2HandController.VisualizeHandTargets();
-            player1HandController.HideAllBoardTargets();
-            player1HandController.HideHandTargets();
+            player2HandController.HideBoardTargets();
+            player2HandController.VisualizePlayableHand();
+            player1HandController.HideBoardTargets();
+            player1HandController.HidePlayableHand();
         }
 
 
