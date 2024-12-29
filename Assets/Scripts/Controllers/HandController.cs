@@ -218,7 +218,7 @@ public class HandController : MonoBehaviour
         {
             CardController c = t.GetComponentInChildren<CardController>();
 
-            if (c == null || owningPlayer.name != "Player") continue;
+            if (c == null || owningPlayer.name != "PlayerController") continue;
 
             if (activeCard.isInHand)
             {
@@ -237,7 +237,7 @@ public class HandController : MonoBehaviour
         {
             CardController c = t.GetComponentInChildren<CardController>();
 
-            if (c == null || owningPlayer.name != "Player") continue;
+            if (c == null || owningPlayer.name != "PlayerController") continue;
 
             if (activeCard.isInHand)
             {
@@ -288,7 +288,7 @@ public class HandController : MonoBehaviour
         foreach (var t in cardPositions)
         {
             CardController c = t.GetComponentInChildren<CardController>();
-            if (c != null && c.manaCost <= owningPlayer.currentMana && owningPlayer.name == "Player")
+            if (c != null && c.manaCost <= owningPlayer.currentMana && owningPlayer.name == "PlayerController")
             {
                 if (!c.isFlipped || !AllPlayerSlotsFull())
                     c.HighlightCard();
@@ -573,7 +573,7 @@ public class HandController : MonoBehaviour
         activeCard = null;
         lineRenderer.enabled = false;
 
-        if (encounterController.currentPlayer.name == "Player")
+        if (encounterController.currentPlayer.name == "PlayerController")
         {
             HideBoardTargets();
             VisualizePlayableHand();
