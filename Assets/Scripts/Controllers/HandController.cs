@@ -169,6 +169,19 @@ public class HandController : MonoBehaviour
 
         return targets;
     }
+    public List<GameObject> GetPlayerPlayableBoard()
+    {
+        List<GameObject> targets = new List<GameObject>();
+
+        targets.Add(GameObject.Find("PlayerSlot-1"));
+        targets.Add(GameObject.Find("PlayerSlot-2"));
+        targets.Add(GameObject.Find("PlayerSlot-3"));
+
+        //targets.Add(GameObject.Find("Player"));
+        //targets.Add(GameObject.Find("Opponent"));
+
+        return targets;
+    }
     public bool AllPlayerSlotsFull()
     {
         int cnt = 0;
@@ -251,10 +264,22 @@ public class HandController : MonoBehaviour
 
     public void HidePlayableBoard()
     {
-
+        foreach (var t in GetPlayerPlayableBoard())
+        {
+            CardController c = t.GetComponentInChildren<CardController>();
+            if (c != null)
+                c.UnHighlightCard();
+        }
     }
     public void VisualizePlayableBoard()
     {
+
+        foreach (var t in GetPlayerPlayableBoard())
+        {
+            CardController c = t.GetComponentInChildren<CardController>();
+            if (c != null && !c.isTapped && !c.hasSummoningSickness)
+                c.HighlightCard();
+        }
 
     }
 
@@ -265,7 +290,7 @@ public class HandController : MonoBehaviour
             CardController c = t.GetComponentInChildren<CardController>();
             if (c != null && c.manaCost <= owningPlayer.currentMana && owningPlayer.name == "Player")
             {
-                if ((activeCard != null && !activeCard.isFlipped) || !AllPlayerSlotsFull())
+                if (!c.isFlipped || !AllPlayerSlotsFull())
                     c.HighlightCard();
 
             }
@@ -548,8 +573,15 @@ public class HandController : MonoBehaviour
         activeCard = null;
         lineRenderer.enabled = false;
 
-        HideBoardTargets();
-        VisualizePlayableHand();
+        if (encounterController.currentPlayer.name == "Player")
+        {
+            HideBoardTargets();
+            VisualizePlayableHand();
+
+            HidePlayableBoard();
+            VisualizePlayableBoard();
+
+        }
     }
 
     public List<CardController> GetHand() => playerHand;

@@ -71,9 +71,10 @@ public class EncounterController : MonoBehaviour
             DrawCard(currentPlayer);
 
             player1HandController.HideBoardTargets();
+            player1HandController.HidePlayableHand();
+            player1HandController.HidePlayableBoard();
             player1HandController.VisualizePlayableHand();
-            player2HandController.HideBoardTargets();
-            player2HandController.HidePlayableHand();
+            player1HandController.VisualizePlayableBoard();
 
         }
         else
@@ -86,13 +87,10 @@ public class EncounterController : MonoBehaviour
             player2.ResetBoard();
             DrawCard(currentPlayer);
 
-            player2HandController.HideBoardTargets();
-            player2HandController.VisualizePlayableHand();
             player1HandController.HideBoardTargets();
             player1HandController.HidePlayableHand();
+            player1HandController.HidePlayableBoard();
         }
-
-
     }
 
     public void EndTurn()
