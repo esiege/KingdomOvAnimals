@@ -530,37 +530,62 @@ public class HandController : MonoBehaviour
     {
         lineRenderer.startColor = lineRenderer.endColor = color;
     }
-
     private void OnMouseUp()
     {
         if (activeCard == null) return;
 
-        RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-        if (encounterController.currentPlayer != owningPlayer)
-        {
-        }
-        else if (hit.collider != null)
-        {
-            GameObject hitObject = hit.collider.gameObject;
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePosition.z = 0;
 
+        // Get all colliders at the mouse position
+        RaycastHit2D[] hits = Physics2D.RaycastAll(mousePosition, Vector2.zero);
+
+        GameObject hitObject = null;
+        CardController targetCard = null;
+        PlayerController targetPlayer = null;
+
+        // Iterate through hits to find the first relevant object (CardController or PlayerController)
+        foreach (var hit in hits)
+        {
+            if (hit.collider.TryGetComponent(out CardController card))
+            {
+                targetCard = card;
+                hitObject = hit.collider.gameObject;
+                break;
+            }
+            else if (hit.collider.TryGetComponent(out PlayerController player))
+            {
+                targetPlayer = player;
+                hitObject = hit.collider.gameObject;
+                break;
+            }
+            else
+            {
+                hitObject = hit.collider.gameObject; // Fallback to generic hit (e.g., slot)
+            }
+        }
+
+        if (hitObject != null)
+        {
             string slotName = "PlayerSlot";
             if (owningPlayer.name == "Opponent")
                 slotName = "OpponentSlot";
 
-            // drag card to empty slot
+            // Drag card to empty slot
             if (hitObject.name.StartsWith(slotName))
+            {
                 addCardToEncounter(activeCard, hitObject);
-
-            // drag card on to another card
-            else if (hitObject.TryGetComponent(out CardController targetCard))
+            }
+            // Drag card onto another card
+            else if (targetCard != null)
             {
                 if (targetCard.owningPlayer == this.owningPlayer)
                     useCardAbilityDefensive(targetCard);
                 else
                     useCardAbilityOffensive(targetCard);
             }
-            // drag card on to a player
-            else if (hitObject.TryGetComponent(out PlayerController targetPlayer))
+            // Drag card onto a player
+            else if (targetPlayer != null)
             {
                 if (targetPlayer == owningPlayer)
                     useCardAbilityDefensive(targetPlayer);
@@ -569,10 +594,10 @@ public class HandController : MonoBehaviour
             }
         }
 
-        //activeCard.GetComponent<HoverHandler>().enabled = true;
         activeCard = null;
         lineRenderer.enabled = false;
 
+        // Hide and visualize targets and playables
         if (encounterController.currentPlayer.name == "PlayerController")
         {
             HideBoardTargets();
@@ -580,7 +605,6 @@ public class HandController : MonoBehaviour
 
             HidePlayableBoard();
             VisualizePlayableBoard();
-
         }
     }
 
