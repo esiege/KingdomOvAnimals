@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
-using System.Collections.Generic; // Add this line
+using System.Collections.Generic; 
+using System;
 
 public class CardController : MonoBehaviour
 {
@@ -11,6 +12,9 @@ public class CardController : MonoBehaviour
 
     // Owner reference
     public PlayerController owningPlayer;
+
+    // Unique ID for each card
+    public string id;
 
     // Card status tracking
     public bool isInHand = true;
@@ -47,6 +51,7 @@ public class CardController : MonoBehaviour
     // Initialization method
     public void Start()
     {
+        id = Guid.NewGuid().ToString();
         UpdateCardUI();
         UpdateVisualEffects(); // Update visuals on load
     }

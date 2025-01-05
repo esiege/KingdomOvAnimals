@@ -14,6 +14,7 @@ public class HandController : MonoBehaviour
     private LineRenderer lineRenderer;
 
     public List<GameObject> cardPositions;
+    public TargetingController targetingController;
     public EncounterController encounterController;
     public float transitionSpeed = 5f;
     public float zIncrement = 0.2f;
@@ -40,6 +41,7 @@ public class HandController : MonoBehaviour
         StartCoroutine(CheckFocusedCard());
         VisualizePlayableHand();
         HideBoardTargets();
+
     }
 
 
@@ -103,9 +105,11 @@ public class HandController : MonoBehaviour
         ArrangeCardsInHand();
     }
 
-    public void RemoveCardFromHand(CardController card)
+    public void RemoveCardFromHand(string cardId)
     {
-        int removedIndex = playerHand.IndexOf(card);  // Get the index of the card being removed
+        // Find the card in the hand by its ID
+        int removedIndex = playerHand.FindIndex(card => card.id == cardId);
+
         if (removedIndex >= 0)
         {
             // Remove the card from the hand
@@ -116,9 +120,10 @@ public class HandController : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Attempted to remove a card that is not in the hand.");
+            Debug.LogWarning($"Attempted to remove a card with ID {cardId} that is not in the hand.");
         }
     }
+
 
     // Method to arrange the cards in hand and update their positions
     private void ArrangeCardsInHand()
@@ -212,7 +217,19 @@ public class HandController : MonoBehaviour
 
     public void VisualizeBoardTargets()
     {
+        if (!targetingController)
+            return;
 
+        List<CardController> targets = targetingController.GetUsableCardsOnBoard();
+
+        foreach (var t in targets)
+        {
+            t.HighlightCard();
+        }
+        
+        
+        
+        return;
         List<GameObject> offensiveTargets = activeCard.offensiveAbility.GetComponentInChildren<DamageAbility>().GetHighlightTargets();
         foreach (var t in offensiveTargets)
         {
@@ -232,7 +249,7 @@ public class HandController : MonoBehaviour
             }
 
         }
-        List<GameObject> supportTargets = activeCard.supportAbility.GetComponentInChildren<HealAbility>().GetHighlightTargets();
+        List<GameObject> supportTargets = activeCard.supportAbility.GetComponentInChildren<Ability_Heal>().GetHighlightTargets();
         foreach (var t in supportTargets)
         {
             CardController c = t.GetComponentInChildren<CardController>();
@@ -285,17 +302,29 @@ public class HandController : MonoBehaviour
 
     public void VisualizePlayableHand()
     {
-        foreach (var t in cardPositions)
+        if (!targetingController)
+            return;
+
+
+        List<CardController> targets = targetingController.GetPlayableCardsInHand();
+
+        foreach (var t in targets)
         {
-            CardController c = t.GetComponentInChildren<CardController>();
-            if (c != null && c.manaCost <= owningPlayer.currentMana && owningPlayer.name == "PlayerController")
-            {
-                if (!c.isFlipped || !AllPlayerSlotsFull())
-                    c.HighlightCard();
-
-            }
-
+            t.HighlightCard();
         }
+
+
+        //foreach (var t in cardPositions)
+        //{
+        //    CardController c = t.GetComponentInChildren<CardController>();
+        //    if (c != null && c.manaCost <= owningPlayer.currentMana && owningPlayer.name == "PlayerController")
+        //    {
+        //        if (!c.isFlipped || !AllPlayerSlotsFull())
+        //            c.HighlightCard();
+
+        //    }
+
+        //}
 
     }
     public void HidePlayableHand()
@@ -390,7 +419,7 @@ public class HandController : MonoBehaviour
         card.UnflipCard();
         card.EnterPlay();
 
-        RemoveCardFromHand(card);
+        RemoveCardFromHand(card.id);
         encounterController.currentPlayer.AddCardToBoard(card);
     }
 
@@ -532,6 +561,8 @@ public class HandController : MonoBehaviour
     }
     private void OnMouseUp()
     {
+
+        
         if (activeCard == null) return;
 
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
