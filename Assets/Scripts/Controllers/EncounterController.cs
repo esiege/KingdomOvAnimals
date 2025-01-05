@@ -5,17 +5,17 @@ using System.Collections.Generic;
 public class EncounterController : MonoBehaviour
 {
     // Player References
-    public PlayerController player1;
-    public PlayerController player2;
+    public PlayerController player;
+    public PlayerController opponent;
 
     // Hand Controllers for both players
-    public HandController player1HandController;
-    public HandController player2HandController;
+    public HandController playerHandController;
+    public HandController opponentHandController;
 
     // Turn Management
     public PlayerController currentPlayer;
-    public PlayerController otherPlayer;
-    private bool isPlayer1Turn;
+
+    private bool isCurrentPlayerTurn;
 
     public int turnNumber = 1;
 
@@ -32,11 +32,11 @@ public class EncounterController : MonoBehaviour
     public void InitializeEncounter()
     {
         // Initialize turn order
-        isPlayer1Turn = true;
-        currentPlayer = player1;
+        isCurrentPlayerTurn = true;
+        currentPlayer = player;
 
-        player1.ShuffleDeck();
-        player2.ShuffleDeck();
+        player.ShuffleDeck();
+        opponent.ShuffleDeck();
 
         // Start with both players drawing 3 cards with a delay
         StartCoroutine(DrawInitialCards());
@@ -47,10 +47,10 @@ public class EncounterController : MonoBehaviour
     {
         for (int i = 0; i < 3; i++)
         {
-            DrawCard(player1);
+            DrawCard(player);
             yield return new WaitForSeconds(0.1f);
 
-            DrawCard(player2);
+            DrawCard(opponent);
             yield return new WaitForSeconds(0.1f);
         }
 
@@ -60,52 +60,50 @@ public class EncounterController : MonoBehaviour
     // Method to start a player's turn
     public void StartTurn()
     {
-        if (isPlayer1Turn)
+        if (isCurrentPlayerTurn)
         {
-            currentPlayer = player1;
-            otherPlayer = player2;
+            currentPlayer = player;
 
-            player1.maxMana += 1;
-            player1.RefillMana();
-            player1.ResetBoard();
+            player.maxMana += 1;
+            player.RefillMana();
+            player.ResetBoard();
             DrawCard(currentPlayer);
 
-            player1HandController.HideBoardTargets();
-            player1HandController.HidePlayableHand();
-            player1HandController.HidePlayableBoard();
-            player1HandController.VisualizePlayableHand();
-            player1HandController.VisualizePlayableBoard();
+            playerHandController.HideBoardTargets();
+            playerHandController.HidePlayableHand();
+            playerHandController.HidePlayableBoard();
+            playerHandController.VisualizePlayableHand();
+            playerHandController.VisualizePlayableBoard();
 
         }
         else
         {
-            currentPlayer = player2;
-            otherPlayer = player1;
+            currentPlayer = opponent;
 
-            player2.maxMana += 1;
-            player2.RefillMana();
-            player2.ResetBoard();
+            opponent.maxMana += 1;
+            opponent.RefillMana();
+            opponent.ResetBoard();
             DrawCard(currentPlayer);
 
-            player1HandController.HideBoardTargets();
-            player1HandController.HidePlayableHand();
-            player1HandController.HidePlayableBoard();
+            playerHandController.HideBoardTargets();
+            playerHandController.HidePlayableHand();
+            playerHandController.HidePlayableBoard();
         }
     }
 
     public void EndTurn()
     {
-        isPlayer1Turn = !isPlayer1Turn;
+        isCurrentPlayerTurn = !isCurrentPlayerTurn;
         turnNumber++;
 
-        Debug.Log("Turn ended. It is now " + (isPlayer1Turn ? "Player 1's" : "Player 2's") + " turn: " + turnNumber);
+        Debug.Log("Turn ended. It is now " + (isCurrentPlayerTurn ? "Player 1's" : "Player 2's") + " turn: " + turnNumber);
 
         StartTurn();
     }
 
     private void DrawCard(PlayerController player)
     {
-        HandController handController = player == player1 ? player1HandController : player2HandController;
+        HandController handController = player == this.player ? playerHandController : opponentHandController;
 
         if (handController.GetHand().Count >= maxHandSize)
         {

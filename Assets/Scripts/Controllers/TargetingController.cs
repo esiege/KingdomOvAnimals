@@ -10,9 +10,9 @@ public class TargetingController : MonoBehaviour
     {
         List<CardController> playableCards = new List<CardController>();
 
-        HandController handController = encounterController.currentPlayer == encounterController.player1
-            ? encounterController.player1HandController
-            : encounterController.player2HandController;
+        HandController handController = encounterController.currentPlayer == encounterController.player
+            ? encounterController.playerHandController
+            : encounterController.opponentHandController;
 
         if (!HasOpenBoardSlot(encounterController.currentPlayer))
         {
@@ -70,7 +70,7 @@ public class TargetingController : MonoBehaviour
         switch (targetType)
         {
             case AbilityTargetType.SingleEnemy:
-                offensiveTargets.Add(GetFirstEnemyTarget() ?? encounterController.player2.gameObject);
+                offensiveTargets.Add(GetFirstEnemyTarget() ?? encounterController.opponent.gameObject);
                 break;
 
             case AbilityTargetType.AllEnemies:
