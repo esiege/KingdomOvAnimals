@@ -80,7 +80,7 @@ public class HandController : MonoBehaviour
 
     public void AddCardToHand(CardController card)
     {
-        if (playerHand.Count >= cardPositions.Count) //?
+        if (playerHand.Count >= cardPositions.Count) 
         {
             Debug.LogError("Hand is full. Cannot add more cards.");
             return;
@@ -345,7 +345,6 @@ public class HandController : MonoBehaviour
     {
         if (activeCard == null) return;
 
-
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePosition.z = 0;
         lineRenderer.SetPosition(1, mousePosition);
@@ -365,7 +364,7 @@ public class HandController : MonoBehaviour
             slotName = "OpponentSlot";
 
 
-        if (activeCard.owningPlayer != encounterController.currentPlayer)
+        if (owningPlayer != encounterController.currentPlayer)
             return;
 
         if (hitObject.name.StartsWith(slotName))
@@ -394,6 +393,7 @@ public class HandController : MonoBehaviour
     private void addCardToEncounter(CardController card, GameObject hitObject)
     {
         if (activeCard.isInPlay) return;
+        if (owningPlayer != encounterController.currentPlayer) return;
 
         if (hitObject.GetComponentInChildren<CardController>() != null)
         {
