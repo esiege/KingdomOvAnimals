@@ -23,7 +23,6 @@ public class HandController : MonoBehaviour
     // Owner reference
     public PlayerController owningPlayer;
 
-    private Vector3 hoverOffset = new Vector3(0, 1.8f, 0);
 
     void Awake()
     {
@@ -45,7 +44,13 @@ public class HandController : MonoBehaviour
     }
 
 
-    void Update() => HandleMouseInput();
+    void Update()
+    {
+        if (owningPlayer != encounterController.currentPlayer) return;
+
+        HandleMouseInput();
+    }
+
 
     private void HandleMouseInput()
     {
@@ -80,7 +85,7 @@ public class HandController : MonoBehaviour
 
     public void AddCardToHand(CardController card)
     {
-        if (playerHand.Count >= cardPositions.Count) 
+        if (playerHand.Count >= cardPositions.Count)
         {
             Debug.LogError("Hand is full. Cannot add more cards.");
             return;
@@ -210,63 +215,46 @@ public class HandController : MonoBehaviour
         lineRenderer.SetPosition(0, activeCardPosition);
         activeCard.isActive = true;
         HidePlayableHand();
-        VisualizeBoardTargets();
+        VisualizeBoardTargets(card);
 
     }
 
 
-    public void VisualizeBoardTargets()
+    public void VisualizeBoardTargets(CardController card)
     {
         if (!targetingController)
             return;
 
-        List<CardController> targets = targetingController.GetUsableCardsOnBoard();
 
-        foreach (var t in targets)
+        foreach (var t in encounterController.currentPlayer.board)
         {
-            t.HighlightCard();
+            t.UnHighlightCard();
         }
-        
-        
-        
-        return;
-        List<GameObject> offensiveTargets = activeCard.offensiveAbility.GetComponentInChildren<DamageAbility>().GetHighlightTargets();
-        foreach (var t in offensiveTargets)
-        {
-            CardController c = t.GetComponentInChildren<CardController>();
 
-            if (c == null || owningPlayer.name != "PlayerController") continue;
 
-            if (activeCard.isInHand)
-            {
-                if (!activeCard.isFlipped && activeCard.manaCost <= owningPlayer.currentMana)
-                    c.HighlightCard();
-            }
-            else
-            {
-                if (!activeCard.hasSummoningSickness && !activeCard.isTapped && activeCard != c)
-                    c.HighlightCard();
-            }
-
-        }
-        List<GameObject> supportTargets = activeCard.supportAbility.GetComponentInChildren<Ability_Heal>().GetHighlightTargets();
+        List<GameObject> supportTargets = targetingController.GetSupportTargets(card);
         foreach (var t in supportTargets)
         {
             CardController c = t.GetComponentInChildren<CardController>();
 
-            if (c == null || owningPlayer.name != "PlayerController") continue;
+            if (c != null)
+                c.HighlightCard();
 
-            if (activeCard.isInHand)
-            {
-                if (!activeCard.isFlipped && activeCard.manaCost <= owningPlayer.currentMana)
-                    c.HighlightCard();
-            }
-            else
-            {
-                if (!activeCard.hasSummoningSickness && !activeCard.isTapped && activeCard != c)
-                    c.HighlightCard();
-            }
+            PlayerController p = t.GetComponentInChildren<PlayerController>();
         }
+
+        List<GameObject> offensiveTargets = targetingController.GetOffensiveTargets(card);
+        foreach (var t in offensiveTargets)
+        {
+            CardController c = t.GetComponentInChildren<CardController>();
+
+            if (c != null)
+                c.HighlightCard();
+
+            PlayerController p = t.GetComponentInChildren<PlayerController>();
+        }
+        
+        
     }
 
     public void HideBoardTargets()
@@ -449,6 +437,7 @@ public class HandController : MonoBehaviour
 
         activeCard.ActivateDefensiveAbility(targetCard);
         Debug.Log("Defense action triggered on card!");
+
     }
 
     // Activate Defensive Ability: PlayerController target
@@ -561,8 +550,6 @@ public class HandController : MonoBehaviour
     }
     private void OnMouseUp()
     {
-
-        
         if (activeCard == null) return;
 
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -628,15 +615,11 @@ public class HandController : MonoBehaviour
         activeCard = null;
         lineRenderer.enabled = false;
 
-        // Hide and visualize targets and playables
-        if (encounterController.currentPlayer.name == "PlayerController")
-        {
-            HideBoardTargets();
-            VisualizePlayableHand();
+        HideBoardTargets();
+        VisualizePlayableHand();
 
-            HidePlayableBoard();
-            VisualizePlayableBoard();
-        }
+        HidePlayableBoard();
+        VisualizePlayableBoard();
     }
 
     public List<CardController> GetHand() => playerHand;
