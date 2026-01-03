@@ -1,0 +1,41 @@
+# Sprint 01 - FishNet Foundation
+
+## Sprint Information
+
+- **Sprint Number**: 01
+- **Start Date**: January 3, 2026
+- **End Date**: January 17, 2026
+- **Duration**: 2 weeks (10 working days)
+- **Status**: 🟡 In Progress
+
+## Sprint Goal
+
+Set up the FishNet NetworkManager foundation for multiplayer.
+
+## Sprint Backlog
+
+| Story ID | Title | Priority | Status |
+|----------|-------|----------|--------|
+| 001 | Setup FishNet NetworkManager scene | High | 🟡 In Progress |
+
+## Daily Progress
+
+### Day 1 - January 3, 2026
+- Sprint kickoff
+- Committed to Story 001: Setup FishNet NetworkManager scene
+- Starting implementation
+
+## Sprint Review Notes
+*(To be filled at sprint end)*
+
+## Sprint Retrospective
+*(To be filled at sprint end)*
+
+### What went well?
+- 
+
+### What could be improved?
+- 
+
+### Action items for next sprint
+- 
