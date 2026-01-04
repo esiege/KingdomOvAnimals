@@ -16,7 +16,9 @@ Set up the FishNet NetworkManager foundation for multiplayer.
 
 | Story ID | Title | Priority | Status |
 |----------|-------|----------|--------|
-| 001 | Setup FishNet NetworkManager scene | High | 🟡 In Progress |
+| 001 | Setup FishNet NetworkManager scene | High | ✅ Complete |
+| 002 | Create player connection handler | High | ✅ Complete |
+| 003 | Create main menu scene | High | 🟡 In Progress |
 
 ## Daily Progress
 

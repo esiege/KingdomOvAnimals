@@ -6,10 +6,10 @@ Stories in priority order. We commit to **1 story at a time per sprint**.
 
 ## Backlog
 
-1. [x] Setup FishNet NetworkManager scene *(Sprint 01 - In Progress)*
-2. [ ] Create player connection handler
-3. [ ] Implement basic server hosting
-4. [ ] Implement client connection flow
+1. [x] Setup FishNet NetworkManager scene *(Sprint 01 - Complete)*
+2. [x] Create player connection handler *(Sprint 01 - Complete)*
+3. [x] Create main menu scene *(Sprint 01 - Complete)*
+4. [ ] Sync player health and mana across network
 5. [ ] Create main menu with Find Game button
 6. [ ] Implement simple matchmaking queue
 7. [ ] Pair two players and start match
@@ -34,4 +34,6 @@ Stories in priority order. We commit to **1 story at a time per sprint**.
 
 | Story | Sprint | Completed |
 |-------|--------|-----------|
-| - | - | - |
+| Setup FishNet NetworkManager scene | Sprint 01 | 2026-01-03 |
+| Create player connection handler | Sprint 01 | 2026-01-03 |
+| Create main menu scene | Sprint 01 | 2026-01-03 |
