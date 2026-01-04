@@ -180,6 +180,25 @@ public class PlayerController : MonoBehaviour
         }
         Debug.Log("Deck shuffled!");
     }
+    
+    /// <summary>
+    /// Shuffle the deck using a specific seed for deterministic results (network sync).
+    /// </summary>
+    public void ShuffleDeckWithSeed(int seed)
+    {
+        // Use System.Random with seed for deterministic shuffle
+        System.Random rng = new System.Random(seed);
+        
+        for (int i = deck.Count - 1; i > 0; i--)
+        {
+            int randomIndex = rng.Next(i + 1);
+            // Swap current card with a card at a random index
+            CardController temp = deck[i];
+            deck[i] = deck[randomIndex];
+            deck[randomIndex] = temp;
+        }
+        Debug.Log($"Deck shuffled with seed {seed}!");
+    }
 
     // Method to manage mana
     public void RefillMana()

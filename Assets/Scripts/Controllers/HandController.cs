@@ -414,6 +414,47 @@ public class HandController : MonoBehaviour
             return;
         }
 
+        // Check if we're in a network game
+        if (owningPlayer.networkPlayer != null)
+        {
+            // Network play - send request to server
+            int cardIndex = playerHand.IndexOf(card);
+            int slotIndex = GetSlotIndex(hitObject);
+            
+            if (cardIndex >= 0 && slotIndex >= 0)
+            {
+                Debug.Log($"[HandController] Sending network card play: card {cardIndex}, slot {slotIndex}");
+                owningPlayer.networkPlayer.CmdPlayCard(cardIndex, slotIndex);
+            }
+            else
+            {
+                Debug.LogError($"[HandController] Invalid card index {cardIndex} or slot index {slotIndex}");
+            }
+            return;
+        }
+
+        // Local play (single player or fallback)
+        ExecuteLocalCardPlay(card, hitObject);
+    }
+    
+    /// <summary>
+    /// Gets the slot index (0, 1, 2) from a slot GameObject.
+    /// </summary>
+    private int GetSlotIndex(GameObject slot)
+    {
+        string slotName = slot.name;
+        // Handles both "PlayerSlot-1" and "OpponentSlot-1" etc.
+        if (slotName.Contains("-1")) return 0;
+        if (slotName.Contains("-2")) return 1;
+        if (slotName.Contains("-3")) return 2;
+        return -1;
+    }
+    
+    /// <summary>
+    /// Executes a card play locally (for single player or called by network).
+    /// </summary>
+    private void ExecuteLocalCardPlay(CardController card, GameObject hitObject)
+    {
         encounterController.currentPlayer.SpendMana(card.manaCost);
 
         card.transform.SetParent(hitObject.transform);

@@ -6,27 +6,17 @@ Stories in priority order. We commit to **1 story at a time per sprint**.
 
 ## Backlog
 
-1. [x] Setup FishNet NetworkManager scene *(Sprint 01 - Complete)*
-2. [x] Create player connection handler *(Sprint 01 - Complete)*
-3. [x] Create main menu scene *(Sprint 01 - Complete)*
-4. [ ] Sync player health and mana across network
-5. [ ] Create main menu with Find Game button
-6. [ ] Implement simple matchmaking queue
-7. [ ] Pair two players and start match
-8. [ ] Sync player health and mana across network
-9. [ ] Sync card play actions to opponent
-10. [ ] Sync ability usage to opponent
-11. [ ] Sync turn state changes
-12. [ ] Replicate card positions on board
-13. [ ] Sync card status effects (tapped, summoning sickness)
-14. [ ] Sync card death/removal
-15. [ ] Network-authorize turn switching
-16. [ ] Prevent out-of-turn actions
-17. [ ] Handle player disconnect during matchmaking
-18. [ ] Handle mid-game disconnect
-19. [ ] Handle timeout/AFK player
-20. [ ] Add reconnection support
-21. [ ] Show opponent connection status indicator
+1. [x] **Story 001**: Setup FishNet NetworkManager scene *(Sprint 01 - Complete)*
+2. [x] **Story 002**: Create player connection handler *(Sprint 01 - Complete)*
+3. [x] **Story 003**: Create main menu scene *(Sprint 01 - Complete)*
+4. [x] **Story 004**: Sync player health and mana *(Sprint 01 - Complete)*
+5. [ ] **Story 005**: Sync card plays *(Sprint 01 - In Progress)*
+6. [ ] **Story 006**: Sync combat and abilities
+7. [ ] **Story 007**: Implement matchmaking queue
+8. [ ] **Story 008**: Network-authorize turn switching
+9. [ ] **Story 009**: Handle player disconnect
+10. [ ] **Story 010**: Add reconnection support
+11. [ ] **Story 011**: Show opponent connection status
 
 ---
 
@@ -34,6 +24,7 @@ Stories in priority order. We commit to **1 story at a time per sprint**.
 
 | Story | Sprint | Completed |
 |-------|--------|-----------|
-| Setup FishNet NetworkManager scene | Sprint 01 | 2026-01-03 |
-| Create player connection handler | Sprint 01 | 2026-01-03 |
-| Create main menu scene | Sprint 01 | 2026-01-03 |
+| 001 - Setup FishNet NetworkManager scene | Sprint 01 | 2026-01-03 |
+| 002 - Create player connection handler | Sprint 01 | 2026-01-03 |
+| 003 - Create main menu scene | Sprint 01 | 2026-01-03 |
+| 004 - Sync player health and mana | Sprint 01 | 2026-01-03 |

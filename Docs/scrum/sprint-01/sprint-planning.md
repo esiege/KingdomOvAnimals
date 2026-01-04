@@ -19,7 +19,8 @@ Set up the FishNet NetworkManager foundation for multiplayer.
 | 001 | Setup FishNet NetworkManager scene | High | ✅ Complete |
 | 002 | Create player connection handler | High | ✅ Complete |
 | 003 | Create main menu scene | High | ✅ Complete |
-| 004 | Sync player health and mana | High | 🟡 In Progress |
+| 004 | Sync player health and mana | High | ✅ Complete |
+| 005 | Sync card plays | High | 🟡 In Progress |
 
 ## Daily Progress
 

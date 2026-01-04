@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -22,8 +24,13 @@ public class EncounterController : MonoBehaviour
     // Maximum hand size
     public int maxHandSize = 5;
     
+    // Turn Indicator UI
+    [Header("Turn Indicator")]
+    public TextMeshProUGUI turnIndicatorText;
+    
     // Network mode flag
     private bool isNetworkGame = false;
+    private bool networkInitialized = false;
     private NetworkGameManager networkGameManager;
 
     // Initialization method
@@ -37,24 +44,13 @@ public class EncounterController : MonoBehaviour
         {
             Debug.Log("[EncounterController] Network game detected, waiting for network to start game...");
             // In network mode, wait for NetworkGameManager to call OnNetworkGameStarted
-            // But still do initial setup
-            InitializeEncounterLocal();
+            // DON'T shuffle/draw here - wait for seed from server
         }
         else
         {
             // Single player mode - initialize normally
             InitializeEncounter();
         }
-    }
-    
-    /// <summary>
-    /// Local initialization (deck shuffle, draw cards) - no turn logic
-    /// </summary>
-    private void InitializeEncounterLocal()
-    {
-        player.ShuffleDeck();
-        opponent.ShuffleDeck();
-        StartCoroutine(DrawInitialCards());
     }
 
     // Method to initialize the encounter (single player mode)
@@ -74,14 +70,34 @@ public class EncounterController : MonoBehaviour
     /// <summary>
     /// Called by NetworkGameManager when the networked game starts.
     /// </summary>
-    public void OnNetworkGameStarted(bool isLocalPlayerFirst)
+    public void OnNetworkGameStarted(bool isLocalPlayerFirst, int shuffleSeed)
     {
-        Debug.Log($"[EncounterController] Network game started! Local player goes first: {isLocalPlayerFirst}");
+        Debug.Log($"[EncounterController] Network game started! Local player goes first: {isLocalPlayerFirst}, Seed: {shuffleSeed}");
         
-        // Just set initial state - OnNetworkTurnChanged will handle starting the first turn
+        // Shuffle decks with synchronized seeds
+        // IMPORTANT: First player (host) always uses seed, second player always uses seed+1
+        // This ensures both clients see the same deck orders regardless of perspective
+        if (isLocalPlayerFirst)
+        {
+            // We go first - our deck uses seed, opponent uses seed+1
+            player.ShuffleDeckWithSeed(shuffleSeed);
+            opponent.ShuffleDeckWithSeed(shuffleSeed + 1);
+        }
+        else
+        {
+            // Opponent goes first - they use seed, we use seed+1
+            opponent.ShuffleDeckWithSeed(shuffleSeed);
+            player.ShuffleDeckWithSeed(shuffleSeed + 1);
+        }
+        
+        // Draw initial cards (both clients will draw same cards due to same seed)
+        StartCoroutine(DrawInitialCards());
+        
+        // Set initial state - OnNetworkTurnChanged will handle starting the first turn
         isCurrentPlayerTurn = isLocalPlayerFirst;
         currentPlayer = isLocalPlayerFirst ? player : opponent;
         turnNumber = 1;
+        networkInitialized = true;
         
         // Note: Don't call StartTurnNetwork() here - OnNetworkTurnChanged will handle it
     }
@@ -91,15 +107,75 @@ public class EncounterController : MonoBehaviour
     /// </summary>
     public void OnNetworkTurnChanged(bool isLocalPlayerTurn, int networkTurnNumber)
     {
-        Debug.Log($"[EncounterController] Network turn changed. Local turn: {isLocalPlayerTurn}, Turn #: {networkTurnNumber}");
+        Debug.Log($"[EncounterController] Network turn changed. Local turn: {isLocalPlayerTurn}, Turn #: {networkTurnNumber}, initialized: {networkInitialized}");
+        
+        // Ignore turn changes before the encounter is initialized
+        if (!networkInitialized)
+        {
+            Debug.Log("[EncounterController] Ignoring turn change - not initialized yet");
+            return;
+        }
         
         // Sync turn state
         isCurrentPlayerTurn = isLocalPlayerTurn;
         turnNumber = networkTurnNumber;
         currentPlayer = isLocalPlayerTurn ? player : opponent;
         
-        // Start the new turn
-        StartTurnNetwork();
+        // Turn 1 is handled by OnNetworkGameStarted (initial draw + mana)
+        // Only call StartTurnNetwork for turn 2+
+        if (networkTurnNumber > 1)
+        {
+            StartTurnNetwork();
+        }
+        else
+        {
+            // Turn 1 - just update playable UI for whoever goes first
+            if (isLocalPlayerTurn)
+            {
+                playerHandController.VisualizePlayableHand();
+                playerHandController.VisualizePlayableBoard();
+                Debug.Log("[EncounterController] Turn 1 - your turn! Cards are playable.");
+            }
+            else
+            {
+                playerHandController.HidePlayableHand();
+                playerHandController.HidePlayableBoard();
+                Debug.Log("[EncounterController] Turn 1 - opponent's turn. Waiting...");
+            }
+        }
+        
+        // Update turn indicator UI
+        UpdateTurnIndicator();
+    }
+    
+    /// <summary>
+    /// Updates the turn indicator UI to show whose turn it is.
+    /// </summary>
+    private void UpdateTurnIndicator()
+    {
+        if (turnIndicatorText == null)
+        {
+            // Try to find it dynamically if not assigned
+            var indicatorObj = GameObject.Find("TurnIndicatorText");
+            if (indicatorObj != null)
+            {
+                turnIndicatorText = indicatorObj.GetComponent<TextMeshProUGUI>();
+            }
+        }
+        
+        if (turnIndicatorText != null)
+        {
+            if (isCurrentPlayerTurn)
+            {
+                turnIndicatorText.text = $"YOUR TURN (Turn {turnNumber})";
+                turnIndicatorText.color = Color.green;
+            }
+            else
+            {
+                turnIndicatorText.text = $"OPPONENT'S TURN (Turn {turnNumber})";
+                turnIndicatorText.color = Color.red;
+            }
+        }
     }
 
     // Coroutine to draw 3 cards for each player with a 1-second delay
@@ -172,22 +248,34 @@ public class EncounterController : MonoBehaviour
     
     /// <summary>
     /// Start turn logic for network mode.
-    /// Only the active player performs turn start actions (mana refill, draw).
-    /// The opponent's client just updates UI state.
+    /// Both clients execute draw for current player (decks are synced via seed).
     /// </summary>
     private void StartTurnNetwork()
     {
         Debug.Log($"[EncounterController] Starting network turn. isCurrentPlayerTurn: {isCurrentPlayerTurn}");
         
+        // BOTH clients draw for the current player (decks are in same order due to seed)
+        // This keeps hands in sync on both sides
         if (isCurrentPlayerTurn)
         {
-            // It's local player's turn - perform turn start actions
+            // It's local player's turn
             currentPlayer = player;
-
-            player.maxMana += 1;
-            player.RefillMana();
+            
+            // Use network commands for mana (so it syncs to opponent)
+            if (player.networkPlayer != null)
+            {
+                Debug.Log($"[EncounterController] Calling CmdIncreaseMaxMana for {player.networkPlayer.PlayerName.Value}");
+                player.networkPlayer.CmdIncreaseMaxMana(1);  // This also refills mana
+            }
+            else
+            {
+                Debug.LogWarning("[EncounterController] player.networkPlayer is NULL - using local fallback");
+                player.maxMana += 1;
+                player.RefillMana();
+            }
+            
             player.ResetBoard();
-            DrawCard(player);
+            DrawCard(player);  // Local player draws for themselves
 
             // Show playable cards
             playerHandController.HideBoardTargets();
@@ -200,9 +288,11 @@ public class EncounterController : MonoBehaviour
         }
         else
         {
-            // It's opponent's turn - just update local state, don't perform actions
-            // The opponent's client will handle their own mana/draw
+            // It's opponent's turn - draw for opponent (keeps decks in sync)
             currentPlayer = opponent;
+            
+            // Draw for opponent so their hand stays in sync
+            DrawCard(opponent);
 
             // Hide all playable indicators - can't play during opponent's turn
             playerHandController.HideBoardTargets();
@@ -211,6 +301,9 @@ public class EncounterController : MonoBehaviour
             
             Debug.Log("[EncounterController] Opponent's turn. Waiting...");
         }
+        
+        // Update turn indicator UI
+        UpdateTurnIndicator();
     }
 
     public void EndTurn()

@@ -26,9 +26,9 @@ public class NetworkGameManager : NetworkBehaviour
 
     [Header("Turn State (Synced)")]
     /// <summary>
-    /// The player ID whose turn it currently is. -1 means game not started.
+    /// The ObjectId of the NetworkPlayer whose turn it currently is. -1 means game not started.
     /// </summary>
-    public readonly SyncVar<int> CurrentTurnPlayerId = new SyncVar<int>(-1);
+    public readonly SyncVar<int> CurrentTurnObjectId = new SyncVar<int>(-1);
     
     /// <summary>
     /// The current turn number (starts at 1).
@@ -39,6 +39,11 @@ public class NetworkGameManager : NetworkBehaviour
     /// Whether the game has started.
     /// </summary>
     public readonly SyncVar<bool> GameStarted = new SyncVar<bool>(false);
+    
+    /// <summary>
+    /// Random seed for deterministic deck shuffling. Set by server, synced to clients.
+    /// </summary>
+    public readonly SyncVar<int> ShuffleSeed = new SyncVar<int>(0);
 
     [Header("Runtime State")]
     private NetworkPlayer localNetworkPlayer;
@@ -56,14 +61,14 @@ public class NetworkGameManager : NetworkBehaviour
         Instance = this;
         
         // Subscribe to SyncVar changes
-        CurrentTurnPlayerId.OnChange += OnTurnChanged;
+        CurrentTurnObjectId.OnChange += OnTurnChanged;
         TurnNumber.OnChange += OnTurnNumberChanged;
         GameStarted.OnChange += OnGameStartedChanged;
     }
     
     private void OnDestroy()
     {
-        CurrentTurnPlayerId.OnChange -= OnTurnChanged;
+        CurrentTurnObjectId.OnChange -= OnTurnChanged;
         TurnNumber.OnChange -= OnTurnNumberChanged;
         GameStarted.OnChange -= OnGameStartedChanged;
     }
@@ -128,12 +133,13 @@ public class NetworkGameManager : NetworkBehaviour
     /// </summary>
     public void RegisterNetworkPlayer(NetworkPlayer player)
     {
-        int playerId = player.PlayerId.Value;
+        // Use ObjectId as stable key since PlayerId SyncVar may not be synced yet on client
+        int objectId = player.ObjectId;
         
-        if (!networkPlayers.ContainsKey(playerId))
+        if (!networkPlayers.ContainsKey(objectId))
         {
-            networkPlayers[playerId] = player;
-            Debug.Log($"[NetworkGameManager] Registered NetworkPlayer: {player.PlayerName.Value} (ID: {playerId})");
+            networkPlayers[objectId] = player;
+            Debug.Log($"[NetworkGameManager] Registered NetworkPlayer: {player.PlayerName.Value} (ObjectId: {objectId}, PlayerId: {player.PlayerId.Value})");
         }
         
         // Check if this is our local player
@@ -188,6 +194,9 @@ public class NetworkGameManager : NetworkBehaviour
             Debug.Log("[NetworkGameManager] Both players ready, starting game...");
             ServerStartGame();
         }
+        
+        // Try to initialize encounter (for client that joined after game started)
+        TryInitializeEncounter();
     }
 
     /// <summary>
@@ -227,7 +236,12 @@ public class NetworkGameManager : NetworkBehaviour
     /// </summary>
     public bool IsLocalPlayerTurn()
     {
-        return localNetworkPlayer != null && CurrentTurnPlayerId.Value == localNetworkPlayer.PlayerId.Value;
+        if (localNetworkPlayer == null) return false;
+        
+        // Simply check if the current turn ObjectId matches local player's ObjectId
+        bool isLocal = CurrentTurnObjectId.Value == localNetworkPlayer.ObjectId;
+        Debug.Log($"[NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId={CurrentTurnObjectId.Value}, localObjectId={localNetworkPlayer.ObjectId}, result={isLocal}");
+        return isLocal;
     }
     
     /// <summary>
@@ -264,18 +278,18 @@ public class NetworkGameManager : NetworkBehaviour
             }
         }
         
-        if (requestingPlayer == null || requestingPlayer.PlayerId.Value != CurrentTurnPlayerId.Value)
+        if (requestingPlayer == null || requestingPlayer.ObjectId != CurrentTurnObjectId.Value)
         {
             Debug.LogWarning($"[NetworkGameManager] Player tried to end turn but it's not their turn!");
             return;
         }
         
         // Switch to next player
-        int nextPlayerId = GetNextPlayerId();
+        int nextObjectId = GetNextPlayerObjectId();
         TurnNumber.Value++;
-        CurrentTurnPlayerId.Value = nextPlayerId;
+        CurrentTurnObjectId.Value = nextObjectId;
         
-        Debug.Log($"[Server] Turn ended. Now Player {nextPlayerId}'s turn. Turn #{TurnNumber.Value}");
+        Debug.Log($"[Server] Turn ended. Now ObjectId {nextObjectId}'s turn. Turn #{TurnNumber.Value}");
     }
     
     /// <summary>
@@ -286,18 +300,47 @@ public class NetworkGameManager : NetworkBehaviour
     {
         if (GameStarted.Value) return;
         
-        // Player 0 goes first
-        CurrentTurnPlayerId.Value = 0;
+        // Generate a random seed for deterministic shuffling on all clients
+        ShuffleSeed.Value = UnityEngine.Random.Range(1, int.MaxValue);
+        Debug.Log($"[Server] Generated shuffle seed: {ShuffleSeed.Value}");
+        
+        // Find the lowest ObjectId (first spawned player) to go first
+        int firstObjectId = -1;
+        foreach (var kvp in networkPlayers)
+        {
+            if (firstObjectId == -1 || kvp.Key < firstObjectId)
+            {
+                firstObjectId = kvp.Key;
+            }
+        }
+        
+        if (firstObjectId == -1)
+        {
+            Debug.LogError("[Server] No players registered - cannot start game!");
+            return;
+        }
+        
+        CurrentTurnObjectId.Value = firstObjectId;
         TurnNumber.Value = 1;
         GameStarted.Value = true;
         
-        Debug.Log($"[Server] Game started! Player 0 goes first.");
+        Debug.Log($"[Server] Game started! ObjectId {firstObjectId} goes first.");
     }
     
-    private int GetNextPlayerId()
+    private int GetNextPlayerObjectId()
     {
-        // Simple 2-player toggle
-        return CurrentTurnPlayerId.Value == 0 ? 1 : 0;
+        // Simple 2-player toggle - find the OTHER player in the dictionary
+        foreach (var kvp in networkPlayers)
+        {
+            if (kvp.Key != CurrentTurnObjectId.Value)
+            {
+                return kvp.Key;
+            }
+        }
+        
+        // Fallback - shouldn't happen
+        Debug.LogWarning("[Server] Could not find next player ObjectId!");
+        return CurrentTurnObjectId.Value;
     }
     
     /// <summary>
@@ -305,7 +348,13 @@ public class NetworkGameManager : NetworkBehaviour
     /// </summary>
     private void OnTurnChanged(int oldValue, int newValue, bool asServer)
     {
-        Debug.Log($"[NetworkGameManager] Turn changed: Player {oldValue} -> Player {newValue}");
+        // On host, this fires twice (server + client). Only process the client callback.
+        if (asServer && IsClientInitialized)
+        {
+            return; // Skip server callback on host - client callback will handle it
+        }
+        
+        Debug.Log($"[NetworkGameManager] Turn changed: ObjectId {oldValue} -> ObjectId {newValue}");
         
         // Notify the EncounterController about turn change
         if (encounterController != null && GameStarted.Value)
@@ -324,11 +373,37 @@ public class NetworkGameManager : NetworkBehaviour
     {
         Debug.Log($"[NetworkGameManager] Game started: {newValue}");
         
-        if (newValue && encounterController != null)
+        if (newValue)
         {
-            // Initialize the encounter when game starts
+            TryInitializeEncounter();
+        }
+    }
+    
+    /// <summary>
+    /// Try to initialize the encounter. Called when game starts or when players are linked.
+    /// </summary>
+    private bool _encounterInitialized = false;
+    private void TryInitializeEncounter()
+    {
+        if (_encounterInitialized) return;
+        if (!GameStarted.Value) return;
+        
+        // Try to find encounterController if not set
+        if (encounterController == null)
+        {
+            encounterController = FindObjectOfType<EncounterController>();
+        }
+        
+        if (encounterController != null && localNetworkPlayer != null)
+        {
             bool isLocalTurn = IsLocalPlayerTurn();
-            encounterController.OnNetworkGameStarted(isLocalTurn);
+            Debug.Log($"[NetworkGameManager] Initializing encounter with seed {ShuffleSeed.Value}");
+            encounterController.OnNetworkGameStarted(isLocalTurn, ShuffleSeed.Value);
+            _encounterInitialized = true;
+        }
+        else
+        {
+            Debug.Log($"[NetworkGameManager] Cannot init encounter yet - encounterController={(encounterController != null)}, localPlayer={(localNetworkPlayer != null)}");
         }
     }
     
