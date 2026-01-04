@@ -2,6 +2,7 @@ using FishNet;
 using FishNet.Managing;
 using FishNet.Managing.Scened;
 using FishNet.Connection;
+using FishNet.Object;
 using FishNet.Transporting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -223,7 +224,9 @@ public class MainMenuController : MonoBehaviour
         
         if (count >= requiredPlayers)
         {
-            UpdateStatus("Ready to start!");
+            UpdateStatus("Match starting...");
+            // Auto-start when enough players
+            LoadGameScene();
         }
         else
         {
@@ -242,6 +245,10 @@ public class MainMenuController : MonoBehaviour
         // Use FishNet's scene manager for networked scene loading
         SceneLoadData sld = new SceneLoadData(gameSceneName);
         sld.ReplaceScenes = ReplaceOption.All;
+        
+        // Keep spawned network objects (like NetworkPlayer) when changing scenes
+        sld.Options.AllowStacking = false;
+        sld.MovedNetworkObjects = new NetworkObject[0]; // Empty = move all spawned objects
         
         _networkManager.SceneManager.LoadGlobalScenes(sld);
     }

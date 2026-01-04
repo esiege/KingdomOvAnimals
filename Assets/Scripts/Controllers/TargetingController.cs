@@ -166,9 +166,20 @@ public class TargetingController : MonoBehaviour
     // Helper: Check for open slots on the player's side of the board
     private bool HasOpenBoardSlot(PlayerController player)
     {
-        return GameObject.Find("PlayerSlot-1").GetComponentInChildren<CardController>() == null ||
-               GameObject.Find("PlayerSlot-2").GetComponentInChildren<CardController>() == null ||
-               GameObject.Find("PlayerSlot-3").GetComponentInChildren<CardController>() == null;
+        GameObject slot1 = GameObject.Find("PlayerSlot-1");
+        GameObject slot2 = GameObject.Find("PlayerSlot-2");
+        GameObject slot3 = GameObject.Find("PlayerSlot-3");
+        
+        // Return false if slots aren't found (scene still loading)
+        if (slot1 == null || slot2 == null || slot3 == null)
+        {
+            Debug.LogWarning("[TargetingController] Board slots not found - scene may still be loading");
+            return false;
+        }
+        
+        return slot1.GetComponentInChildren<CardController>() == null ||
+               slot2.GetComponentInChildren<CardController>() == null ||
+               slot3.GetComponentInChildren<CardController>() == null;
     }
 
     // Helper: Get the card occupying a specific slot

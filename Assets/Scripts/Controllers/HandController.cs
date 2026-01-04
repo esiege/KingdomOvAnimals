@@ -167,12 +167,25 @@ public class HandController : MonoBehaviour
     {
         List<GameObject> targets = new List<GameObject>();
 
-        targets.Add(GameObject.Find("OpponentSlot-1"));
-        targets.Add(GameObject.Find("OpponentSlot-2"));
-        targets.Add(GameObject.Find("OpponentSlot-3"));
-        targets.Add(GameObject.Find("PlayerSlot-1"));
-        targets.Add(GameObject.Find("PlayerSlot-2"));
-        targets.Add(GameObject.Find("PlayerSlot-3"));
+        GameObject slot;
+        
+        slot = GameObject.Find("OpponentSlot-1");
+        if (slot != null) targets.Add(slot);
+        
+        slot = GameObject.Find("OpponentSlot-2");
+        if (slot != null) targets.Add(slot);
+        
+        slot = GameObject.Find("OpponentSlot-3");
+        if (slot != null) targets.Add(slot);
+        
+        slot = GameObject.Find("PlayerSlot-1");
+        if (slot != null) targets.Add(slot);
+        
+        slot = GameObject.Find("PlayerSlot-2");
+        if (slot != null) targets.Add(slot);
+        
+        slot = GameObject.Find("PlayerSlot-3");
+        if (slot != null) targets.Add(slot);
 
         //targets.Add(GameObject.Find("Player"));
         //targets.Add(GameObject.Find("Opponent"));
