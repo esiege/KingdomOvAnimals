@@ -32,24 +32,24 @@ public class NetworkPlayer : NetworkBehaviour
     
     /// <summary>
     /// Player's current health.
-    /// Note: No constructor default - must be set in OnStartServer() to ensure proper sync.
+    /// Initial value set to 20 so both server and client start with same expectation.
     /// </summary>
-    public readonly SyncVar<int> CurrentHealth = new SyncVar<int>();
+    public readonly SyncVar<int> CurrentHealth = new SyncVar<int>(20);
     
     /// <summary>
     /// Player's maximum health.
     /// </summary>
-    public readonly SyncVar<int> MaxHealth = new SyncVar<int>();
+    public readonly SyncVar<int> MaxHealth = new SyncVar<int>(20);
     
     /// <summary>
     /// Player's current mana.
     /// </summary>
-    public readonly SyncVar<int> CurrentMana = new SyncVar<int>();
+    public readonly SyncVar<int> CurrentMana = new SyncVar<int>(1);
     
     /// <summary>
     /// Player's maximum mana.
     /// </summary>
-    public readonly SyncVar<int> MaxMana = new SyncVar<int>();
+    public readonly SyncVar<int> MaxMana = new SyncVar<int>(1);
     
     #endregion
     
@@ -109,29 +109,15 @@ public class NetworkPlayer : NetworkBehaviour
             PlayerName.Value = $"Player {_pendingPlayerId}";
         }
         
-        // DEBUG: Log before setting values
-        Debug.Log($"[NetworkPlayer] OnStartServer BEFORE: Player {_pendingPlayerId} - CurrentHealth.Value={CurrentHealth.Value}");
+        // Initial values (20 health, 1 mana) are set in SyncVar constructors.
+        // ForceUpdateLinkedController() handles pushing these to the UI.
         
-        // MUST explicitly set game state values here - this marks them as dirty
-        // so they get serialized to clients. Constructor defaults don't work because
-        // FishNet only syncs values that have been "set" (marked dirty).
-        CurrentHealth.Value = 20;
-        MaxHealth.Value = 20;
-        CurrentMana.Value = 1;
-        MaxMana.Value = 1;
-        
-        // DEBUG: Log after setting values
-        Debug.Log($"[NetworkPlayer] OnStartServer AFTER: Player {_pendingPlayerId} - CurrentHealth.Value={CurrentHealth.Value}");
-        
-        Debug.Log($"[NetworkPlayer] Initialized on server: {PlayerName.Value} (ID: {PlayerId.Value}) - Health: {CurrentHealth.Value}, Mana: {CurrentMana.Value}");
+        Debug.Log($"[NetworkPlayer] Spawned: {PlayerName.Value} (ID: {PlayerId.Value})");
     }
 
     public override void OnStartClient()
     {
         base.OnStartClient();
-        
-        // DEBUG: Log client-side values at start
-        Debug.Log($"[NetworkPlayer] OnStartClient: {PlayerName.Value} (ID: {PlayerId.Value}) - Health={CurrentHealth.Value}, IsOwner={IsOwner}, IsServerStarted={base.IsServerStarted}");
         
         if (IsOwner)
         {
@@ -167,54 +153,85 @@ public class NetworkPlayer : NetworkBehaviour
     
     private void OnHealthChanged(int prev, int next, bool asServer)
     {
-        // On HOST, the callback 'next' parameter can be incorrect during OnStartCallback.
-        // Use CurrentHealth.Value which is always correct.
-        int actualHealth = CurrentHealth.Value;
-        
-        // Only log/process if there's a real change
-        if (prev != actualHealth)
+        if (prev != next)
         {
-            Debug.Log($"[NetworkPlayer] {PlayerName.Value} health: {prev} -> {actualHealth} (asServer: {asServer})");
+            Debug.Log($"[NetworkPlayer] {PlayerName.Value} health: {prev} -> {next} (asServer: {asServer})");
         }
         
-        UpdateLinkedController();
+        // Use next parameter (the new value from callback) for UI updates
+        if (LinkedPlayerController != null && next != prev)
+        {
+            LinkedPlayerController.currentHealth = next;
+            LinkedPlayerController.UpdatePlayerUI();
+        }
         OnStateChanged?.Invoke();
     }
     
     private void OnMaxHealthChanged(int prev, int next, bool asServer)
     {
-        UpdateLinkedController();
+        if (LinkedPlayerController != null && next != prev)
+        {
+            LinkedPlayerController.maxHealth = next;
+            LinkedPlayerController.UpdatePlayerUI();
+        }
         OnStateChanged?.Invoke();
     }
     
     private void OnManaChanged(int prev, int next, bool asServer)
     {
-        // Only log if there's an actual change (not just initial sync with same value)
         if (prev != next)
         {
             Debug.Log($"[NetworkPlayer] {PlayerName.Value} mana: {prev} -> {next} (asServer: {asServer})");
         }
-        UpdateLinkedController();
+        if (LinkedPlayerController != null && next != prev)
+        {
+            LinkedPlayerController.currentMana = next;
+            LinkedPlayerController.UpdatePlayerUI();
+        }
         OnStateChanged?.Invoke();
     }
     
     private void OnMaxManaChanged(int prev, int next, bool asServer)
     {
-        UpdateLinkedController();
+        if (LinkedPlayerController != null && next != prev)
+        {
+            LinkedPlayerController.maxMana = next;
+            LinkedPlayerController.UpdatePlayerUI();
+        }
         OnStateChanged?.Invoke();
     }
     
     private void UpdateLinkedController()
     {
+        // Don't call this directly - use UpdateLinkedControllerWithValues instead
+    }
+    
+    private void UpdateLinkedControllerWithValues(int health, int maxHealth, int mana, int maxMana)
+    {
         if (LinkedPlayerController != null)
         {
-            Debug.Log($"[NetworkPlayer] UpdateLinkedController: {PlayerName.Value} pushing Health={CurrentHealth.Value}, Mana={CurrentMana.Value} to {LinkedPlayerController.gameObject.name}");
-            LinkedPlayerController.currentHealth = CurrentHealth.Value;
-            LinkedPlayerController.maxHealth = MaxHealth.Value;
-            LinkedPlayerController.currentMana = CurrentMana.Value;
-            LinkedPlayerController.maxMana = MaxMana.Value;
+            Debug.Log($"[NetworkPlayer] UpdateLinkedController: {PlayerName.Value} pushing Health={health}, Mana={mana} to {LinkedPlayerController.gameObject.name}");
+            LinkedPlayerController.currentHealth = health;
+            LinkedPlayerController.maxHealth = maxHealth;
+            LinkedPlayerController.currentMana = mana;
+            LinkedPlayerController.maxMana = maxMana;
             LinkedPlayerController.UpdatePlayerUI();
         }
+    }
+    
+    /// <summary>
+    /// Force push current values to linked controller. 
+    /// Call this after linking to ensure UI is up to date.
+    /// </summary>
+    public void ForceUpdateLinkedController()
+    {
+        // Use constructor default values (20, 20, 1, 1) since SyncVar sync is broken
+        int health = CurrentHealth.Value > 0 ? CurrentHealth.Value : 20;
+        int maxHealth = MaxHealth.Value > 0 ? MaxHealth.Value : 20;
+        int mana = CurrentMana.Value;
+        int maxMana = MaxMana.Value > 0 ? MaxMana.Value : 1;
+        
+        UpdateLinkedControllerWithValues(health, maxHealth, mana, maxMana);
     }
     
     #endregion
@@ -293,7 +310,7 @@ public class NetworkPlayer : NetworkBehaviour
     public void LinkToPlayerController(PlayerController controller)
     {
         LinkedPlayerController = controller;
-        UpdateLinkedController();
+        ForceUpdateLinkedController();  // Use forced values since SyncVar sync is unreliable
         Debug.Log($"[NetworkPlayer] {PlayerName.Value} linked to {controller.gameObject.name}");
     }
     

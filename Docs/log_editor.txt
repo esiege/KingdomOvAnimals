@@ -1,19 +1,19 @@
-=== Log started: 2026-01-03 19:25:40 (EDITOR/HOST) ===
+=== Log started: 2026-01-03 19:47:42 (EDITOR/HOST) ===
 === Log file: D:/Google Drive/Unity/KingdomOvAnimals/KingdomOvAnimals/Assets\..\Docs\log_editor.txt ===
 
-[0.62s] [ERROR] No cloud project ID was found by the Analytics SDK. This means Analytics events will not be sent. Please make sure to link your cloud project in the Unity editor to fix this problem.
+[0.75s] [ERROR] No cloud project ID was found by the Analytics SDK. This means Analytics events will not be sent. Please make sure to link your cloud project in the Unity editor to fix this problem.
 UnityEngine.Debug:LogError (object)
 Unity.Services.Analytics.AnalyticsServiceInstance:.ctor () (at Library/PackageCache/com.unity.services.analytics@4.2.0/Runtime/AnalyticsServiceInstance.cs:55)
 Unity.Services.Analytics.AnalyticsService:.cctor () (at Library/PackageCache/com.unity.services.analytics@4.2.0/Runtime/AnalyticsService.cs:7)
 UnityEngine.GameObject:AddComponent<Unity.Services.Analytics.AnalyticsLifetime> ()
 Unity.Services.Analytics.ContainerObject:Initialize () (at Library/PackageCache/com.unity.services.analytics@4.2.0/Runtime/Runtime/AnalyticsLifetime.cs:88)
 
-[7.57s] [MainMenu] Starting host...
+[38.66s] [MainMenu] Starting host...
 UnityEngine.Debug:Log (object)
 MainMenuController:OnHostClicked () (at Assets/Scripts/Network/MainMenuController.cs:74)
 UnityEngine.EventSystems.EventSystem:Update () (at Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/EventSystem.cs:501)
 
-[7.57s] Local server is starting for Tugboat. Listening on port 7770.
+[38.66s] Local server is starting for Tugboat. Listening on port 7770.
 UnityEngine.Debug:Log (object)
 FishNet.Managing.Logging.LevelLoggingConfiguration:Log (string) (at Assets/FishNet/Runtime/Managing/Logging/LevelLoggingConfiguration.cs:109)
 FishNet.Managing.NetworkManager:InternalLog (string) (at Assets/FishNet/Runtime/Managing/NetworkManager.Logging.cs:54)
@@ -29,7 +29,7 @@ FishNet.Managing.Server.ServerManager:StartConnection () (at Assets/FishNet/Runt
 MainMenuController:OnHostClicked () (at Assets/Scripts/Network/MainMenuController.cs:77)
 UnityEngine.EventSystems.EventSystem:Update () (at Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/EventSystem.cs:501)
 
-[7.57s] Local client is starting for Tugboat. Server IP is localhost, port is 7770.
+[38.66s] Local client is starting for Tugboat. Server IP is localhost, port is 7770.
 UnityEngine.Debug:Log (object)
 FishNet.Managing.Logging.LevelLoggingConfiguration:Log (string) (at Assets/FishNet/Runtime/Managing/Logging/LevelLoggingConfiguration.cs:109)
 FishNet.Managing.NetworkManager:InternalLog (string) (at Assets/FishNet/Runtime/Managing/NetworkManager.Logging.cs:54)
@@ -44,7 +44,7 @@ FishNet.Managing.Client.ClientManager:StartConnection () (at Assets/FishNet/Runt
 MainMenuController:OnHostClicked () (at Assets/Scripts/Network/MainMenuController.cs:78)
 UnityEngine.EventSystems.EventSystem:Update () (at Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/EventSystem.cs:501)
 
-[7.64s] Local server is started for Tugboat.
+[38.73s] Local server is started for Tugboat.
 UnityEngine.Debug:Log (object)
 FishNet.Managing.Logging.LevelLoggingConfiguration:Log (string) (at Assets/FishNet/Runtime/Managing/Logging/LevelLoggingConfiguration.cs:109)
 FishNet.Managing.NetworkManager:InternalLog (string) (at Assets/FishNet/Runtime/Managing/NetworkManager.Logging.cs:54)
@@ -62,7 +62,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.64s] [MainMenu] Server started!
+[38.73s] [MainMenu] Server started!
 UnityEngine.Debug:Log (object)
 MainMenuController:OnServerConnectionState (FishNet.Transporting.ServerConnectionStateArgs) (at Assets/Scripts/Network/MainMenuController.cs:134)
 FishNet.Managing.Server.ServerManager:Transport_OnServerConnectionState (FishNet.Transporting.ServerConnectionStateArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:522)
@@ -77,7 +77,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.64s] Remote connection started for Id 0.
+[38.76s] Remote connection started for Id 0.
 UnityEngine.Debug:Log (object)
 FishNet.Managing.Logging.LevelLoggingConfiguration:Log (string) (at Assets/FishNet/Runtime/Managing/Logging/LevelLoggingConfiguration.cs:109)
 FishNet.Managing.NetworkManager:InternalLog (string) (at Assets/FishNet/Runtime/Managing/NetworkManager.Logging.cs:54)
@@ -93,7 +93,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.64s] [PlayerConnectionHandler] Player connected: Connection ID 0
+[38.76s] [PlayerConnectionHandler] Player connected: Connection ID 0
 UnityEngine.Debug:Log (object)
 PlayerConnectionHandler:OnPlayerConnected (FishNet.Connection.NetworkConnection) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:76)
 PlayerConnectionHandler:OnRemoteConnectionState (FishNet.Connection.NetworkConnection,FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:62)
@@ -108,7 +108,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.65s] [WARN] NetworkPlayer(Clone) was spawned but it's recommended to not spawn objects for connections until they have loaded start scenes. You can be notified when a connection loads start scenes by using connection.OnLoadedStartScenes on the connection, or SceneManager.OnClientLoadStartScenes.
+[38.76s] [WARN] NetworkPlayer(Clone) was spawned but it's recommended to not spawn objects for connections until they have loaded start scenes. You can be notified when a connection loads start scenes by using connection.OnLoadedStartScenes on the connection, or SceneManager.OnClientLoadStartScenes.
 UnityEngine.Debug:LogWarning (object)
 FishNet.Managing.Logging.LevelLoggingConfiguration:LogWarning (string) (at Assets/FishNet/Runtime/Managing/Logging/LevelLoggingConfiguration.cs:119)
 FishNet.Managing.NetworkManager:InternalLogWarning (string) (at Assets/FishNet/Runtime/Managing/NetworkManager.Logging.cs:75)
@@ -128,9 +128,9 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.66s] [NetworkPlayer] OnStartServer BEFORE: Player 0 - CurrentHealth.Value=0
+[38.78s] [NetworkPlayer] Spawned: Player 0 (ID: 0)
 UnityEngine.Debug:Log (object)
-NetworkPlayer:OnStartServer () (at Assets/Scripts/Network/NetworkPlayer.cs:113)
+NetworkPlayer:OnStartServer () (at Assets/Scripts/Network/NetworkPlayer.cs:115)
 FishNet.Object.NetworkBehaviour:OnStartServer_Internal () (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:121)
 FishNet.Object.NetworkObject:InvokeStartCallbacks (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.Callbacks.cs:46)
 FishNet.Object.NetworkObject:Initialize (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.cs:942)
@@ -151,107 +151,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.66s] [NetworkPlayer] Player 0 health: 0 -> 20 (asServer: True)
-UnityEngine.Debug:Log (object)
-NetworkPlayer:OnHealthChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:177)
-FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:345)
-FishNet.Object.Synchronizing.SyncVar`1<int>:SetValue (int,bool,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:258)
-FishNet.Object.Synchronizing.SyncVar`1<int>:set_Value (int) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:81)
-NetworkPlayer:OnStartServer () (at Assets/Scripts/Network/NetworkPlayer.cs:118)
-FishNet.Object.NetworkBehaviour:OnStartServer_Internal () (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:121)
-FishNet.Object.NetworkObject:InvokeStartCallbacks (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.Callbacks.cs:46)
-FishNet.Object.NetworkObject:Initialize (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.cs:942)
-FishNet.Managing.Server.ServerObjects:SetupWithoutSynchronization (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,System.Nullable`1<int>) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:455)
-FishNet.Managing.Server.ServerObjects:SpawnWithoutChecks (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,System.Nullable`1<int>,bool) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:558)
-FishNet.Managing.Server.ServerObjects:Spawn (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,UnityEngine.SceneManagement.Scene) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:544)
-FishNet.Managing.Server.ServerManager:Spawn (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,UnityEngine.SceneManagement.Scene) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.QOL.cs:119)
-PlayerConnectionHandler:OnPlayerConnected (FishNet.Connection.NetworkConnection) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:93)
-PlayerConnectionHandler:OnRemoteConnectionState (FishNet.Connection.NetworkConnection,FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:62)
-FishNet.Managing.Server.ServerManager:Transport_OnRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:595)
-FishNet.Transporting.Tugboat.Tugboat:HandleRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:188)
-FishNet.Transporting.Tugboat.Server.ServerSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ServerSocket.cs:502)
-FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:209)
-FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
-FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1042)
-FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
-FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
-FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
-FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
-
-[7.66s] [NetworkPlayer] Player 0 mana: 0 -> 1 (asServer: True)
-UnityEngine.Debug:Log (object)
-NetworkPlayer:OnManaChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:195)
-FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:345)
-FishNet.Object.Synchronizing.SyncVar`1<int>:SetValue (int,bool,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:258)
-FishNet.Object.Synchronizing.SyncVar`1<int>:set_Value (int) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:81)
-NetworkPlayer:OnStartServer () (at Assets/Scripts/Network/NetworkPlayer.cs:120)
-FishNet.Object.NetworkBehaviour:OnStartServer_Internal () (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:121)
-FishNet.Object.NetworkObject:InvokeStartCallbacks (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.Callbacks.cs:46)
-FishNet.Object.NetworkObject:Initialize (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.cs:942)
-FishNet.Managing.Server.ServerObjects:SetupWithoutSynchronization (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,System.Nullable`1<int>) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:455)
-FishNet.Managing.Server.ServerObjects:SpawnWithoutChecks (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,System.Nullable`1<int>,bool) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:558)
-FishNet.Managing.Server.ServerObjects:Spawn (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,UnityEngine.SceneManagement.Scene) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:544)
-FishNet.Managing.Server.ServerManager:Spawn (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,UnityEngine.SceneManagement.Scene) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.QOL.cs:119)
-PlayerConnectionHandler:OnPlayerConnected (FishNet.Connection.NetworkConnection) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:93)
-PlayerConnectionHandler:OnRemoteConnectionState (FishNet.Connection.NetworkConnection,FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:62)
-FishNet.Managing.Server.ServerManager:Transport_OnRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:595)
-FishNet.Transporting.Tugboat.Tugboat:HandleRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:188)
-FishNet.Transporting.Tugboat.Server.ServerSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ServerSocket.cs:502)
-FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:209)
-FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
-FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1042)
-FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
-FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
-FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
-FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
-
-[7.66s] [NetworkPlayer] OnStartServer AFTER: Player 0 - CurrentHealth.Value=20
-UnityEngine.Debug:Log (object)
-NetworkPlayer:OnStartServer () (at Assets/Scripts/Network/NetworkPlayer.cs:124)
-FishNet.Object.NetworkBehaviour:OnStartServer_Internal () (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:121)
-FishNet.Object.NetworkObject:InvokeStartCallbacks (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.Callbacks.cs:46)
-FishNet.Object.NetworkObject:Initialize (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.cs:942)
-FishNet.Managing.Server.ServerObjects:SetupWithoutSynchronization (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,System.Nullable`1<int>) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:455)
-FishNet.Managing.Server.ServerObjects:SpawnWithoutChecks (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,System.Nullable`1<int>,bool) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:558)
-FishNet.Managing.Server.ServerObjects:Spawn (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,UnityEngine.SceneManagement.Scene) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:544)
-FishNet.Managing.Server.ServerManager:Spawn (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,UnityEngine.SceneManagement.Scene) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.QOL.cs:119)
-PlayerConnectionHandler:OnPlayerConnected (FishNet.Connection.NetworkConnection) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:93)
-PlayerConnectionHandler:OnRemoteConnectionState (FishNet.Connection.NetworkConnection,FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:62)
-FishNet.Managing.Server.ServerManager:Transport_OnRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:595)
-FishNet.Transporting.Tugboat.Tugboat:HandleRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:188)
-FishNet.Transporting.Tugboat.Server.ServerSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ServerSocket.cs:502)
-FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:209)
-FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
-FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1042)
-FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
-FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
-FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
-FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
-
-[7.66s] [NetworkPlayer] Initialized on server: Player 0 (ID: 0) - Health: 20, Mana: 1
-UnityEngine.Debug:Log (object)
-NetworkPlayer:OnStartServer () (at Assets/Scripts/Network/NetworkPlayer.cs:126)
-FishNet.Object.NetworkBehaviour:OnStartServer_Internal () (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:121)
-FishNet.Object.NetworkObject:InvokeStartCallbacks (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.Callbacks.cs:46)
-FishNet.Object.NetworkObject:Initialize (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.cs:942)
-FishNet.Managing.Server.ServerObjects:SetupWithoutSynchronization (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,System.Nullable`1<int>) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:455)
-FishNet.Managing.Server.ServerObjects:SpawnWithoutChecks (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,System.Nullable`1<int>,bool) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:558)
-FishNet.Managing.Server.ServerObjects:Spawn (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,UnityEngine.SceneManagement.Scene) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:544)
-FishNet.Managing.Server.ServerManager:Spawn (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,UnityEngine.SceneManagement.Scene) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.QOL.cs:119)
-PlayerConnectionHandler:OnPlayerConnected (FishNet.Connection.NetworkConnection) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:93)
-PlayerConnectionHandler:OnRemoteConnectionState (FishNet.Connection.NetworkConnection,FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:62)
-FishNet.Managing.Server.ServerManager:Transport_OnRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:595)
-FishNet.Transporting.Tugboat.Tugboat:HandleRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:188)
-FishNet.Transporting.Tugboat.Server.ServerSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ServerSocket.cs:502)
-FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:209)
-FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
-FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1042)
-FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
-FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
-FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
-FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
-
-[7.66s] [PlayerConnectionHandler] Spawned player object for Connection ID 0. Total players: 1
+[38.78s] [PlayerConnectionHandler] Spawned player object for Connection ID 0. Total players: 1
 UnityEngine.Debug:Log (object)
 PlayerConnectionHandler:OnPlayerConnected (FishNet.Connection.NetworkConnection) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:96)
 PlayerConnectionHandler:OnRemoteConnectionState (FishNet.Connection.NetworkConnection,FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:62)
@@ -266,7 +166,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.66s] [MainMenu] Player joined: 0
+[38.78s] [MainMenu] Player joined: 0
 UnityEngine.Debug:Log (object)
 MainMenuController:OnRemoteConnectionState (FishNet.Connection.NetworkConnection,FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/Scripts/Network/MainMenuController.cs:172)
 FishNet.Managing.Server.ServerManager:Transport_OnRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:595)
@@ -280,7 +180,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.67s] Local client is started for Tugboat.
+[38.79s] Local client is started for Tugboat.
 UnityEngine.Debug:Log (object)
 FishNet.Managing.Logging.LevelLoggingConfiguration:Log (string) (at Assets/FishNet/Runtime/Managing/Logging/LevelLoggingConfiguration.cs:109)
 FishNet.Managing.NetworkManager:InternalLog (string) (at Assets/FishNet/Runtime/Managing/NetworkManager.Logging.cs:54)
@@ -297,7 +197,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.67s] [MainMenu] Connected to server!
+[38.79s] [MainMenu] Connected to server!
 UnityEngine.Debug:Log (object)
 MainMenuController:OnClientConnectionState (FishNet.Transporting.ClientConnectionStateArgs) (at Assets/Scripts/Network/MainMenuController.cs:148)
 FishNet.Managing.Client.ClientManager:Transport_OnClientConnectionState (FishNet.Transporting.ClientConnectionStateArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:334)
@@ -312,7 +212,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.70s] Remote connection started for Id 1.
+[38.95s] Remote connection started for Id 1.
 UnityEngine.Debug:Log (object)
 FishNet.Managing.Logging.LevelLoggingConfiguration:Log (string) (at Assets/FishNet/Runtime/Managing/Logging/LevelLoggingConfiguration.cs:109)
 FishNet.Managing.NetworkManager:InternalLog (string) (at Assets/FishNet/Runtime/Managing/NetworkManager.Logging.cs:54)
@@ -328,7 +228,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.70s] [PlayerConnectionHandler] Player connected: Connection ID 1
+[38.95s] [PlayerConnectionHandler] Player connected: Connection ID 1
 UnityEngine.Debug:Log (object)
 PlayerConnectionHandler:OnPlayerConnected (FishNet.Connection.NetworkConnection) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:76)
 PlayerConnectionHandler:OnRemoteConnectionState (FishNet.Connection.NetworkConnection,FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:62)
@@ -343,7 +243,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.70s] [WARN] NetworkPlayer(Clone) was spawned but it's recommended to not spawn objects for connections until they have loaded start scenes. You can be notified when a connection loads start scenes by using connection.OnLoadedStartScenes on the connection, or SceneManager.OnClientLoadStartScenes.
+[38.96s] [WARN] NetworkPlayer(Clone) was spawned but it's recommended to not spawn objects for connections until they have loaded start scenes. You can be notified when a connection loads start scenes by using connection.OnLoadedStartScenes on the connection, or SceneManager.OnClientLoadStartScenes.
 UnityEngine.Debug:LogWarning (object)
 FishNet.Managing.Logging.LevelLoggingConfiguration:LogWarning (string) (at Assets/FishNet/Runtime/Managing/Logging/LevelLoggingConfiguration.cs:119)
 FishNet.Managing.NetworkManager:InternalLogWarning (string) (at Assets/FishNet/Runtime/Managing/NetworkManager.Logging.cs:75)
@@ -363,9 +263,9 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.70s] [NetworkPlayer] OnStartServer BEFORE: Player 1 - CurrentHealth.Value=0
+[38.96s] [NetworkPlayer] Spawned: Player 1 (ID: 1)
 UnityEngine.Debug:Log (object)
-NetworkPlayer:OnStartServer () (at Assets/Scripts/Network/NetworkPlayer.cs:113)
+NetworkPlayer:OnStartServer () (at Assets/Scripts/Network/NetworkPlayer.cs:115)
 FishNet.Object.NetworkBehaviour:OnStartServer_Internal () (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:121)
 FishNet.Object.NetworkObject:InvokeStartCallbacks (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.Callbacks.cs:46)
 FishNet.Object.NetworkObject:Initialize (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.cs:942)
@@ -386,107 +286,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.70s] [NetworkPlayer] Player 1 health: 0 -> 20 (asServer: True)
-UnityEngine.Debug:Log (object)
-NetworkPlayer:OnHealthChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:177)
-FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:345)
-FishNet.Object.Synchronizing.SyncVar`1<int>:SetValue (int,bool,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:258)
-FishNet.Object.Synchronizing.SyncVar`1<int>:set_Value (int) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:81)
-NetworkPlayer:OnStartServer () (at Assets/Scripts/Network/NetworkPlayer.cs:118)
-FishNet.Object.NetworkBehaviour:OnStartServer_Internal () (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:121)
-FishNet.Object.NetworkObject:InvokeStartCallbacks (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.Callbacks.cs:46)
-FishNet.Object.NetworkObject:Initialize (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.cs:942)
-FishNet.Managing.Server.ServerObjects:SetupWithoutSynchronization (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,System.Nullable`1<int>) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:455)
-FishNet.Managing.Server.ServerObjects:SpawnWithoutChecks (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,System.Nullable`1<int>,bool) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:558)
-FishNet.Managing.Server.ServerObjects:Spawn (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,UnityEngine.SceneManagement.Scene) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:544)
-FishNet.Managing.Server.ServerManager:Spawn (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,UnityEngine.SceneManagement.Scene) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.QOL.cs:119)
-PlayerConnectionHandler:OnPlayerConnected (FishNet.Connection.NetworkConnection) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:93)
-PlayerConnectionHandler:OnRemoteConnectionState (FishNet.Connection.NetworkConnection,FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:62)
-FishNet.Managing.Server.ServerManager:Transport_OnRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:595)
-FishNet.Transporting.Tugboat.Tugboat:HandleRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:188)
-FishNet.Transporting.Tugboat.Server.ServerSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ServerSocket.cs:502)
-FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:209)
-FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
-FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1042)
-FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
-FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
-FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
-FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
-
-[7.70s] [NetworkPlayer] Player 1 mana: 0 -> 1 (asServer: True)
-UnityEngine.Debug:Log (object)
-NetworkPlayer:OnManaChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:195)
-FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:345)
-FishNet.Object.Synchronizing.SyncVar`1<int>:SetValue (int,bool,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:258)
-FishNet.Object.Synchronizing.SyncVar`1<int>:set_Value (int) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:81)
-NetworkPlayer:OnStartServer () (at Assets/Scripts/Network/NetworkPlayer.cs:120)
-FishNet.Object.NetworkBehaviour:OnStartServer_Internal () (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:121)
-FishNet.Object.NetworkObject:InvokeStartCallbacks (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.Callbacks.cs:46)
-FishNet.Object.NetworkObject:Initialize (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.cs:942)
-FishNet.Managing.Server.ServerObjects:SetupWithoutSynchronization (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,System.Nullable`1<int>) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:455)
-FishNet.Managing.Server.ServerObjects:SpawnWithoutChecks (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,System.Nullable`1<int>,bool) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:558)
-FishNet.Managing.Server.ServerObjects:Spawn (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,UnityEngine.SceneManagement.Scene) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:544)
-FishNet.Managing.Server.ServerManager:Spawn (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,UnityEngine.SceneManagement.Scene) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.QOL.cs:119)
-PlayerConnectionHandler:OnPlayerConnected (FishNet.Connection.NetworkConnection) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:93)
-PlayerConnectionHandler:OnRemoteConnectionState (FishNet.Connection.NetworkConnection,FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:62)
-FishNet.Managing.Server.ServerManager:Transport_OnRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:595)
-FishNet.Transporting.Tugboat.Tugboat:HandleRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:188)
-FishNet.Transporting.Tugboat.Server.ServerSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ServerSocket.cs:502)
-FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:209)
-FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
-FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1042)
-FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
-FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
-FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
-FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
-
-[7.70s] [NetworkPlayer] OnStartServer AFTER: Player 1 - CurrentHealth.Value=20
-UnityEngine.Debug:Log (object)
-NetworkPlayer:OnStartServer () (at Assets/Scripts/Network/NetworkPlayer.cs:124)
-FishNet.Object.NetworkBehaviour:OnStartServer_Internal () (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:121)
-FishNet.Object.NetworkObject:InvokeStartCallbacks (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.Callbacks.cs:46)
-FishNet.Object.NetworkObject:Initialize (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.cs:942)
-FishNet.Managing.Server.ServerObjects:SetupWithoutSynchronization (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,System.Nullable`1<int>) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:455)
-FishNet.Managing.Server.ServerObjects:SpawnWithoutChecks (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,System.Nullable`1<int>,bool) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:558)
-FishNet.Managing.Server.ServerObjects:Spawn (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,UnityEngine.SceneManagement.Scene) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:544)
-FishNet.Managing.Server.ServerManager:Spawn (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,UnityEngine.SceneManagement.Scene) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.QOL.cs:119)
-PlayerConnectionHandler:OnPlayerConnected (FishNet.Connection.NetworkConnection) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:93)
-PlayerConnectionHandler:OnRemoteConnectionState (FishNet.Connection.NetworkConnection,FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:62)
-FishNet.Managing.Server.ServerManager:Transport_OnRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:595)
-FishNet.Transporting.Tugboat.Tugboat:HandleRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:188)
-FishNet.Transporting.Tugboat.Server.ServerSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ServerSocket.cs:502)
-FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:209)
-FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
-FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1042)
-FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
-FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
-FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
-FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
-
-[7.70s] [NetworkPlayer] Initialized on server: Player 1 (ID: 1) - Health: 20, Mana: 1
-UnityEngine.Debug:Log (object)
-NetworkPlayer:OnStartServer () (at Assets/Scripts/Network/NetworkPlayer.cs:126)
-FishNet.Object.NetworkBehaviour:OnStartServer_Internal () (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:121)
-FishNet.Object.NetworkObject:InvokeStartCallbacks (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.Callbacks.cs:46)
-FishNet.Object.NetworkObject:Initialize (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.cs:942)
-FishNet.Managing.Server.ServerObjects:SetupWithoutSynchronization (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,System.Nullable`1<int>) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:455)
-FishNet.Managing.Server.ServerObjects:SpawnWithoutChecks (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,System.Nullable`1<int>,bool) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:558)
-FishNet.Managing.Server.ServerObjects:Spawn (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,UnityEngine.SceneManagement.Scene) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.cs:544)
-FishNet.Managing.Server.ServerManager:Spawn (FishNet.Object.NetworkObject,FishNet.Connection.NetworkConnection,UnityEngine.SceneManagement.Scene) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.QOL.cs:119)
-PlayerConnectionHandler:OnPlayerConnected (FishNet.Connection.NetworkConnection) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:93)
-PlayerConnectionHandler:OnRemoteConnectionState (FishNet.Connection.NetworkConnection,FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:62)
-FishNet.Managing.Server.ServerManager:Transport_OnRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:595)
-FishNet.Transporting.Tugboat.Tugboat:HandleRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:188)
-FishNet.Transporting.Tugboat.Server.ServerSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ServerSocket.cs:502)
-FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:209)
-FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
-FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1042)
-FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
-FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
-FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
-FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
-
-[7.70s] [PlayerConnectionHandler] Spawned player object for Connection ID 1. Total players: 2
+[38.96s] [PlayerConnectionHandler] Spawned player object for Connection ID 1. Total players: 2
 UnityEngine.Debug:Log (object)
 PlayerConnectionHandler:OnPlayerConnected (FishNet.Connection.NetworkConnection) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:96)
 PlayerConnectionHandler:OnRemoteConnectionState (FishNet.Connection.NetworkConnection,FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:62)
@@ -501,7 +301,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.70s] [MainMenu] Player joined: 1
+[38.96s] [MainMenu] Player joined: 1
 UnityEngine.Debug:Log (object)
 MainMenuController:OnRemoteConnectionState (FishNet.Connection.NetworkConnection,FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/Scripts/Network/MainMenuController.cs:172)
 FishNet.Managing.Server.ServerManager:Transport_OnRemoteConnectionState (FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:595)
@@ -515,7 +315,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.70s] [MainMenu] Loading scene: DuelScreen
+[38.96s] [MainMenu] Loading scene: DuelScreen
 UnityEngine.Debug:Log (object)
 MainMenuController:LoadGameScene () (at Assets/Scripts/Network/MainMenuController.cs:243)
 MainMenuController:CheckCanStartMatch () (at Assets/Scripts/Network/MainMenuController.cs:229)
@@ -531,7 +331,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.70s] [MainMenu] Moving NetworkObject: NetworkPlayer(Clone) (Owner: 0)
+[38.96s] [MainMenu] Moving NetworkObject: NetworkPlayer(Clone) (Owner: 0)
 UnityEngine.Debug:Log (object)
 MainMenuController:LoadGameScene () (at Assets/Scripts/Network/MainMenuController.cs:254)
 MainMenuController:CheckCanStartMatch () (at Assets/Scripts/Network/MainMenuController.cs:229)
@@ -547,7 +347,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.70s] [MainMenu] Moving NetworkObject: NetworkPlayer(Clone) (Owner: 1)
+[38.96s] [MainMenu] Moving NetworkObject: NetworkPlayer(Clone) (Owner: 1)
 UnityEngine.Debug:Log (object)
 MainMenuController:LoadGameScene () (at Assets/Scripts/Network/MainMenuController.cs:254)
 MainMenuController:CheckCanStartMatch () (at Assets/Scripts/Network/MainMenuController.cs:229)
@@ -563,7 +363,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[7.70s] [MainMenu] Moving 2 NetworkObjects to DuelScreen
+[38.96s] [MainMenu] Moving 2 NetworkObjects to DuelScreen
 UnityEngine.Debug:Log (object)
 MainMenuController:LoadGameScene () (at Assets/Scripts/Network/MainMenuController.cs:258)
 MainMenuController:CheckCanStartMatch () (at Assets/Scripts/Network/MainMenuController.cs:229)
@@ -579,113 +379,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[8.32s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
-[8.32s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[8.32s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
-[8.32s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[8.32s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
-[8.32s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[8.32s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
-[8.32s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[8.32s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
-[8.33s] NetworkManager on object NetworkManager is being destroyed due to persistence type DestroyNewest. A NetworkManager instance already exist on NetworkManager.
-UnityEngine.Debug:Log (object)
-FishNet.Managing.Logging.LevelLoggingConfiguration:Log (string) (at Assets/FishNet/Runtime/Managing/Logging/LevelLoggingConfiguration.cs:109)
-FishNet.Managing.NetworkManager:InternalLog (string) (at Assets/FishNet/Runtime/Managing/NetworkManager.Logging.cs:54)
-FishNet.Managing.NetworkManager:CanInitialize () (at Assets/FishNet/Runtime/Managing/NetworkManager.cs:388)
-FishNet.Managing.NetworkManager:Awake () (at Assets/FishNet/Runtime/Managing/NetworkManager.cs:258)
-
-[8.33s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
-UnityEngine.Debug:Log (object)
-PlayerController:UpdatePlayerUI () (at Assets/Scripts/Controllers/PlayerController.cs:41)
-PlayerController:Awake () (at Assets/Scripts/Controllers/PlayerController.cs:35)
-
-[8.33s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
-UnityEngine.Debug:Log (object)
-PlayerController:UpdatePlayerUI () (at Assets/Scripts/Controllers/PlayerController.cs:41)
-PlayerController:Awake () (at Assets/Scripts/Controllers/PlayerController.cs:35)
-
-[8.34s] [WARN] HealAmountText is not assigned in HealAbility.
-UnityEngine.Debug:LogWarning (object)
-Ability_Heal:UpdateUI () (at Assets/Scripts/Abilities/Ability_Heal.cs:26)
-Ability_Heal:Start () (at Assets/Scripts/Abilities/Ability_Heal.cs:14)
-
-[8.34s] [EncounterController] Network game detected, waiting for network to start game...
-UnityEngine.Debug:Log (object)
-EncounterController:Start () (at Assets/Scripts/Controllers/EncounterController.cs:38)
-
-[8.34s] Deck shuffled!
-UnityEngine.Debug:Log (object)
-PlayerController:ShuffleDeck () (at Assets/Scripts/Controllers/PlayerController.cs:181)
-EncounterController:InitializeEncounterLocal () (at Assets/Scripts/Controllers/EncounterController.cs:55)
-EncounterController:Start () (at Assets/Scripts/Controllers/EncounterController.cs:41)
-
-[8.34s] Deck shuffled!
-UnityEngine.Debug:Log (object)
-PlayerController:ShuffleDeck () (at Assets/Scripts/Controllers/PlayerController.cs:181)
-EncounterController:InitializeEncounterLocal () (at Assets/Scripts/Controllers/EncounterController.cs:56)
-EncounterController:Start () (at Assets/Scripts/Controllers/EncounterController.cs:41)
-
-[8.34s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
-UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
-HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
-EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
-EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:110)
-UnityEngine.MonoBehaviour:StartCoroutine (System.Collections.IEnumerator)
-EncounterController:InitializeEncounterLocal () (at Assets/Scripts/Controllers/EncounterController.cs:57)
-EncounterController:Start () (at Assets/Scripts/Controllers/EncounterController.cs:41)
-
-[8.34s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
-HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
-EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
-EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:110)
-UnityEngine.MonoBehaviour:StartCoroutine (System.Collections.IEnumerator)
-EncounterController:InitializeEncounterLocal () (at Assets/Scripts/Controllers/EncounterController.cs:57)
-EncounterController:Start () (at Assets/Scripts/Controllers/EncounterController.cs:41)
-
-[8.34s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
-HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
-EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
-EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:110)
-UnityEngine.MonoBehaviour:StartCoroutine (System.Collections.IEnumerator)
-EncounterController:InitializeEncounterLocal () (at Assets/Scripts/Controllers/EncounterController.cs:57)
-EncounterController:Start () (at Assets/Scripts/Controllers/EncounterController.cs:41)
-
-[8.34s] Player draws Card.
-UnityEngine.Debug:Log (object)
-EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:271)
-EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:110)
-UnityEngine.MonoBehaviour:StartCoroutine (System.Collections.IEnumerator)
-EncounterController:InitializeEncounterLocal () (at Assets/Scripts/Controllers/EncounterController.cs:57)
-EncounterController:Start () (at Assets/Scripts/Controllers/EncounterController.cs:41)
-
-[8.34s] [WARN] [TargetingController] Board slots not found - scene may still be loading
-UnityEngine.Debug:LogWarning (object)
-TargetingController:HasOpenBoardSlot (PlayerController) (at Assets/Scripts/Controllers/TargetingController.cs:176)
-TargetingController:GetPlayableCardsInHand () (at Assets/Scripts/Controllers/TargetingController.cs:17)
-HandController:VisualizePlayableHand () (at Assets/Scripts/Controllers/HandController.cs:316)
-HandController:Start () (at Assets/Scripts/Controllers/HandController.cs:41)
-
-[8.34s] No open slots available.
-UnityEngine.Debug:Log (object)
-TargetingController:GetPlayableCardsInHand () (at Assets/Scripts/Controllers/TargetingController.cs:19)
-HandController:VisualizePlayableHand () (at Assets/Scripts/Controllers/HandController.cs:316)
-HandController:Start () (at Assets/Scripts/Controllers/HandController.cs:41)
-
-[8.42s] Opponent draws Card.
-UnityEngine.Debug:Log (object)
-EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:271)
-EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:113)
-UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
-
-[8.42s] [WARN] HealAmountText is not assigned in HealAbility.
-UnityEngine.Debug:LogWarning (object)
-Ability_Heal:UpdateUI () (at Assets/Scripts/Abilities/Ability_Heal.cs:26)
-Ability_Heal:Start () (at Assets/Scripts/Abilities/Ability_Heal.cs:14)
-
-[8.61s] [WARN] Player prefab is empty and cannot be spawned for connection 0.
+[39.07s] [WARN] Player prefab is empty and cannot be spawned for connection 0.
 UnityEngine.Debug:LogWarning (object)
 FishNet.Managing.Logging.LevelLoggingConfiguration:LogWarning (string) (at Assets/FishNet/Runtime/Managing/Logging/LevelLoggingConfiguration.cs:119)
 FishNet.Managing.NetworkManager:InternalLogWarning (string) (at Assets/FishNet/Runtime/Managing/NetworkManager.Logging.cs:75)
@@ -694,7 +388,8 @@ FishNet.Managing.NetworkManagerExtensions:LogWarning (string) (at Assets/FishNet
 FishNet.Component.Spawning.PlayerSpawner:SceneManager_OnClientLoadedStartScenes (FishNet.Connection.NetworkConnection,bool) (at Assets/FishNet/Runtime/Generated/Component/Spawning/PlayerSpawner.cs:92)
 FishNet.Managing.Scened.SceneManager:TryInvokeLoadedStartScenes (FishNet.Connection.NetworkConnection,bool) (at Assets/FishNet/Runtime/Managing/Scened/SceneManager.cs:318)
 FishNet.Managing.Scened.SceneManager:OnClientLoadedScenes (FishNet.Connection.NetworkConnection,FishNet.Managing.Scened.ClientScenesLoadedBroadcast,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Managing/Scened/SceneManager.cs:462)
-FishNet.Broadcast.Helping.ClientBroadcastHandler`1<FishNet.Managing.Scened.ClientScenesLoadedBroadcast>:InvokeHandlers (FishNet.Connection.NetworkConnection,FishNet.Serializing.PooledReader,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Serializing/Helping/Broadcasts.cs:100)
+FishNet.Managing.Scened.SceneManager:OnServerEmptyStartScenes (FishNet.Connection.NetworkConnection,FishNet.Managing.Scened.EmptyStartScenesBroadcast,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Managing/Scened/SceneManager.cs:380)
+FishNet.Broadcast.Helping.ClientBroadcastHandler`1<FishNet.Managing.Scened.EmptyStartScenesBroadcast>:InvokeHandlers (FishNet.Connection.NetworkConnection,FishNet.Serializing.PooledReader,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Serializing/Helping/Broadcasts.cs:100)
 FishNet.Managing.Server.ServerManager:ParseBroadcast (FishNet.Serializing.PooledReader,FishNet.Connection.NetworkConnection,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.Broadcast.cs:85)
 FishNet.Managing.Server.ServerManager:ParseReceived (FishNet.Transporting.ServerReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:796)
 FishNet.Managing.Server.ServerManager:Transport_OnServerReceivedData (FishNet.Transporting.ServerReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:658)
@@ -708,36 +403,179 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[8.61s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
+[39.13s] [NetworkPlayer] You are: Player 0 (ID: 0)
+UnityEngine.Debug:Log (object)
+NetworkPlayer:OnStartClient () (at Assets/Scripts/Network/NetworkPlayer.cs:124)
+FishNet.Object.NetworkBehaviour:OnStartClient_Internal () (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:172)
+FishNet.Object.NetworkObject:InvokeStartCallbacks (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.Callbacks.cs:55)
+FishNet.Object.NetworkObject:Initialize (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.cs:942)
+FishNet.Managing.Client.ClientObjectCache:Iterate () (at Assets/FishNet/Runtime/Managing/Client/Object/ObjectCaching.cs:437)
+FishNet.Managing.Client.ClientObjects:IterateObjectCache () (at Assets/FishNet/Runtime/Managing/Client/Object/ClientObjects.cs:482)
+FishNet.Managing.Client.ClientManager:ParseReader (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,bool) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:537)
+FishNet.Managing.Client.ClientManager:ParseReceived (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:384)
+FishNet.Managing.Client.ClientManager:Transport_OnClientReceivedData (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:342)
+FishNet.Transporting.Tugboat.Tugboat:HandleClientReceivedDataArgs (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:238)
+FishNet.Transporting.Tugboat.Client.ClientSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ClientSocket.cs:295)
+FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:211)
+FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
+FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1043)
+FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
+FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
+FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
+FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
+
+[39.64s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
+[39.64s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[39.64s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
+[39.64s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[39.64s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
+[39.64s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[39.64s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
+[39.64s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[39.64s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
+[39.65s] NetworkManager on object NetworkManager is being destroyed due to persistence type DestroyNewest. A NetworkManager instance already exist on NetworkManager.
+UnityEngine.Debug:Log (object)
+FishNet.Managing.Logging.LevelLoggingConfiguration:Log (string) (at Assets/FishNet/Runtime/Managing/Logging/LevelLoggingConfiguration.cs:109)
+FishNet.Managing.NetworkManager:InternalLog (string) (at Assets/FishNet/Runtime/Managing/NetworkManager.Logging.cs:54)
+FishNet.Managing.NetworkManager:CanInitialize () (at Assets/FishNet/Runtime/Managing/NetworkManager.cs:388)
+FishNet.Managing.NetworkManager:Awake () (at Assets/FishNet/Runtime/Managing/NetworkManager.cs:258)
+
+[39.66s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+UnityEngine.Debug:Log (object)
+PlayerController:UpdatePlayerUI () (at Assets/Scripts/Controllers/PlayerController.cs:41)
+PlayerController:Awake () (at Assets/Scripts/Controllers/PlayerController.cs:35)
+
+[39.66s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+UnityEngine.Debug:Log (object)
+PlayerController:UpdatePlayerUI () (at Assets/Scripts/Controllers/PlayerController.cs:41)
+PlayerController:Awake () (at Assets/Scripts/Controllers/PlayerController.cs:35)
+
+[39.66s] [WARN] HealAmountText is not assigned in HealAbility.
+UnityEngine.Debug:LogWarning (object)
+Ability_Heal:UpdateUI () (at Assets/Scripts/Abilities/Ability_Heal.cs:26)
+Ability_Heal:Start () (at Assets/Scripts/Abilities/Ability_Heal.cs:14)
+
+[39.66s] [EncounterController] Network game detected, waiting for network to start game...
+UnityEngine.Debug:Log (object)
+EncounterController:Start () (at Assets/Scripts/Controllers/EncounterController.cs:38)
+
+[39.66s] Deck shuffled!
+UnityEngine.Debug:Log (object)
+PlayerController:ShuffleDeck () (at Assets/Scripts/Controllers/PlayerController.cs:181)
+EncounterController:InitializeEncounterLocal () (at Assets/Scripts/Controllers/EncounterController.cs:55)
+EncounterController:Start () (at Assets/Scripts/Controllers/EncounterController.cs:41)
+
+[39.66s] Deck shuffled!
+UnityEngine.Debug:Log (object)
+PlayerController:ShuffleDeck () (at Assets/Scripts/Controllers/PlayerController.cs:181)
+EncounterController:InitializeEncounterLocal () (at Assets/Scripts/Controllers/EncounterController.cs:56)
+EncounterController:Start () (at Assets/Scripts/Controllers/EncounterController.cs:41)
+
+[39.66s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
+UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
+HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
+EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
+EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:110)
+UnityEngine.MonoBehaviour:StartCoroutine (System.Collections.IEnumerator)
+EncounterController:InitializeEncounterLocal () (at Assets/Scripts/Controllers/EncounterController.cs:57)
+EncounterController:Start () (at Assets/Scripts/Controllers/EncounterController.cs:41)
+
+[39.66s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
+HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
+EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
+EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:110)
+UnityEngine.MonoBehaviour:StartCoroutine (System.Collections.IEnumerator)
+EncounterController:InitializeEncounterLocal () (at Assets/Scripts/Controllers/EncounterController.cs:57)
+EncounterController:Start () (at Assets/Scripts/Controllers/EncounterController.cs:41)
+
+[39.66s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
+HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
+EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
+EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:110)
+UnityEngine.MonoBehaviour:StartCoroutine (System.Collections.IEnumerator)
+EncounterController:InitializeEncounterLocal () (at Assets/Scripts/Controllers/EncounterController.cs:57)
+EncounterController:Start () (at Assets/Scripts/Controllers/EncounterController.cs:41)
+
+[39.67s] Player draws Flying Fox.
+UnityEngine.Debug:Log (object)
+EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:271)
+EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:110)
+UnityEngine.MonoBehaviour:StartCoroutine (System.Collections.IEnumerator)
+EncounterController:InitializeEncounterLocal () (at Assets/Scripts/Controllers/EncounterController.cs:57)
+EncounterController:Start () (at Assets/Scripts/Controllers/EncounterController.cs:41)
+
+[39.67s] [WARN] [TargetingController] Board slots not found - scene may still be loading
+UnityEngine.Debug:LogWarning (object)
+TargetingController:HasOpenBoardSlot (PlayerController) (at Assets/Scripts/Controllers/TargetingController.cs:176)
+TargetingController:GetPlayableCardsInHand () (at Assets/Scripts/Controllers/TargetingController.cs:17)
+HandController:VisualizePlayableHand () (at Assets/Scripts/Controllers/HandController.cs:316)
+HandController:Start () (at Assets/Scripts/Controllers/HandController.cs:41)
+
+[39.67s] No open slots available.
+UnityEngine.Debug:Log (object)
+TargetingController:GetPlayableCardsInHand () (at Assets/Scripts/Controllers/TargetingController.cs:19)
+HandController:VisualizePlayableHand () (at Assets/Scripts/Controllers/HandController.cs:316)
+HandController:Start () (at Assets/Scripts/Controllers/HandController.cs:41)
+
+[39.74s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
+UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
+HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
+EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
+EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:113)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[39.74s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
+HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
+EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
+EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:113)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[39.74s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
+HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
+EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
+EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:113)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[39.74s] Opponent draws Flying Fox.
+UnityEngine.Debug:Log (object)
+EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:271)
+EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:113)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[39.84s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
 UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
 HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
 EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
 EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:110)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.61s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[39.84s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
 UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
 HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
 EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
 EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:110)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.61s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[39.84s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
 UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
 HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
 EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
 EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:110)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.61s] Player draws Chip 'N Wail.
+[39.84s] Player draws Flying Fox.
 UnityEngine.Debug:Log (object)
 EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:271)
 EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:110)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.63s] [NetworkPlayer] OnStartClient: Player 0 (ID: 0) - Health=20, IsOwner=True, IsServerStarted=True
+[39.92s] [NetworkPlayer] Other player joined: Player 1 (ID: 1)
 UnityEngine.Debug:Log (object)
-NetworkPlayer:OnStartClient () (at Assets/Scripts/Network/NetworkPlayer.cs:134)
+NetworkPlayer:OnStartClient () (at Assets/Scripts/Network/NetworkPlayer.cs:128)
 FishNet.Object.NetworkBehaviour:OnStartClient_Internal () (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:172)
 FishNet.Object.NetworkObject:InvokeStartCallbacks (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.Callbacks.cs:55)
 FishNet.Object.NetworkObject:Initialize (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.cs:942)
@@ -756,70 +594,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[8.63s] [NetworkPlayer] You are: Player 0 (ID: 0)
-UnityEngine.Debug:Log (object)
-NetworkPlayer:OnStartClient () (at Assets/Scripts/Network/NetworkPlayer.cs:138)
-FishNet.Object.NetworkBehaviour:OnStartClient_Internal () (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:172)
-FishNet.Object.NetworkObject:InvokeStartCallbacks (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.Callbacks.cs:55)
-FishNet.Object.NetworkObject:Initialize (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.cs:942)
-FishNet.Managing.Client.ClientObjectCache:Iterate () (at Assets/FishNet/Runtime/Managing/Client/Object/ObjectCaching.cs:437)
-FishNet.Managing.Client.ClientObjects:IterateObjectCache () (at Assets/FishNet/Runtime/Managing/Client/Object/ClientObjects.cs:482)
-FishNet.Managing.Client.ClientManager:ParseReader (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,bool) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:537)
-FishNet.Managing.Client.ClientManager:ParseReceived (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:384)
-FishNet.Managing.Client.ClientManager:Transport_OnClientReceivedData (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:342)
-FishNet.Transporting.Tugboat.Tugboat:HandleClientReceivedDataArgs (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:238)
-FishNet.Transporting.Tugboat.Client.ClientSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ClientSocket.cs:295)
-FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:211)
-FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
-FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1043)
-FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
-FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
-FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
-FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
-
-[8.63s] [NetworkPlayer] OnStartClient: Player 1 (ID: 1) - Health=20, IsOwner=False, IsServerStarted=True
-UnityEngine.Debug:Log (object)
-NetworkPlayer:OnStartClient () (at Assets/Scripts/Network/NetworkPlayer.cs:134)
-FishNet.Object.NetworkBehaviour:OnStartClient_Internal () (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:172)
-FishNet.Object.NetworkObject:InvokeStartCallbacks (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.Callbacks.cs:55)
-FishNet.Object.NetworkObject:Initialize (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.cs:942)
-FishNet.Managing.Client.ClientObjectCache:Iterate () (at Assets/FishNet/Runtime/Managing/Client/Object/ObjectCaching.cs:437)
-FishNet.Managing.Client.ClientObjects:IterateObjectCache () (at Assets/FishNet/Runtime/Managing/Client/Object/ClientObjects.cs:482)
-FishNet.Managing.Client.ClientManager:ParseReader (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,bool) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:537)
-FishNet.Managing.Client.ClientManager:ParseReceived (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:384)
-FishNet.Managing.Client.ClientManager:Transport_OnClientReceivedData (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:342)
-FishNet.Transporting.Tugboat.Tugboat:HandleClientReceivedDataArgs (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:238)
-FishNet.Transporting.Tugboat.Client.ClientSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ClientSocket.cs:295)
-FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:211)
-FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
-FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1043)
-FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
-FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
-FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
-FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
-
-[8.63s] [NetworkPlayer] Other player joined: Player 1 (ID: 1)
-UnityEngine.Debug:Log (object)
-NetworkPlayer:OnStartClient () (at Assets/Scripts/Network/NetworkPlayer.cs:142)
-FishNet.Object.NetworkBehaviour:OnStartClient_Internal () (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:172)
-FishNet.Object.NetworkObject:InvokeStartCallbacks (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.Callbacks.cs:55)
-FishNet.Object.NetworkObject:Initialize (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.cs:942)
-FishNet.Managing.Client.ClientObjectCache:Iterate () (at Assets/FishNet/Runtime/Managing/Client/Object/ObjectCaching.cs:437)
-FishNet.Managing.Client.ClientObjects:IterateObjectCache () (at Assets/FishNet/Runtime/Managing/Client/Object/ClientObjects.cs:482)
-FishNet.Managing.Client.ClientManager:ParseReader (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,bool) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:537)
-FishNet.Managing.Client.ClientManager:ParseReceived (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:384)
-FishNet.Managing.Client.ClientManager:Transport_OnClientReceivedData (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:342)
-FishNet.Transporting.Tugboat.Tugboat:HandleClientReceivedDataArgs (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:238)
-FishNet.Transporting.Tugboat.Client.ClientSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ClientSocket.cs:295)
-FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:211)
-FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
-FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1043)
-FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
-FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
-FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
-FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
-
-[8.63s] [NetworkGameManager] Client started, looking for NetworkPlayers...
+[39.92s] [NetworkGameManager] Client started, looking for NetworkPlayers...
 UnityEngine.Debug:Log (object)
 NetworkGameManager:OnStartClient () (at Assets/Scripts/Network/NetworkGameManager.cs:74)
 FishNet.Object.NetworkBehaviour:OnStartClient_Internal () (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:172)
@@ -840,9 +615,9 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[8.63s] [NetworkPlayer] Player 0 mana: 0 -> 1 (asServer: False)
+[39.92s] [NetworkPlayer] Player 1 health: 20 -> 0 (asServer: False)
 UnityEngine.Debug:Log (object)
-NetworkPlayer:OnManaChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:195)
+NetworkPlayer:OnHealthChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:158)
 FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:352)
 FishNet.Object.Synchronizing.SyncVar`1<int>:OnStartCallback (bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:372)
 FishNet.Object.NetworkBehaviour:InvokeSyncTypeOnStartCallbacks (bool) (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:55)
@@ -862,160 +637,142 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[8.63s] [NetworkPlayer] Player 1 mana: 0 -> 1 (asServer: False)
-UnityEngine.Debug:Log (object)
-NetworkPlayer:OnManaChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:195)
-FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:352)
-FishNet.Object.Synchronizing.SyncVar`1<int>:OnStartCallback (bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:372)
-FishNet.Object.NetworkBehaviour:InvokeSyncTypeOnStartCallbacks (bool) (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:55)
-FishNet.Object.NetworkObject:InvokeOnStartSyncTypeCallbacks (bool) (at Assets/FishNet/Runtime/Object/NetworkObject.Callbacks.cs:74)
-FishNet.Managing.Client.ClientObjectCache:Iterate () (at Assets/FishNet/Runtime/Managing/Client/Object/ObjectCaching.cs:446)
-FishNet.Managing.Client.ClientObjects:IterateObjectCache () (at Assets/FishNet/Runtime/Managing/Client/Object/ClientObjects.cs:482)
-FishNet.Managing.Client.ClientManager:ParseReader (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,bool) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:537)
-FishNet.Managing.Client.ClientManager:ParseReceived (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:384)
-FishNet.Managing.Client.ClientManager:Transport_OnClientReceivedData (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:342)
-FishNet.Transporting.Tugboat.Tugboat:HandleClientReceivedDataArgs (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:238)
-FishNet.Transporting.Tugboat.Client.ClientSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ClientSocket.cs:295)
-FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:211)
-FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
-FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1043)
-FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
-FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
-FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
-FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
-
-[8.70s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
+[39.94s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
 UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
 HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
 EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
 EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:113)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.70s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[39.94s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
 UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
 HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
 EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
 EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:113)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.70s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[39.94s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
 UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
 HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
 EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
 EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:113)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.71s] Opponent draws Card.
+[39.94s] Opponent draws Card.
 UnityEngine.Debug:Log (object)
 EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:271)
 EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:113)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [NetworkGameManager] Found 2 NetworkPlayer(s) after 1 attempts
+[40.02s] [NetworkGameManager] Found 2 NetworkPlayer(s) after 1 attempts
 UnityEngine.Debug:Log (object)
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:96)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [NetworkGameManager] Registered NetworkPlayer: Player 1 (ID: 1)
+[40.02s] [NetworkGameManager] Registered NetworkPlayer: Player 1 (ID: 1)
 UnityEngine.Debug:Log (object)
 NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Network/NetworkGameManager.cs:136)
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [NetworkGameManager] Opponent identified: Player 1
+[40.02s] [NetworkGameManager] Opponent identified: Player 1
 UnityEngine.Debug:Log (object)
 NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Network/NetworkGameManager.cs:148)
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [NetworkPlayer] UpdateLinkedController: Player 1 pushing Health=20, Mana=1 to Opponent
+[40.02s] [NetworkPlayer] UpdateLinkedController: Player 1 pushing Health=20, Mana=1 to Opponent
 UnityEngine.Debug:Log (object)
-NetworkPlayer:UpdateLinkedController () (at Assets/Scripts/Network/NetworkPlayer.cs:211)
-NetworkPlayer:LinkToPlayerController (PlayerController) (at Assets/Scripts/Network/NetworkPlayer.cs:296)
+NetworkPlayer:UpdateLinkedControllerWithValues (int,int,int,int) (at Assets/Scripts/Network/NetworkPlayer.cs:213)
+NetworkPlayer:ForceUpdateLinkedController () (at Assets/Scripts/Network/NetworkPlayer.cs:234)
+NetworkPlayer:LinkToPlayerController (PlayerController) (at Assets/Scripts/Network/NetworkPlayer.cs:313)
 NetworkGameManager:LinkPlayersToControllers () (at Assets/Scripts/Network/NetworkGameManager.cs:173)
 NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Network/NetworkGameManager.cs:152)
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
+[40.02s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
 UnityEngine.Debug:Log (object)
 PlayerController:UpdatePlayerUI () (at Assets/Scripts/Controllers/PlayerController.cs:41)
-NetworkPlayer:UpdateLinkedController () (at Assets/Scripts/Network/NetworkPlayer.cs:216)
-NetworkPlayer:LinkToPlayerController (PlayerController) (at Assets/Scripts/Network/NetworkPlayer.cs:296)
+NetworkPlayer:UpdateLinkedControllerWithValues (int,int,int,int) (at Assets/Scripts/Network/NetworkPlayer.cs:218)
+NetworkPlayer:ForceUpdateLinkedController () (at Assets/Scripts/Network/NetworkPlayer.cs:234)
+NetworkPlayer:LinkToPlayerController (PlayerController) (at Assets/Scripts/Network/NetworkPlayer.cs:313)
 NetworkGameManager:LinkPlayersToControllers () (at Assets/Scripts/Network/NetworkGameManager.cs:173)
 NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Network/NetworkGameManager.cs:152)
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [NetworkPlayer] Player 1 linked to Opponent
+[40.02s] [NetworkPlayer] Player 1 linked to Opponent
 UnityEngine.Debug:Log (object)
-NetworkPlayer:LinkToPlayerController (PlayerController) (at Assets/Scripts/Network/NetworkPlayer.cs:297)
+NetworkPlayer:LinkToPlayerController (PlayerController) (at Assets/Scripts/Network/NetworkPlayer.cs:314)
 NetworkGameManager:LinkPlayersToControllers () (at Assets/Scripts/Network/NetworkGameManager.cs:173)
 NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Network/NetworkGameManager.cs:152)
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [NetworkGameManager] Linked opponent NetworkPlayer to OpponentController
+[40.02s] [NetworkGameManager] Linked opponent NetworkPlayer to OpponentController
 UnityEngine.Debug:Log (object)
 NetworkGameManager:LinkPlayersToControllers () (at Assets/Scripts/Network/NetworkGameManager.cs:175)
 NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Network/NetworkGameManager.cs:152)
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [NetworkGameManager] Registered NetworkPlayer: Player 0 (ID: 0)
+[40.02s] [NetworkGameManager] Registered NetworkPlayer: Player 0 (ID: 0)
 UnityEngine.Debug:Log (object)
 NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Network/NetworkGameManager.cs:136)
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [NetworkGameManager] Local player identified: Player 0
+[40.02s] [NetworkGameManager] Local player identified: Player 0
 UnityEngine.Debug:Log (object)
 NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Network/NetworkGameManager.cs:143)
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [NetworkPlayer] UpdateLinkedController: Player 0 pushing Health=20, Mana=1 to Player
+[40.02s] [NetworkPlayer] UpdateLinkedController: Player 0 pushing Health=20, Mana=1 to Player
 UnityEngine.Debug:Log (object)
-NetworkPlayer:UpdateLinkedController () (at Assets/Scripts/Network/NetworkPlayer.cs:211)
-NetworkPlayer:LinkToPlayerController (PlayerController) (at Assets/Scripts/Network/NetworkPlayer.cs:296)
+NetworkPlayer:UpdateLinkedControllerWithValues (int,int,int,int) (at Assets/Scripts/Network/NetworkPlayer.cs:213)
+NetworkPlayer:ForceUpdateLinkedController () (at Assets/Scripts/Network/NetworkPlayer.cs:234)
+NetworkPlayer:LinkToPlayerController (PlayerController) (at Assets/Scripts/Network/NetworkPlayer.cs:313)
 NetworkGameManager:LinkPlayersToControllers () (at Assets/Scripts/Network/NetworkGameManager.cs:162)
 NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Network/NetworkGameManager.cs:152)
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [PlayerController] Player UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
+[40.02s] [PlayerController] Player UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
 UnityEngine.Debug:Log (object)
 PlayerController:UpdatePlayerUI () (at Assets/Scripts/Controllers/PlayerController.cs:41)
-NetworkPlayer:UpdateLinkedController () (at Assets/Scripts/Network/NetworkPlayer.cs:216)
-NetworkPlayer:LinkToPlayerController (PlayerController) (at Assets/Scripts/Network/NetworkPlayer.cs:296)
+NetworkPlayer:UpdateLinkedControllerWithValues (int,int,int,int) (at Assets/Scripts/Network/NetworkPlayer.cs:218)
+NetworkPlayer:ForceUpdateLinkedController () (at Assets/Scripts/Network/NetworkPlayer.cs:234)
+NetworkPlayer:LinkToPlayerController (PlayerController) (at Assets/Scripts/Network/NetworkPlayer.cs:313)
 NetworkGameManager:LinkPlayersToControllers () (at Assets/Scripts/Network/NetworkGameManager.cs:162)
 NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Network/NetworkGameManager.cs:152)
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [NetworkPlayer] Player 0 linked to Player
+[40.02s] [NetworkPlayer] Player 0 linked to Player
 UnityEngine.Debug:Log (object)
-NetworkPlayer:LinkToPlayerController (PlayerController) (at Assets/Scripts/Network/NetworkPlayer.cs:297)
+NetworkPlayer:LinkToPlayerController (PlayerController) (at Assets/Scripts/Network/NetworkPlayer.cs:314)
 NetworkGameManager:LinkPlayersToControllers () (at Assets/Scripts/Network/NetworkGameManager.cs:162)
 NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Network/NetworkGameManager.cs:152)
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [NetworkGameManager] Linked local NetworkPlayer to PlayerController
+[40.02s] [NetworkGameManager] Linked local NetworkPlayer to PlayerController
 UnityEngine.Debug:Log (object)
 NetworkGameManager:LinkPlayersToControllers () (at Assets/Scripts/Network/NetworkGameManager.cs:164)
 NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Network/NetworkGameManager.cs:152)
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [NetworkGameManager] Both players ready, starting game...
+[40.02s] [NetworkGameManager] Both players ready, starting game...
 UnityEngine.Debug:Log (object)
 NetworkGameManager:LinkPlayersToControllers () (at Assets/Scripts/Network/NetworkGameManager.cs:188)
 NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Network/NetworkGameManager.cs:152)
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [NetworkGameManager] Turn changed: Player -1 -> Player 0
+[40.02s] [NetworkGameManager] Turn changed: Player -1 -> Player 0
 UnityEngine.Debug:Log (object)
 NetworkGameManager:OnTurnChanged (int,int,bool) (at Assets/Scripts/Network/NetworkGameManager.cs:308)
 FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:345)
@@ -1027,7 +784,7 @@ NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Netw
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [NetworkGameManager] Turn number: 0 -> 1
+[40.02s] [NetworkGameManager] Turn number: 0 -> 1
 UnityEngine.Debug:Log (object)
 NetworkGameManager:OnTurnNumberChanged (int,int,bool) (at Assets/Scripts/Network/NetworkGameManager.cs:320)
 FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:345)
@@ -1039,7 +796,7 @@ NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Netw
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [NetworkGameManager] Game started: True
+[40.03s] [NetworkGameManager] Game started: True
 UnityEngine.Debug:Log (object)
 NetworkGameManager:OnGameStartedChanged (bool,bool,bool) (at Assets/Scripts/Network/NetworkGameManager.cs:325)
 FishNet.Object.Synchronizing.SyncVar`1<bool>:InvokeOnChange (bool,bool,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:345)
@@ -1051,7 +808,7 @@ NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Netw
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [EncounterController] Network game started! Local player goes first: True
+[40.03s] [EncounterController] Network game started! Local player goes first: True
 UnityEngine.Debug:Log (object)
 EncounterController:OnNetworkGameStarted (bool) (at Assets/Scripts/Controllers/EncounterController.cs:79)
 NetworkGameManager:OnGameStartedChanged (bool,bool,bool) (at Assets/Scripts/Network/NetworkGameManager.cs:331)
@@ -1064,7 +821,7 @@ NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Netw
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.73s] [Server] Game started! Player 0 goes first.
+[40.03s] [Server] Game started! Player 0 goes first.
 UnityEngine.Debug:Log (object)
 NetworkGameManager:ServerStartGame () (at Assets/Scripts/Network/NetworkGameManager.cs:294)
 NetworkGameManager:LinkPlayersToControllers () (at Assets/Scripts/Network/NetworkGameManager.cs:189)
@@ -1072,18 +829,34 @@ NetworkGameManager:RegisterNetworkPlayer (NetworkPlayer) (at Assets/Scripts/Netw
 NetworkGameManager/<FindAndLinkPlayers>d__16:MoveNext () (at Assets/Scripts/Network/NetworkGameManager.cs:100)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.81s] Player draws Card.
+[40.04s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
+UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
+HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
+EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
+EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:110)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[40.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
+HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
+EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
+EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:110)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[40.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
+HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
+EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
+EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:110)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[40.05s] Player draws Chip 'N Wail.
 UnityEngine.Debug:Log (object)
 EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:271)
 EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:110)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[8.81s] [WARN] HealAmountText is not assigned in HealAbility.
-UnityEngine.Debug:LogWarning (object)
-Ability_Heal:UpdateUI () (at Assets/Scripts/Abilities/Ability_Heal.cs:26)
-Ability_Heal:Start () (at Assets/Scripts/Abilities/Ability_Heal.cs:14)
-
-[8.82s] [NetworkGameManager] Game started: True
+[40.12s] [NetworkGameManager] Game started: True
 UnityEngine.Debug:Log (object)
 NetworkGameManager:OnGameStartedChanged (bool,bool,bool) (at Assets/Scripts/Network/NetworkGameManager.cs:325)
 FishNet.Object.Synchronizing.SyncVar`1<bool>:InvokeOnChange (bool,bool,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:352)
@@ -1104,7 +877,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[8.83s] [EncounterController] Network game started! Local player goes first: True
+[40.12s] [EncounterController] Network game started! Local player goes first: True
 UnityEngine.Debug:Log (object)
 EncounterController:OnNetworkGameStarted (bool) (at Assets/Scripts/Controllers/EncounterController.cs:79)
 NetworkGameManager:OnGameStartedChanged (bool,bool,bool) (at Assets/Scripts/Network/NetworkGameManager.cs:331)
@@ -1126,7 +899,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[8.83s] [NetworkGameManager] Turn number: 0 -> 1
+[40.12s] [NetworkGameManager] Turn number: 0 -> 1
 UnityEngine.Debug:Log (object)
 NetworkGameManager:OnTurnNumberChanged (int,int,bool) (at Assets/Scripts/Network/NetworkGameManager.cs:320)
 FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:352)
@@ -1147,7 +920,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[8.83s] [NetworkGameManager] Turn changed: Player -1 -> Player 0
+[40.12s] [NetworkGameManager] Turn changed: Player -1 -> Player 0
 UnityEngine.Debug:Log (object)
 NetworkGameManager:OnTurnChanged (int,int,bool) (at Assets/Scripts/Network/NetworkGameManager.cs:308)
 FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:352)
@@ -1168,7 +941,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[8.83s] [EncounterController] Network turn changed. Local turn: True, Turn #: 1
+[40.12s] [EncounterController] Network turn changed. Local turn: True, Turn #: 1
 UnityEngine.Debug:Log (object)
 EncounterController:OnNetworkTurnChanged (bool,int) (at Assets/Scripts/Controllers/EncounterController.cs:94)
 NetworkGameManager:OnTurnChanged (int,int,bool) (at Assets/Scripts/Network/NetworkGameManager.cs:314)
@@ -1190,7 +963,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[8.83s] [EncounterController] Starting network turn. isCurrentPlayerTurn: True
+[40.12s] [EncounterController] Starting network turn. isCurrentPlayerTurn: True
 UnityEngine.Debug:Log (object)
 EncounterController:StartTurnNetwork () (at Assets/Scripts/Controllers/EncounterController.cs:180)
 EncounterController:OnNetworkTurnChanged (bool,int) (at Assets/Scripts/Controllers/EncounterController.cs:102)
@@ -1213,7 +986,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[8.83s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
+[40.13s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
 UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
 HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
 EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
@@ -1238,7 +1011,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[8.83s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[40.13s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
 UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
 HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
 EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
@@ -1263,7 +1036,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[8.83s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[40.13s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
 UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
 HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
 EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
@@ -1288,7 +1061,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[8.83s] Player draws Card.
+[40.13s] Player draws Card.
 UnityEngine.Debug:Log (object)
 EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:271)
 EncounterController:StartTurnNetwork () (at Assets/Scripts/Controllers/EncounterController.cs:190)
@@ -1312,7 +1085,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[8.83s] [EncounterController] Your turn! Cards are playable.
+[40.13s] [EncounterController] Your turn! Cards are playable.
 UnityEngine.Debug:Log (object)
 EncounterController:StartTurnNetwork () (at Assets/Scripts/Controllers/EncounterController.cs:199)
 EncounterController:OnNetworkTurnChanged (bool,int) (at Assets/Scripts/Controllers/EncounterController.cs:102)
@@ -1335,9 +1108,36 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[8.86s] [Server] Player 0 mana refilled to 1
+[40.14s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
+UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
+HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
+EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
+EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:113)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[40.15s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
+HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
+EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
+EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:113)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[40.15s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
+HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
+EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
+EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:113)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[40.15s] Opponent draws Card.
 UnityEngine.Debug:Log (object)
-NetworkPlayer:RpcLogic___CmdRefillMana_2166136261 () (at Assets/Scripts/Network/NetworkPlayer.cs:270)
+EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:271)
+EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:113)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[40.16s] [Server] Player 0 mana refilled to 1
+UnityEngine.Debug:Log (object)
+NetworkPlayer:RpcLogic___CmdRefillMana_2166136261 () (at Assets/Scripts/Network/NetworkPlayer.cs:287)
 NetworkPlayer:RpcReader___Server_CmdRefillMana_2166136261 (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,FishNet.Connection.NetworkConnection)
 FishNet.Object.NetworkBehaviour:ReadServerRpc (FishNet.Serializing.PooledReader,FishNet.Connection.NetworkConnection,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Object/NetworkBehaviour.RPCs.cs:190)
 FishNet.Managing.Server.ServerObjects:ParseServerRpc (FishNet.Serializing.PooledReader,FishNet.Connection.NetworkConnection,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.Parsing.cs:24)
@@ -1353,34 +1153,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[8.91s] [WARN] The referenced script (Unknown) on this Behaviour is missing!
-UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
-HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
-EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
-EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:113)
-UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
-
-[8.91s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
-HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
-EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
-EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:113)
-UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
-
-[8.91s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-UnityEngine.Object:Instantiate<UnityEngine.GameObject> (UnityEngine.GameObject,UnityEngine.Vector3,UnityEngine.Quaternion)
-HandController:AddCardToHand (CardController) (at Assets/Scripts/Controllers/HandController.cs:103)
-EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:269)
-EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:113)
-UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
-
-[8.91s] Opponent draws Owl.
-UnityEngine.Debug:Log (object)
-EncounterController:DrawCard (PlayerController) (at Assets/Scripts/Controllers/EncounterController.cs:271)
-EncounterController/<DrawInitialCards>d__15:MoveNext () (at Assets/Scripts/Controllers/EncounterController.cs:113)
-UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
-
-[9.13s] [WARN] Player prefab is empty and cannot be spawned for connection 1.
+[40.42s] [WARN] Player prefab is empty and cannot be spawned for connection 1.
 UnityEngine.Debug:LogWarning (object)
 FishNet.Managing.Logging.LevelLoggingConfiguration:LogWarning (string) (at Assets/FishNet/Runtime/Managing/Logging/LevelLoggingConfiguration.cs:119)
 FishNet.Managing.NetworkManager:InternalLogWarning (string) (at Assets/FishNet/Runtime/Managing/NetworkManager.Logging.cs:75)
@@ -1403,7 +1176,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[10.66s] [ERROR] No support ability found for card Card
+[41.45s] [ERROR] No support ability found for card Card
 UnityEngine.Debug:LogError (object)
 TargetingController:GetSupportTargets (CardController) (at Assets/Scripts/Controllers/TargetingController.cs:101)
 HandController:VisualizeBoardTargets (CardController) (at Assets/Scripts/Controllers/HandController.cs:254)
@@ -1412,21 +1185,29 @@ HandController:HandleMouseDown () (at Assets/Scripts/Controllers/HandController.
 HandController:HandleMouseInput () (at Assets/Scripts/Controllers/HandController.cs:58)
 HandController:Update () (at Assets/Scripts/Controllers/HandController.cs:51)
 
-[10.90s] Card has been added to the board.
+[42.12s] Dealing 1 damage to player: Opponent.
 UnityEngine.Debug:Log (object)
-PlayerController:AddCardToBoard (CardController) (at Assets/Scripts/Controllers/PlayerController.cs:78)
-HandController:addCardToEncounter (CardController,UnityEngine.GameObject) (at Assets/Scripts/Controllers/HandController.cs:430)
-HandController:OnMouseUp () (at Assets/Scripts/Controllers/HandController.cs:614)
+DamageAbility:Activate (PlayerController) (at Assets/Scripts/Abilities/DamageAbility.cs:49)
+CardController:ActivateOffensiveAbility (PlayerController) (at Assets/Scripts/Controllers/CardController.cs:286)
+HandController:useCardAbilityOffensive (PlayerController) (at Assets/Scripts/Controllers/HandController.cs:485)
+HandController:OnMouseUp () (at Assets/Scripts/Controllers/HandController.cs:630)
 HandController:HandleMouseInput () (at Assets/Scripts/Controllers/HandController.cs:62)
 HandController:Update () (at Assets/Scripts/Controllers/HandController.cs:51)
 
-[10.96s] [NetworkPlayer] Player 0 mana: 1 -> 0 (asServer: True)
+[42.12s] Offense action triggered on player!
 UnityEngine.Debug:Log (object)
-NetworkPlayer:OnManaChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:195)
+HandController:useCardAbilityOffensive (PlayerController) (at Assets/Scripts/Controllers/HandController.cs:486)
+HandController:OnMouseUp () (at Assets/Scripts/Controllers/HandController.cs:630)
+HandController:HandleMouseInput () (at Assets/Scripts/Controllers/HandController.cs:62)
+HandController:Update () (at Assets/Scripts/Controllers/HandController.cs:51)
+
+[42.16s] [NetworkPlayer] Player 0 mana: 1 -> 0 (asServer: True)
+UnityEngine.Debug:Log (object)
+NetworkPlayer:OnManaChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:184)
 FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:345)
 FishNet.Object.Synchronizing.SyncVar`1<int>:SetValue (int,bool,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:258)
 FishNet.Object.Synchronizing.SyncVar`1<int>:set_Value (int) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:81)
-NetworkPlayer:RpcLogic___CmdSpendMana_3316948804 (int) (at Assets/Scripts/Network/NetworkPlayer.cs:257)
+NetworkPlayer:RpcLogic___CmdSpendMana_3316948804 (int) (at Assets/Scripts/Network/NetworkPlayer.cs:274)
 NetworkPlayer:RpcReader___Server_CmdSpendMana_3316948804 (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,FishNet.Connection.NetworkConnection)
 FishNet.Object.NetworkBehaviour:ReadServerRpc (FishNet.Serializing.PooledReader,FishNet.Connection.NetworkConnection,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Object/NetworkBehaviour.RPCs.cs:190)
 FishNet.Managing.Server.ServerObjects:ParseServerRpc (FishNet.Serializing.PooledReader,FishNet.Connection.NetworkConnection,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.Parsing.cs:24)
@@ -1442,38 +1223,14 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[10.96s] [NetworkPlayer] UpdateLinkedController: Player 0 pushing Health=20, Mana=0 to Player
-UnityEngine.Debug:Log (object)
-NetworkPlayer:UpdateLinkedController () (at Assets/Scripts/Network/NetworkPlayer.cs:211)
-NetworkPlayer:OnManaChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:197)
-FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:345)
-FishNet.Object.Synchronizing.SyncVar`1<int>:SetValue (int,bool,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:258)
-FishNet.Object.Synchronizing.SyncVar`1<int>:set_Value (int) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:81)
-NetworkPlayer:RpcLogic___CmdSpendMana_3316948804 (int) (at Assets/Scripts/Network/NetworkPlayer.cs:257)
-NetworkPlayer:RpcReader___Server_CmdSpendMana_3316948804 (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,FishNet.Connection.NetworkConnection)
-FishNet.Object.NetworkBehaviour:ReadServerRpc (FishNet.Serializing.PooledReader,FishNet.Connection.NetworkConnection,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Object/NetworkBehaviour.RPCs.cs:190)
-FishNet.Managing.Server.ServerObjects:ParseServerRpc (FishNet.Serializing.PooledReader,FishNet.Connection.NetworkConnection,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.Parsing.cs:24)
-FishNet.Managing.Server.ServerManager:ParseReceived (FishNet.Transporting.ServerReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:774)
-FishNet.Managing.Server.ServerManager:Transport_OnServerReceivedData (FishNet.Transporting.ServerReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:658)
-FishNet.Transporting.Tugboat.Tugboat:HandleServerReceivedDataArgs (FishNet.Transporting.ServerReceivedDataArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:250)
-FishNet.Transporting.Tugboat.Server.ServerSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ServerSocket.cs:518)
-FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:209)
-FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
-FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1042)
-FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
-FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
-FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
-FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
-
-[10.96s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[42.16s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
 UnityEngine.Debug:Log (object)
 PlayerController:UpdatePlayerUI () (at Assets/Scripts/Controllers/PlayerController.cs:41)
-NetworkPlayer:UpdateLinkedController () (at Assets/Scripts/Network/NetworkPlayer.cs:216)
-NetworkPlayer:OnManaChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:197)
+NetworkPlayer:OnManaChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:189)
 FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:345)
 FishNet.Object.Synchronizing.SyncVar`1<int>:SetValue (int,bool,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:258)
 FishNet.Object.Synchronizing.SyncVar`1<int>:set_Value (int) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:81)
-NetworkPlayer:RpcLogic___CmdSpendMana_3316948804 (int) (at Assets/Scripts/Network/NetworkPlayer.cs:257)
+NetworkPlayer:RpcLogic___CmdSpendMana_3316948804 (int) (at Assets/Scripts/Network/NetworkPlayer.cs:274)
 NetworkPlayer:RpcReader___Server_CmdSpendMana_3316948804 (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,FishNet.Connection.NetworkConnection)
 FishNet.Object.NetworkBehaviour:ReadServerRpc (FishNet.Serializing.PooledReader,FishNet.Connection.NetworkConnection,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Object/NetworkBehaviour.RPCs.cs:190)
 FishNet.Managing.Server.ServerObjects:ParseServerRpc (FishNet.Serializing.PooledReader,FishNet.Connection.NetworkConnection,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.Parsing.cs:24)
@@ -1489,9 +1246,9 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[10.96s] [Server] Player 0 spent 1 mana. Remaining: 0
+[42.16s] [Server] Player 0 spent 1 mana. Remaining: 0
 UnityEngine.Debug:Log (object)
-NetworkPlayer:RpcLogic___CmdSpendMana_3316948804 (int) (at Assets/Scripts/Network/NetworkPlayer.cs:258)
+NetworkPlayer:RpcLogic___CmdSpendMana_3316948804 (int) (at Assets/Scripts/Network/NetworkPlayer.cs:275)
 NetworkPlayer:RpcReader___Server_CmdSpendMana_3316948804 (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,FishNet.Connection.NetworkConnection)
 FishNet.Object.NetworkBehaviour:ReadServerRpc (FishNet.Serializing.PooledReader,FishNet.Connection.NetworkConnection,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Object/NetworkBehaviour.RPCs.cs:190)
 FishNet.Managing.Server.ServerObjects:ParseServerRpc (FishNet.Serializing.PooledReader,FishNet.Connection.NetworkConnection,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.Parsing.cs:24)
@@ -1507,54 +1264,72 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[11.03s] [NetworkPlayer] Player 0 mana: 1 -> 0 (asServer: False)
+[42.16s] [NetworkPlayer] Player 1 health: 20 -> 19 (asServer: True)
 UnityEngine.Debug:Log (object)
-NetworkPlayer:OnManaChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:195)
-FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:352)
-FishNet.Object.Synchronizing.SyncVar`1<int>:SetValue (int,bool,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:281)
-FishNet.Object.Synchronizing.SyncVar`1<int>:Read (FishNet.Serializing.PooledReader,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:425)
-FishNet.Object.NetworkBehaviour:ReadSyncType (FishNet.Serializing.PooledReader,int,bool) (at Assets/FishNet/Runtime/Object/NetworkBehaviour.SyncTypes.cs:183)
-FishNet.Managing.Client.ClientObjects:ParseSyncType (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Managing/Client/Object/ClientObjects.cs:289)
-FishNet.Managing.Client.ClientManager:ParseReader (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,bool) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:487)
-FishNet.Managing.Client.ClientManager:ParseReceived (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:384)
-FishNet.Managing.Client.ClientManager:Transport_OnClientReceivedData (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:342)
-FishNet.Transporting.Tugboat.Tugboat:HandleClientReceivedDataArgs (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:238)
-FishNet.Transporting.Tugboat.Client.ClientSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ClientSocket.cs:295)
-FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:211)
+NetworkPlayer:OnHealthChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:158)
+FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:345)
+FishNet.Object.Synchronizing.SyncVar`1<int>:SetValue (int,bool,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:258)
+FishNet.Object.Synchronizing.SyncVar`1<int>:set_Value (int) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:81)
+NetworkPlayer:RpcLogic___CmdTakeDamage_3316948804 (int) (at Assets/Scripts/Network/NetworkPlayer.cs:247)
+NetworkPlayer:RpcReader___Server_CmdTakeDamage_3316948804 (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,FishNet.Connection.NetworkConnection)
+FishNet.Object.NetworkBehaviour:ReadServerRpc (FishNet.Serializing.PooledReader,FishNet.Connection.NetworkConnection,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Object/NetworkBehaviour.RPCs.cs:190)
+FishNet.Managing.Server.ServerObjects:ParseServerRpc (FishNet.Serializing.PooledReader,FishNet.Connection.NetworkConnection,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.Parsing.cs:24)
+FishNet.Managing.Server.ServerManager:ParseReceived (FishNet.Transporting.ServerReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:774)
+FishNet.Managing.Server.ServerManager:Transport_OnServerReceivedData (FishNet.Transporting.ServerReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:658)
+FishNet.Transporting.Tugboat.Tugboat:HandleServerReceivedDataArgs (FishNet.Transporting.ServerReceivedDataArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:250)
+FishNet.Transporting.Tugboat.Server.ServerSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ServerSocket.cs:518)
+FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:209)
 FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
-FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1043)
+FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1042)
 FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
 FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[11.03s] [NetworkPlayer] UpdateLinkedController: Player 0 pushing Health=20, Mana=0 to Player
-UnityEngine.Debug:Log (object)
-NetworkPlayer:UpdateLinkedController () (at Assets/Scripts/Network/NetworkPlayer.cs:211)
-NetworkPlayer:OnManaChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:197)
-FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:352)
-FishNet.Object.Synchronizing.SyncVar`1<int>:SetValue (int,bool,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:281)
-FishNet.Object.Synchronizing.SyncVar`1<int>:Read (FishNet.Serializing.PooledReader,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:425)
-FishNet.Object.NetworkBehaviour:ReadSyncType (FishNet.Serializing.PooledReader,int,bool) (at Assets/FishNet/Runtime/Object/NetworkBehaviour.SyncTypes.cs:183)
-FishNet.Managing.Client.ClientObjects:ParseSyncType (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Managing/Client/Object/ClientObjects.cs:289)
-FishNet.Managing.Client.ClientManager:ParseReader (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,bool) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:487)
-FishNet.Managing.Client.ClientManager:ParseReceived (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:384)
-FishNet.Managing.Client.ClientManager:Transport_OnClientReceivedData (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:342)
-FishNet.Transporting.Tugboat.Tugboat:HandleClientReceivedDataArgs (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:238)
-FishNet.Transporting.Tugboat.Client.ClientSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ClientSocket.cs:295)
-FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:211)
-FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
-FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1043)
-FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
-FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
-FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
-FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
-
-[11.03s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[42.16s] [PlayerController] Opponent UpdatePlayerUI: health=19, mana=1, healthText=assigned, manaText=assigned
 UnityEngine.Debug:Log (object)
 PlayerController:UpdatePlayerUI () (at Assets/Scripts/Controllers/PlayerController.cs:41)
-NetworkPlayer:UpdateLinkedController () (at Assets/Scripts/Network/NetworkPlayer.cs:216)
-NetworkPlayer:OnManaChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:197)
+NetworkPlayer:OnHealthChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:165)
+FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:345)
+FishNet.Object.Synchronizing.SyncVar`1<int>:SetValue (int,bool,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:258)
+FishNet.Object.Synchronizing.SyncVar`1<int>:set_Value (int) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:81)
+NetworkPlayer:RpcLogic___CmdTakeDamage_3316948804 (int) (at Assets/Scripts/Network/NetworkPlayer.cs:247)
+NetworkPlayer:RpcReader___Server_CmdTakeDamage_3316948804 (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,FishNet.Connection.NetworkConnection)
+FishNet.Object.NetworkBehaviour:ReadServerRpc (FishNet.Serializing.PooledReader,FishNet.Connection.NetworkConnection,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Object/NetworkBehaviour.RPCs.cs:190)
+FishNet.Managing.Server.ServerObjects:ParseServerRpc (FishNet.Serializing.PooledReader,FishNet.Connection.NetworkConnection,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.Parsing.cs:24)
+FishNet.Managing.Server.ServerManager:ParseReceived (FishNet.Transporting.ServerReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:774)
+FishNet.Managing.Server.ServerManager:Transport_OnServerReceivedData (FishNet.Transporting.ServerReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:658)
+FishNet.Transporting.Tugboat.Tugboat:HandleServerReceivedDataArgs (FishNet.Transporting.ServerReceivedDataArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:250)
+FishNet.Transporting.Tugboat.Server.ServerSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ServerSocket.cs:518)
+FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:209)
+FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
+FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1042)
+FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
+FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
+FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
+FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
+
+[42.16s] [Server] Player 1 took 1 damage. Health: 19
+UnityEngine.Debug:Log (object)
+NetworkPlayer:RpcLogic___CmdTakeDamage_3316948804 (int) (at Assets/Scripts/Network/NetworkPlayer.cs:249)
+NetworkPlayer:RpcReader___Server_CmdTakeDamage_3316948804 (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,FishNet.Connection.NetworkConnection)
+FishNet.Object.NetworkBehaviour:ReadServerRpc (FishNet.Serializing.PooledReader,FishNet.Connection.NetworkConnection,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Object/NetworkBehaviour.RPCs.cs:190)
+FishNet.Managing.Server.ServerObjects:ParseServerRpc (FishNet.Serializing.PooledReader,FishNet.Connection.NetworkConnection,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Managing/Server/Object/ServerObjects.Parsing.cs:24)
+FishNet.Managing.Server.ServerManager:ParseReceived (FishNet.Transporting.ServerReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:774)
+FishNet.Managing.Server.ServerManager:Transport_OnServerReceivedData (FishNet.Transporting.ServerReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Server/ServerManager.cs:658)
+FishNet.Transporting.Tugboat.Tugboat:HandleServerReceivedDataArgs (FishNet.Transporting.ServerReceivedDataArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:250)
+FishNet.Transporting.Tugboat.Server.ServerSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ServerSocket.cs:518)
+FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:209)
+FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
+FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1042)
+FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
+FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
+FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
+FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
+
+[42.22s] [NetworkPlayer] Player 0 mana: 1 -> 0 (asServer: False)
+UnityEngine.Debug:Log (object)
+NetworkPlayer:OnManaChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:184)
 FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:352)
 FishNet.Object.Synchronizing.SyncVar`1<int>:SetValue (int,bool,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:281)
 FishNet.Object.Synchronizing.SyncVar`1<int>:Read (FishNet.Serializing.PooledReader,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:425)
@@ -1573,7 +1348,72 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[12.73s] [PlayerConnectionHandler] Player disconnected: Connection ID 1
+[42.22s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+UnityEngine.Debug:Log (object)
+PlayerController:UpdatePlayerUI () (at Assets/Scripts/Controllers/PlayerController.cs:41)
+NetworkPlayer:OnManaChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:189)
+FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:352)
+FishNet.Object.Synchronizing.SyncVar`1<int>:SetValue (int,bool,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:281)
+FishNet.Object.Synchronizing.SyncVar`1<int>:Read (FishNet.Serializing.PooledReader,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:425)
+FishNet.Object.NetworkBehaviour:ReadSyncType (FishNet.Serializing.PooledReader,int,bool) (at Assets/FishNet/Runtime/Object/NetworkBehaviour.SyncTypes.cs:183)
+FishNet.Managing.Client.ClientObjects:ParseSyncType (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Managing/Client/Object/ClientObjects.cs:289)
+FishNet.Managing.Client.ClientManager:ParseReader (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,bool) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:487)
+FishNet.Managing.Client.ClientManager:ParseReceived (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:384)
+FishNet.Managing.Client.ClientManager:Transport_OnClientReceivedData (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:342)
+FishNet.Transporting.Tugboat.Tugboat:HandleClientReceivedDataArgs (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:238)
+FishNet.Transporting.Tugboat.Client.ClientSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ClientSocket.cs:295)
+FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:211)
+FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
+FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1043)
+FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
+FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
+FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
+FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
+
+[42.22s] [NetworkPlayer] Player 1 health: 0 -> 19 (asServer: False)
+UnityEngine.Debug:Log (object)
+NetworkPlayer:OnHealthChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:158)
+FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:352)
+FishNet.Object.Synchronizing.SyncVar`1<int>:SetValue (int,bool,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:281)
+FishNet.Object.Synchronizing.SyncVar`1<int>:Read (FishNet.Serializing.PooledReader,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:425)
+FishNet.Object.NetworkBehaviour:ReadSyncType (FishNet.Serializing.PooledReader,int,bool) (at Assets/FishNet/Runtime/Object/NetworkBehaviour.SyncTypes.cs:183)
+FishNet.Managing.Client.ClientObjects:ParseSyncType (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Managing/Client/Object/ClientObjects.cs:289)
+FishNet.Managing.Client.ClientManager:ParseReader (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,bool) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:487)
+FishNet.Managing.Client.ClientManager:ParseReceived (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:384)
+FishNet.Managing.Client.ClientManager:Transport_OnClientReceivedData (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:342)
+FishNet.Transporting.Tugboat.Tugboat:HandleClientReceivedDataArgs (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:238)
+FishNet.Transporting.Tugboat.Client.ClientSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ClientSocket.cs:295)
+FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:211)
+FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
+FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1043)
+FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
+FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
+FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
+FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
+
+[42.22s] [PlayerController] Opponent UpdatePlayerUI: health=19, mana=1, healthText=assigned, manaText=assigned
+UnityEngine.Debug:Log (object)
+PlayerController:UpdatePlayerUI () (at Assets/Scripts/Controllers/PlayerController.cs:41)
+NetworkPlayer:OnHealthChanged (int,int,bool) (at Assets/Scripts/Network/NetworkPlayer.cs:165)
+FishNet.Object.Synchronizing.SyncVar`1<int>:InvokeOnChange (int,int,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:352)
+FishNet.Object.Synchronizing.SyncVar`1<int>:SetValue (int,bool,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:281)
+FishNet.Object.Synchronizing.SyncVar`1<int>:Read (FishNet.Serializing.PooledReader,bool) (at Assets/FishNet/Runtime/Object/Synchronizing/SyncVar.cs:425)
+FishNet.Object.NetworkBehaviour:ReadSyncType (FishNet.Serializing.PooledReader,int,bool) (at Assets/FishNet/Runtime/Object/NetworkBehaviour.SyncTypes.cs:183)
+FishNet.Managing.Client.ClientObjects:ParseSyncType (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel) (at Assets/FishNet/Runtime/Managing/Client/Object/ClientObjects.cs:289)
+FishNet.Managing.Client.ClientManager:ParseReader (FishNet.Serializing.PooledReader,FishNet.Transporting.Channel,bool) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:487)
+FishNet.Managing.Client.ClientManager:ParseReceived (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:384)
+FishNet.Managing.Client.ClientManager:Transport_OnClientReceivedData (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Managing/Client/ClientManager.cs:342)
+FishNet.Transporting.Tugboat.Tugboat:HandleClientReceivedDataArgs (FishNet.Transporting.ClientReceivedDataArgs) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:238)
+FishNet.Transporting.Tugboat.Client.ClientSocket:IterateIncoming () (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Core/ClientSocket.cs:295)
+FishNet.Transporting.Tugboat.Tugboat:IterateIncoming (bool) (at Assets/FishNet/Runtime/Transporting/Transports/Tugboat/Tugboat.cs:211)
+FishNet.Managing.Transporting.TransportManager:IterateIncoming (bool) (at Assets/FishNet/Runtime/Managing/Transporting/TransportManager.cs:705)
+FishNet.Managing.Timing.TimeManager:TryIterateData (bool) (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:1043)
+FishNet.Managing.Timing.TimeManager:IncreaseTick () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:708)
+FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:376)
+FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
+FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
+
+[49.29s] [PlayerConnectionHandler] Player disconnected: Connection ID 1
 UnityEngine.Debug:Log (object)
 PlayerConnectionHandler:OnPlayerDisconnected (FishNet.Connection.NetworkConnection) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:110)
 PlayerConnectionHandler:OnRemoteConnectionState (FishNet.Connection.NetworkConnection,FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:66)
@@ -1588,7 +1428,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[12.73s] [PlayerConnectionHandler] Remaining players: 0
+[49.29s] [PlayerConnectionHandler] Remaining players: 0
 UnityEngine.Debug:Log (object)
 PlayerConnectionHandler:OnPlayerDisconnected (FishNet.Connection.NetworkConnection) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:119)
 PlayerConnectionHandler:OnRemoteConnectionState (FishNet.Connection.NetworkConnection,FishNet.Transporting.RemoteConnectionStateArgs) (at Assets/Scripts/Network/PlayerConnectionHandler.cs:66)
@@ -1603,7 +1443,7 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[12.73s] Remote connection stopped for Id 1.
+[49.30s] Remote connection stopped for Id 1.
 UnityEngine.Debug:Log (object)
 FishNet.Managing.Logging.LevelLoggingConfiguration:Log (string) (at Assets/FishNet/Runtime/Managing/Logging/LevelLoggingConfiguration.cs:109)
 FishNet.Managing.NetworkManager:InternalLog (string) (at Assets/FishNet/Runtime/Managing/NetworkManager.Logging.cs:54)
@@ -1619,9 +1459,9 @@ FishNet.Managing.Timing.TimeManager:<TickUpdate>g__MethodLogic|100_0 () (at Asse
 FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Managing/Timing/TimeManager.cs:366)
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
-[12.81s] [NetworkPlayer] Player left: Player 1 (ID: 1)
+[49.39s] [NetworkPlayer] Player left: Player 1 (ID: 1)
 UnityEngine.Debug:Log (object)
-NetworkPlayer:OnStopClient () (at Assets/Scripts/Network/NetworkPlayer.cs:152)
+NetworkPlayer:OnStopClient () (at Assets/Scripts/Network/NetworkPlayer.cs:138)
 FishNet.Object.NetworkBehaviour:OnStopClient_Internal () (at Assets/FishNet/Runtime/Object/NetworkBehaviour.Callbacks.cs:184)
 FishNet.Object.NetworkObject:InvokeStopCallbacks (bool,bool) (at Assets/FishNet/Runtime/Object/NetworkObject.Callbacks.cs:132)
 FishNet.Object.NetworkObject:Deinitialize (bool) (at Assets/FishNet/Runtime/Object/NetworkObject.cs:952)
@@ -1644,4 +1484,4 @@ FishNet.Managing.Timing.TimeManager:TickUpdate () (at Assets/FishNet/Runtime/Man
 FishNet.Transporting.NetworkReaderLoop:Update () (at Assets/FishNet/Runtime/Transporting/NetworkReaderLoop.cs:28)
 
 
-=== Log ended: 2026-01-03 19:25:54 ===
+=== Log ended: 2026-01-03 19:48:33 ===

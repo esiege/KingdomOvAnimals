@@ -1,69 +1,66 @@
-=== Log started: 2026-01-03 19:25:39 (BUILD/CLIENT) ===
+=== Log started: 2026-01-03 19:47:42 (BUILD/CLIENT) ===
 === Log file: D:/Google Drive/Unity/KingdomOvAnimals/KingdomOvAnimals/Build/KingdomOvAnimals_Data\..\..\Docs\log_build.txt ===
 
-[0.05s] [ERROR] No cloud project ID was found by the Analytics SDK. This means Analytics events will not be sent. Please make sure to link your cloud project in the Unity editor to fix this problem.
-[6.92s] [MainMenu] Joining game...
-[8.07s] [MainMenu] Connected to server!
-[8.84s] [WARN] Spawned NetworkObject was expected to exist but does not for Id 0. This may occur if you sent a NetworkObject reference which does not exist, be it destroyed or if the client does not have visibility.
-[8.84s] [WARN] Spawned NetworkObject was expected to exist but does not for Id 1. This may occur if you sent a NetworkObject reference which does not exist, be it destroyed or if the client does not have visibility.
-[9.41s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
-[9.41s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
-[9.41s] [WARN] HealAmountText is not assigned in HealAbility.
-[9.41s] [EncounterController] Network game detected, waiting for network to start game...
-[9.41s] Deck shuffled!
-[9.41s] Deck shuffled!
-[9.41s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[9.41s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[9.41s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[9.41s] Player draws Card.
-[9.41s] [WARN] [TargetingController] Board slots not found - scene may still be loading
-[9.41s] No open slots available.
-[9.52s] Opponent draws Card.
-[9.52s] [WARN] HealAmountText is not assigned in HealAbility.
-[9.55s] [NetworkPlayer] OnStartClient: Player 0 (ID: 0) - Health=0, IsOwner=False, IsServerStarted=False
-[9.55s] [NetworkPlayer] Other player joined: Player 0 (ID: 0)
-[9.55s] [NetworkPlayer] OnStartClient: Player 1 (ID: 1) - Health=0, IsOwner=True, IsServerStarted=False
-[9.55s] [NetworkPlayer] You are: Player 1 (ID: 1)
-[9.55s] [NetworkGameManager] Client started, looking for NetworkPlayers...
-[9.55s] [NetworkPlayer] Player 0 mana: 0 -> 1 (asServer: False)
-[9.55s] [NetworkPlayer] Player 0 health: 20 -> 0 (asServer: False)
-[9.55s] [NetworkPlayer] Player 1 mana: 0 -> 1 (asServer: False)
-[9.55s] [NetworkPlayer] Player 1 health: 20 -> 0 (asServer: False)
-[9.55s] [NetworkGameManager] Game started: True
-[9.55s] [NetworkGameManager] Turn number: 0 -> 1
-[9.55s] [NetworkGameManager] Turn changed: Player -1 -> Player 0
-[9.63s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[9.63s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[9.63s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[9.63s] Player draws Flying Fox.
-[9.65s] [NetworkGameManager] Found 2 NetworkPlayer(s) after 1 attempts
-[9.65s] [NetworkGameManager] Registered NetworkPlayer: Player 1 (ID: 1)
-[9.65s] [NetworkGameManager] Local player identified: Player 1
-[9.65s] [NetworkPlayer] UpdateLinkedController: Player 1 pushing Health=0, Mana=1 to Player
-[9.65s] [PlayerController] Player UpdatePlayerUI: health=0, mana=1, healthText=assigned, manaText=assigned
-[9.65s] [NetworkPlayer] Player 1 linked to Player
-[9.65s] [NetworkGameManager] Linked local NetworkPlayer to PlayerController
-[9.65s] [NetworkGameManager] Registered NetworkPlayer: Player 0 (ID: 0)
-[9.65s] [NetworkGameManager] Opponent identified: Player 0
-[9.65s] [NetworkPlayer] UpdateLinkedController: Player 0 pushing Health=0, Mana=1 to Opponent
-[9.65s] [PlayerController] Opponent UpdatePlayerUI: health=0, mana=1, healthText=assigned, manaText=assigned
-[9.65s] [NetworkPlayer] Player 0 linked to Opponent
-[9.65s] [NetworkGameManager] Linked opponent NetworkPlayer to OpponentController
-[9.75s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[9.75s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[9.75s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[9.75s] Opponent draws Card.
-[9.87s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[9.87s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[9.87s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[9.87s] Player draws Card.
-[9.98s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[9.98s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[9.98s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[9.98s] Opponent draws Card.
-[11.40s] [NetworkPlayer] Player 0 mana: 1 -> 0 (asServer: False)
-[11.40s] [NetworkPlayer] UpdateLinkedController: Player 0 pushing Health=0, Mana=0 to Opponent
-[11.40s] [PlayerController] Opponent UpdatePlayerUI: health=0, mana=0, healthText=assigned, manaText=assigned
-[13.08s] [NetworkPlayer] Player left: Player 0 (ID: 0)
+[0.04s] [ERROR] No cloud project ID was found by the Analytics SDK. This means Analytics events will not be sent. Please make sure to link your cloud project in the Unity editor to fix this problem.
+[38.40s] [MainMenu] Joining game...
+[39.58s] [MainMenu] Connected to server!
+[40.40s] [WARN] Spawned NetworkObject was expected to exist but does not for Id 0. This may occur if you sent a NetworkObject reference which does not exist, be it destroyed or if the client does not have visibility.
+[40.40s] [WARN] Spawned NetworkObject was expected to exist but does not for Id 1. This may occur if you sent a NetworkObject reference which does not exist, be it destroyed or if the client does not have visibility.
+[40.92s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[40.92s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[40.92s] [WARN] HealAmountText is not assigned in HealAbility.
+[40.92s] [EncounterController] Network game detected, waiting for network to start game...
+[40.92s] Deck shuffled!
+[40.92s] Deck shuffled!
+[40.93s] Player draws Card.
+[40.93s] [WARN] [TargetingController] Board slots not found - scene may still be loading
+[40.93s] No open slots available.
+[40.93s] [WARN] HealAmountText is not assigned in HealAbility.
+[41.03s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[41.03s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[41.03s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[41.03s] Opponent draws Chip 'N Wail.
+[41.11s] [NetworkPlayer] Other player joined: Player 0 (ID: 0)
+[41.11s] [NetworkPlayer] You are: Player 1 (ID: -8082)
+[41.11s] [NetworkGameManager] Client started, looking for NetworkPlayers...
+[41.11s] [NetworkPlayer] Player 0 health: 20 -> 0 (asServer: False)
+[41.11s] [NetworkPlayer] Player 1 health: 20 -> 0 (asServer: False)
+[41.11s] [NetworkGameManager] Game started: True
+[41.11s] [NetworkGameManager] Turn number: 0 -> 1
+[41.11s] [NetworkGameManager] Turn changed: Player -1 -> Player 0
+[41.15s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[41.15s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[41.15s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[41.15s] Player draws Owl.
+[41.21s] [NetworkGameManager] Found 2 NetworkPlayer(s) after 1 attempts
+[41.21s] [NetworkGameManager] Registered NetworkPlayer: Player 1 (ID: -8082)
+[41.21s] [NetworkGameManager] Local player identified: Player 1
+[41.21s] [NetworkPlayer] UpdateLinkedController: Player 1 pushing Health=20, Mana=1 to Player
+[41.21s] [PlayerController] Player UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
+[41.21s] [NetworkPlayer] Player 1 linked to Player
+[41.21s] [NetworkGameManager] Linked local NetworkPlayer to PlayerController
+[41.21s] [NetworkGameManager] Registered NetworkPlayer: Player 0 (ID: 0)
+[41.21s] [NetworkGameManager] Opponent identified: Player 0
+[41.21s] [NetworkPlayer] UpdateLinkedController: Player 0 pushing Health=20, Mana=1 to Opponent
+[41.21s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
+[41.21s] [NetworkPlayer] Player 0 linked to Opponent
+[41.21s] [NetworkGameManager] Linked opponent NetworkPlayer to OpponentController
+[41.26s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[41.26s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[41.26s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[41.26s] Opponent draws Chip 'N Wail.
+[41.38s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[41.38s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[41.38s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[41.38s] Player draws Flying Fox.
+[41.50s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[41.50s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[41.50s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[41.50s] Opponent draws Card.
+[42.81s] [NetworkPlayer] Player 0 mana: 1 -> 0 (asServer: False)
+[42.81s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[42.81s] [NetworkPlayer] Player 1 health: 0 -> 19 (asServer: False)
+[42.81s] [PlayerController] Player UpdatePlayerUI: health=19, mana=1, healthText=assigned, manaText=assigned
+[49.86s] [NetworkPlayer] Player left: Player 0 (ID: 0)
 
-=== Log ended: 2026-01-03 19:25:53 ===
+=== Log ended: 2026-01-03 19:48:31 ===
