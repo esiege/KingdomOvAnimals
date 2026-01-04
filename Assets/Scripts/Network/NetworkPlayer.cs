@@ -32,23 +32,24 @@ public class NetworkPlayer : NetworkBehaviour
     
     /// <summary>
     /// Player's current health.
+    /// Note: No constructor default - must be set in OnStartServer() to ensure proper sync.
     /// </summary>
-    public readonly SyncVar<int> CurrentHealth = new SyncVar<int>(20);
+    public readonly SyncVar<int> CurrentHealth = new SyncVar<int>();
     
     /// <summary>
     /// Player's maximum health.
     /// </summary>
-    public readonly SyncVar<int> MaxHealth = new SyncVar<int>(20);
+    public readonly SyncVar<int> MaxHealth = new SyncVar<int>();
     
     /// <summary>
     /// Player's current mana.
     /// </summary>
-    public readonly SyncVar<int> CurrentMana = new SyncVar<int>(1);
+    public readonly SyncVar<int> CurrentMana = new SyncVar<int>();
     
     /// <summary>
     /// Player's maximum mana.
     /// </summary>
-    public readonly SyncVar<int> MaxMana = new SyncVar<int>(1);
+    public readonly SyncVar<int> MaxMana = new SyncVar<int>();
     
     #endregion
     
@@ -85,20 +86,52 @@ public class NetworkPlayer : NetworkBehaviour
         MaxMana.OnChange -= OnMaxManaChanged;
     }
 
+    // Store the player ID to be used during OnStartServer
+    private int _pendingPlayerId = -1;
+
     /// <summary>
-    /// Called by server to initialize this player.
+    /// Called by server to set the player ID before spawn.
+    /// Actual initialization happens in OnStartServer.
     /// </summary>
-    public void Initialize(int playerId)
+    public void SetPlayerId(int playerId)
     {
-        PlayerId.Value = playerId;
-        PlayerName.Value = $"Player {playerId}";
+        _pendingPlayerId = playerId;
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
         
-        Debug.Log($"[NetworkPlayer] Initialized: {PlayerName.Value} (ID: {PlayerId.Value})");
+        // Set identity values
+        if (_pendingPlayerId >= 0)
+        {
+            PlayerId.Value = _pendingPlayerId;
+            PlayerName.Value = $"Player {_pendingPlayerId}";
+        }
+        
+        // DEBUG: Log before setting values
+        Debug.Log($"[NetworkPlayer] OnStartServer BEFORE: Player {_pendingPlayerId} - CurrentHealth.Value={CurrentHealth.Value}");
+        
+        // MUST explicitly set game state values here - this marks them as dirty
+        // so they get serialized to clients. Constructor defaults don't work because
+        // FishNet only syncs values that have been "set" (marked dirty).
+        CurrentHealth.Value = 20;
+        MaxHealth.Value = 20;
+        CurrentMana.Value = 1;
+        MaxMana.Value = 1;
+        
+        // DEBUG: Log after setting values
+        Debug.Log($"[NetworkPlayer] OnStartServer AFTER: Player {_pendingPlayerId} - CurrentHealth.Value={CurrentHealth.Value}");
+        
+        Debug.Log($"[NetworkPlayer] Initialized on server: {PlayerName.Value} (ID: {PlayerId.Value}) - Health: {CurrentHealth.Value}, Mana: {CurrentMana.Value}");
     }
 
     public override void OnStartClient()
     {
         base.OnStartClient();
+        
+        // DEBUG: Log client-side values at start
+        Debug.Log($"[NetworkPlayer] OnStartClient: {PlayerName.Value} (ID: {PlayerId.Value}) - Health={CurrentHealth.Value}, IsOwner={IsOwner}, IsServerStarted={base.IsServerStarted}");
         
         if (IsOwner)
         {
@@ -134,9 +167,18 @@ public class NetworkPlayer : NetworkBehaviour
     
     private void OnHealthChanged(int prev, int next, bool asServer)
     {
+        // On HOST, the callback 'next' parameter can be incorrect during OnStartCallback.
+        // Use CurrentHealth.Value which is always correct.
+        int actualHealth = CurrentHealth.Value;
+        
+        // Only log/process if there's a real change
+        if (prev != actualHealth)
+        {
+            Debug.Log($"[NetworkPlayer] {PlayerName.Value} health: {prev} -> {actualHealth} (asServer: {asServer})");
+        }
+        
         UpdateLinkedController();
         OnStateChanged?.Invoke();
-        Debug.Log($"[NetworkPlayer] {PlayerName.Value} health: {prev} -> {next}");
     }
     
     private void OnMaxHealthChanged(int prev, int next, bool asServer)
@@ -147,9 +189,13 @@ public class NetworkPlayer : NetworkBehaviour
     
     private void OnManaChanged(int prev, int next, bool asServer)
     {
+        // Only log if there's an actual change (not just initial sync with same value)
+        if (prev != next)
+        {
+            Debug.Log($"[NetworkPlayer] {PlayerName.Value} mana: {prev} -> {next} (asServer: {asServer})");
+        }
         UpdateLinkedController();
         OnStateChanged?.Invoke();
-        Debug.Log($"[NetworkPlayer] {PlayerName.Value} mana: {prev} -> {next}");
     }
     
     private void OnMaxManaChanged(int prev, int next, bool asServer)
@@ -162,6 +208,7 @@ public class NetworkPlayer : NetworkBehaviour
     {
         if (LinkedPlayerController != null)
         {
+            Debug.Log($"[NetworkPlayer] UpdateLinkedController: {PlayerName.Value} pushing Health={CurrentHealth.Value}, Mana={CurrentMana.Value} to {LinkedPlayerController.gameObject.name}");
             LinkedPlayerController.currentHealth = CurrentHealth.Value;
             LinkedPlayerController.maxHealth = MaxHealth.Value;
             LinkedPlayerController.currentMana = CurrentMana.Value;

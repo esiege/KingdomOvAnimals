@@ -64,6 +64,12 @@ public class HandController : MonoBehaviour
 
     private void HandleMouseDown()
     {
+        // In network mode, check if it's our turn before allowing interaction
+        if (encounterController != null && !encounterController.IsLocalPlayerTurn())
+        {
+            return; // Not our turn, ignore input
+        }
+        
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePosition.z = 0; // Ensure the position stays in the 2D plane
 

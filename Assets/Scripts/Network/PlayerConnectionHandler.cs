@@ -79,15 +79,18 @@ public class PlayerConnectionHandler : MonoBehaviour
         if (playerPrefab != null)
         {
             NetworkObject nob = _networkManager.GetPooledInstantiated(playerPrefab, true);
-            _networkManager.ServerManager.Spawn(nob, conn);
-
-            // Get the NetworkPlayer component and track it
+            
+            // Get the NetworkPlayer component and set the player ID
+            // The actual initialization will happen in OnStartServer after spawn
             NetworkPlayer networkPlayer = nob.GetComponent<NetworkPlayer>();
             if (networkPlayer != null)
             {
+                networkPlayer.SetPlayerId(conn.ClientId);
                 ConnectedPlayers[conn.ClientId] = networkPlayer;
-                networkPlayer.Initialize(conn.ClientId);
             }
+            
+            // Spawn - OnStartServer will initialize the SyncVars
+            _networkManager.ServerManager.Spawn(nob, conn);
 
             if (logConnections)
                 Debug.Log($"[PlayerConnectionHandler] Spawned player object for Connection ID {conn.ClientId}. Total players: {PlayerCount}");

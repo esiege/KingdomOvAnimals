@@ -242,13 +242,28 @@ public class MainMenuController : MonoBehaviour
     {
         Debug.Log($"[MainMenu] Loading scene: {gameSceneName}");
         
+        // Collect all spawned NetworkPlayer objects to move to new scene
+        System.Collections.Generic.List<NetworkObject> movedObjects = new System.Collections.Generic.List<NetworkObject>();
+        
+        // Get all NetworkObjects owned by connected clients
+        foreach (NetworkConnection conn in _networkManager.ServerManager.Clients.Values)
+        {
+            foreach (NetworkObject nob in conn.Objects)
+            {
+                movedObjects.Add(nob);
+                Debug.Log($"[MainMenu] Moving NetworkObject: {nob.name} (Owner: {conn.ClientId})");
+            }
+        }
+        
+        Debug.Log($"[MainMenu] Moving {movedObjects.Count} NetworkObjects to {gameSceneName}");
+        
         // Use FishNet's scene manager for networked scene loading
         SceneLoadData sld = new SceneLoadData(gameSceneName);
         sld.ReplaceScenes = ReplaceOption.All;
         
         // Keep spawned network objects (like NetworkPlayer) when changing scenes
         sld.Options.AllowStacking = false;
-        sld.MovedNetworkObjects = new NetworkObject[0]; // Empty = move all spawned objects
+        sld.MovedNetworkObjects = movedObjects.ToArray();
         
         _networkManager.SceneManager.LoadGlobalScenes(sld);
     }

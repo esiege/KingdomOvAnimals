@@ -1,12 +1,14 @@
 using FishNet;
 using FishNet.Connection;
 using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
 /// Manages the networked game state in the DuelScreen scene.
 /// Links spawned NetworkPlayer objects to local PlayerController objects.
+/// Also handles turn synchronization.
 /// </summary>
 public class NetworkGameManager : NetworkBehaviour
 {
@@ -18,6 +20,25 @@ public class NetworkGameManager : NetworkBehaviour
     
     [Tooltip("The opponent's PlayerController in the scene")]
     public PlayerController opponentPlayerController;
+    
+    [Tooltip("Reference to the EncounterController")]
+    public EncounterController encounterController;
+
+    [Header("Turn State (Synced)")]
+    /// <summary>
+    /// The player ID whose turn it currently is. -1 means game not started.
+    /// </summary>
+    public readonly SyncVar<int> CurrentTurnPlayerId = new SyncVar<int>(-1);
+    
+    /// <summary>
+    /// The current turn number (starts at 1).
+    /// </summary>
+    public readonly SyncVar<int> TurnNumber = new SyncVar<int>(0);
+    
+    /// <summary>
+    /// Whether the game has started.
+    /// </summary>
+    public readonly SyncVar<bool> GameStarted = new SyncVar<bool>(false);
 
     [Header("Runtime State")]
     private NetworkPlayer localNetworkPlayer;
@@ -33,6 +54,18 @@ public class NetworkGameManager : NetworkBehaviour
             return;
         }
         Instance = this;
+        
+        // Subscribe to SyncVar changes
+        CurrentTurnPlayerId.OnChange += OnTurnChanged;
+        TurnNumber.OnChange += OnTurnNumberChanged;
+        GameStarted.OnChange += OnGameStartedChanged;
+    }
+    
+    private void OnDestroy()
+    {
+        CurrentTurnPlayerId.OnChange -= OnTurnChanged;
+        TurnNumber.OnChange -= OnTurnNumberChanged;
+        GameStarted.OnChange -= OnGameStartedChanged;
     }
 
     public override void OnStartClient()
@@ -142,6 +175,19 @@ public class NetworkGameManager : NetworkBehaviour
                 Debug.Log("[NetworkGameManager] Linked opponent NetworkPlayer to OpponentController");
             }
         }
+        
+        // Auto-find EncounterController if not set
+        if (encounterController == null)
+        {
+            encounterController = FindObjectOfType<EncounterController>();
+        }
+        
+        // Check if we should start the game (server only)
+        if (IsServerInitialized && AreBothPlayersReady() && !GameStarted.Value)
+        {
+            Debug.Log("[NetworkGameManager] Both players ready, starting game...");
+            ServerStartGame();
+        }
     }
 
     /// <summary>
@@ -173,4 +219,118 @@ public class NetworkGameManager : NetworkBehaviour
                localPlayerController != null &&
                opponentPlayerController != null;
     }
+
+    #region Turn Management
+    
+    /// <summary>
+    /// Check if it's the local player's turn.
+    /// </summary>
+    public bool IsLocalPlayerTurn()
+    {
+        return localNetworkPlayer != null && CurrentTurnPlayerId.Value == localNetworkPlayer.PlayerId.Value;
+    }
+    
+    /// <summary>
+    /// Request to end the current turn (client calls this).
+    /// </summary>
+    public void RequestEndTurn()
+    {
+        if (!IsLocalPlayerTurn())
+        {
+            Debug.LogWarning("[NetworkGameManager] Cannot end turn - not your turn!");
+            return;
+        }
+        
+        Debug.Log("[NetworkGameManager] Requesting end turn...");
+        CmdEndTurn();
+    }
+    
+    /// <summary>
+    /// Server RPC to end the current turn.
+    /// </summary>
+    [ServerRpc(RequireOwnership = false)]
+    private void CmdEndTurn(NetworkConnection conn = null)
+    {
+        if (!IsServerInitialized) return;
+        
+        // Verify it's actually this player's turn
+        NetworkPlayer requestingPlayer = null;
+        foreach (var player in networkPlayers.Values)
+        {
+            if (player.Owner == conn)
+            {
+                requestingPlayer = player;
+                break;
+            }
+        }
+        
+        if (requestingPlayer == null || requestingPlayer.PlayerId.Value != CurrentTurnPlayerId.Value)
+        {
+            Debug.LogWarning($"[NetworkGameManager] Player tried to end turn but it's not their turn!");
+            return;
+        }
+        
+        // Switch to next player
+        int nextPlayerId = GetNextPlayerId();
+        TurnNumber.Value++;
+        CurrentTurnPlayerId.Value = nextPlayerId;
+        
+        Debug.Log($"[Server] Turn ended. Now Player {nextPlayerId}'s turn. Turn #{TurnNumber.Value}");
+    }
+    
+    /// <summary>
+    /// Server: Start the game and set first turn.
+    /// </summary>
+    [Server]
+    public void ServerStartGame()
+    {
+        if (GameStarted.Value) return;
+        
+        // Player 0 goes first
+        CurrentTurnPlayerId.Value = 0;
+        TurnNumber.Value = 1;
+        GameStarted.Value = true;
+        
+        Debug.Log($"[Server] Game started! Player 0 goes first.");
+    }
+    
+    private int GetNextPlayerId()
+    {
+        // Simple 2-player toggle
+        return CurrentTurnPlayerId.Value == 0 ? 1 : 0;
+    }
+    
+    /// <summary>
+    /// Called when turn changes (SyncVar callback).
+    /// </summary>
+    private void OnTurnChanged(int oldValue, int newValue, bool asServer)
+    {
+        Debug.Log($"[NetworkGameManager] Turn changed: Player {oldValue} -> Player {newValue}");
+        
+        // Notify the EncounterController about turn change
+        if (encounterController != null && GameStarted.Value)
+        {
+            bool isLocalTurn = IsLocalPlayerTurn();
+            encounterController.OnNetworkTurnChanged(isLocalTurn, TurnNumber.Value);
+        }
+    }
+    
+    private void OnTurnNumberChanged(int oldValue, int newValue, bool asServer)
+    {
+        Debug.Log($"[NetworkGameManager] Turn number: {oldValue} -> {newValue}");
+    }
+    
+    private void OnGameStartedChanged(bool oldValue, bool newValue, bool asServer)
+    {
+        Debug.Log($"[NetworkGameManager] Game started: {newValue}");
+        
+        if (newValue && encounterController != null)
+        {
+            // Initialize the encounter when game starts
+            bool isLocalTurn = IsLocalPlayerTurn();
+            encounterController.OnNetworkGameStarted(isLocalTurn);
+        }
+    }
+    
+    #endregion
 }

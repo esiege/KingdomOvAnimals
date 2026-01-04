@@ -38,6 +38,10 @@ public class PlayerController : MonoBehaviour
     // Method to update the player's UI elements
     public void UpdatePlayerUI()
     {
+        Debug.Log($"[PlayerController] {gameObject.name} UpdatePlayerUI: health={currentHealth}, mana={currentMana}, " +
+                  $"healthText={(currentHealthText != null ? "assigned" : "NULL")}, " +
+                  $"manaText={(currentManaText != null ? "assigned" : "NULL")}");
+        
         if (currentHealthText != null) currentHealthText.text = $"{currentHealth}";
         if (currentManaText != null) currentManaText.text = $"{currentMana}";
 
