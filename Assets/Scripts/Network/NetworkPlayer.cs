@@ -486,6 +486,585 @@ public class NetworkPlayer : NetworkBehaviour
     
     #endregion
     
+    #region Combat/Ability RPCs
+    
+    /// <summary>
+    /// Client requests to use an ability from a card on the board targeting another card.
+    /// Uses slot names for card identification since card IDs aren't synced.
+    /// </summary>
+    /// <param name="attackerSlotName">Name of the slot containing the attacking card (e.g., "PlayerSlot-1")</param>
+    /// <param name="targetSlotName">Name of the slot containing the target card (e.g., "OpponentSlot-2")</param>
+    /// <param name="isOffensive">True for offensive ability, false for defensive/support</param>
+    [ServerRpc]
+    public void CmdUseAbilityOnCard(string attackerSlotName, string targetSlotName, bool isOffensive)
+    {
+        // Validate turn
+        var gameManager = NetworkGameManager.Instance;
+        if (gameManager == null || gameManager.CurrentTurnObjectId.Value != ObjectId)
+        {
+            Debug.LogWarning($"[Server] {PlayerName.Value} tried to use ability but it's not their turn!");
+            return;
+        }
+        
+        // Find attacker card by slot
+        CardController attacker = FindCardInSlot(attackerSlotName);
+        if (attacker == null)
+        {
+            Debug.LogWarning($"[Server] Could not find attacker card in slot {attackerSlotName}");
+            return;
+        }
+        
+        // Validate attacker belongs to this player
+        if (attacker.owningPlayer != LinkedPlayerController)
+        {
+            Debug.LogWarning($"[Server] {PlayerName.Value} tried to use a card they don't own!");
+            return;
+        }
+        
+        // Validate attacker can act (not tapped, no summoning sickness)
+        if (attacker.isTapped)
+        {
+            Debug.LogWarning($"[Server] {attacker.cardName} is already tapped!");
+            return;
+        }
+        
+        if (attacker.hasSummoningSickness)
+        {
+            Debug.LogWarning($"[Server] {attacker.cardName} has summoning sickness!");
+            return;
+        }
+        
+        // Find target card by slot
+        CardController target = FindCardInSlot(targetSlotName);
+        if (target == null)
+        {
+            Debug.LogWarning($"[Server] Could not find target card in slot {targetSlotName}");
+            return;
+        }
+        
+        // Get owner IDs and slot indices for perspective-independent RPC
+        int attackerOwnerId = attacker.owningPlayer?.networkPlayer?.PlayerId.Value ?? -1;
+        int attackerSlotIndex = GetSlotIndex(attackerSlotName);
+        int targetOwnerId = target.owningPlayer?.networkPlayer?.PlayerId.Value ?? -1;
+        int targetSlotIndex = GetSlotIndex(targetSlotName);
+        
+        // Get the ability and damage amount
+        GameObject abilityObj = isOffensive ? attacker.offensiveAbility : attacker.supportAbility;
+        if (abilityObj == null)
+        {
+            Debug.LogWarning($"[Server] {attacker.cardName} has no {(isOffensive ? "offensive" : "support")} ability!");
+            return;
+        }
+        
+        DamageAbility damageAbility = abilityObj.GetComponentInChildren<DamageAbility>();
+        int damageAmount = damageAbility != null ? damageAbility.damageAmount : 0;
+        
+        Debug.Log($"[Server] {attacker.cardName} uses ability on {target.cardName} for {damageAmount} damage");
+        
+        // Broadcast ability use to all clients with owner IDs for correct perspective
+        RpcExecuteAbilityOnCard(attackerOwnerId, attackerSlotIndex, targetOwnerId, targetSlotIndex, isOffensive, damageAmount);
+    }
+    
+    /// <summary>
+    /// Client requests to use a flip ability (card from hand) targeting a card on the board.
+    /// </summary>
+    /// <param name="handIndex">Index of the card in the player's hand</param>
+    /// <param name="targetSlotName">Name of the slot containing the target card</param>
+    /// <param name="isOffensive">True for offensive ability, false for defensive/support</param>
+    [ServerRpc]
+    public void CmdUseFlipAbilityOnCard(int handIndex, string targetSlotName, bool isOffensive)
+    {
+        // Validate turn
+        var gameManager = NetworkGameManager.Instance;
+        if (gameManager == null || gameManager.CurrentTurnObjectId.Value != ObjectId)
+        {
+            Debug.LogWarning($"[Server] {PlayerName.Value} tried to use flip ability but it's not their turn!");
+            return;
+        }
+        
+        // Get the hand controller and card
+        var handController = GetHandController();
+        if (handController == null)
+        {
+            Debug.LogError($"[Server] Could not find HandController for {PlayerName.Value}");
+            return;
+        }
+        
+        var hand = handController.GetHand();
+        if (handIndex < 0 || handIndex >= hand.Count)
+        {
+            Debug.LogWarning($"[Server] Invalid hand index {handIndex} for hand size {hand.Count}");
+            return;
+        }
+        
+        var attacker = hand[handIndex];
+        
+        // Validate mana
+        if (CurrentMana.Value < attacker.manaCost)
+        {
+            Debug.LogWarning($"[Server] {PlayerName.Value} doesn't have enough mana for {attacker.cardName}. Has {CurrentMana.Value}, needs {attacker.manaCost}");
+            return;
+        }
+        
+        // Validate card not already flipped
+        if (attacker.isFlipped)
+        {
+            Debug.LogWarning($"[Server] {attacker.cardName} is already flipped!");
+            return;
+        }
+        
+        // Find target card by slot and get owner info
+        CardController target = FindCardInSlot(targetSlotName);
+        if (target == null)
+        {
+            Debug.LogWarning($"[Server] Could not find target card in slot {targetSlotName}");
+            return;
+        }
+        
+        // Get target owner's player ID and slot index for perspective-independent RPC
+        int targetOwnerId = target.owningPlayer?.networkPlayer?.PlayerId.Value ?? -1;
+        int targetSlotIndex = GetSlotIndex(targetSlotName);
+        
+        // Get the ability and damage amount
+        GameObject abilityObj = isOffensive ? attacker.offensiveAbility : attacker.supportAbility;
+        if (abilityObj == null)
+        {
+            Debug.LogWarning($"[Server] {attacker.cardName} has no {(isOffensive ? "offensive" : "support")} ability!");
+            return;
+        }
+        
+        DamageAbility damageAbility = abilityObj.GetComponentInChildren<DamageAbility>();
+        int damageAmount = damageAbility != null ? damageAbility.damageAmount : 0;
+        
+        // Deduct mana
+        CurrentMana.Value -= attacker.manaCost;
+        
+        Debug.Log($"[Server] {attacker.cardName} (flip) uses ability on {target.cardName} for {damageAmount} damage");
+        
+        // Broadcast flip ability use to all clients with owner ID for correct perspective
+        RpcExecuteFlipAbilityOnCard(handIndex, targetOwnerId, targetSlotIndex, isOffensive, damageAmount);
+    }
+    
+    /// <summary>
+    /// Client requests to use a flip ability (card from hand) targeting a player.
+    /// </summary>
+    [ServerRpc]
+    public void CmdUseFlipAbilityOnPlayer(int handIndex, int targetPlayerId, bool isOffensive)
+    {
+        // Validate turn
+        var gameManager = NetworkGameManager.Instance;
+        if (gameManager == null || gameManager.CurrentTurnObjectId.Value != ObjectId)
+        {
+            Debug.LogWarning($"[Server] {PlayerName.Value} tried to use flip ability but it's not their turn!");
+            return;
+        }
+        
+        // Get the hand controller and card
+        var handController = GetHandController();
+        if (handController == null)
+        {
+            Debug.LogError($"[Server] Could not find HandController for {PlayerName.Value}");
+            return;
+        }
+        
+        var hand = handController.GetHand();
+        if (handIndex < 0 || handIndex >= hand.Count)
+        {
+            Debug.LogWarning($"[Server] Invalid hand index {handIndex} for hand size {hand.Count}");
+            return;
+        }
+        
+        var attacker = hand[handIndex];
+        
+        // Validate mana
+        if (CurrentMana.Value < attacker.manaCost)
+        {
+            Debug.LogWarning($"[Server] {PlayerName.Value} doesn't have enough mana for {attacker.cardName}. Has {CurrentMana.Value}, needs {attacker.manaCost}");
+            return;
+        }
+        
+        // Validate card not already flipped
+        if (attacker.isFlipped)
+        {
+            Debug.LogWarning($"[Server] {attacker.cardName} is already flipped!");
+            return;
+        }
+        
+        // Get the ability and damage amount
+        GameObject abilityObj = isOffensive ? attacker.offensiveAbility : attacker.supportAbility;
+        if (abilityObj == null)
+        {
+            Debug.LogWarning($"[Server] {attacker.cardName} has no {(isOffensive ? "offensive" : "support")} ability!");
+            return;
+        }
+        
+        DamageAbility damageAbility = abilityObj.GetComponentInChildren<DamageAbility>();
+        int damageAmount = damageAbility != null ? damageAbility.damageAmount : 0;
+        
+        // Deduct mana
+        CurrentMana.Value -= attacker.manaCost;
+        
+        Debug.Log($"[Server] {attacker.cardName} (flip) uses ability on Player {targetPlayerId} for {damageAmount} damage");
+        
+        // Apply damage to target player via their NetworkPlayer
+        NetworkPlayer targetNetworkPlayer = FindNetworkPlayerById(targetPlayerId);
+        if (targetNetworkPlayer != null && damageAmount > 0)
+        {
+            targetNetworkPlayer.CurrentHealth.Value -= damageAmount;
+        }
+        
+        // Broadcast flip ability use to all clients
+        RpcExecuteFlipAbilityOnPlayer(handIndex, targetPlayerId, isOffensive, damageAmount);
+    }
+    
+    /// <summary>
+    /// Client requests to use an ability from a card targeting a player.
+    /// </summary>
+    [ServerRpc]
+    public void CmdUseAbilityOnPlayer(string attackerSlotName, int targetPlayerId, bool isOffensive)
+    {
+        // Validate turn
+        var gameManager = NetworkGameManager.Instance;
+        if (gameManager == null || gameManager.CurrentTurnObjectId.Value != ObjectId)
+        {
+            Debug.LogWarning($"[Server] {PlayerName.Value} tried to use ability but it's not their turn!");
+            return;
+        }
+        
+        // Find attacker card by slot
+        CardController attacker = FindCardInSlot(attackerSlotName);
+        if (attacker == null)
+        {
+            Debug.LogWarning($"[Server] Could not find attacker card in slot {attackerSlotName}");
+            return;
+        }
+        
+        // Validate attacker belongs to this player
+        if (attacker.owningPlayer != LinkedPlayerController)
+        {
+            Debug.LogWarning($"[Server] {PlayerName.Value} tried to use a card they don't own!");
+            return;
+        }
+        
+        // Validate attacker can act
+        if (attacker.isTapped)
+        {
+            Debug.LogWarning($"[Server] {attacker.cardName} is already tapped!");
+            return;
+        }
+        
+        if (attacker.hasSummoningSickness)
+        {
+            Debug.LogWarning($"[Server] {attacker.cardName} has summoning sickness!");
+            return;
+        }
+        
+        // Get the ability and damage amount
+        GameObject abilityObj = isOffensive ? attacker.offensiveAbility : attacker.supportAbility;
+        if (abilityObj == null)
+        {
+            Debug.LogWarning($"[Server] {attacker.cardName} has no {(isOffensive ? "offensive" : "support")} ability!");
+            return;
+        }
+        
+        DamageAbility damageAbility = abilityObj.GetComponentInChildren<DamageAbility>();
+        int damageAmount = damageAbility != null ? damageAbility.damageAmount : 0;
+        
+        Debug.Log($"[Server] {attacker.cardName} uses ability on Player {targetPlayerId} for {damageAmount} damage");
+        
+        // Get attacker owner ID and slot index for perspective-independent RPC
+        int attackerOwnerId = attacker.owningPlayer?.networkPlayer?.PlayerId.Value ?? -1;
+        int attackerSlotIndex = GetSlotIndex(attackerSlotName);
+        
+        // Apply damage to target player via their NetworkPlayer
+        NetworkPlayer targetNetworkPlayer = FindNetworkPlayerById(targetPlayerId);
+        if (targetNetworkPlayer != null && damageAmount > 0)
+        {
+            targetNetworkPlayer.CurrentHealth.Value -= damageAmount;
+        }
+        
+        // Broadcast ability use to all clients with owner ID for correct perspective
+        RpcExecuteAbilityOnPlayer(attackerOwnerId, attackerSlotIndex, targetPlayerId, isOffensive, damageAmount);
+    }
+    
+    /// <summary>
+    /// Broadcast to all clients to execute an ability on a card target.
+    /// Uses owner IDs + slot indices so each client resolves to correct perspective.
+    /// </summary>
+    [ObserversRpc]
+    private void RpcExecuteAbilityOnCard(int attackerOwnerId, int attackerSlotIndex, int targetOwnerId, int targetSlotIndex, bool isOffensive, int damageAmount)
+    {
+        Debug.Log($"[Client] Executing ability: attackerOwner={attackerOwnerId}, attackerSlot={attackerSlotIndex}, targetOwner={targetOwnerId}, targetSlot={targetSlotIndex}, damage={damageAmount}");
+        
+        // Resolve slot names based on local perspective
+        string attackerSlotName = ResolveSlotNameForPlayer(attackerOwnerId, attackerSlotIndex);
+        string targetSlotName = ResolveSlotNameForPlayer(targetOwnerId, targetSlotIndex);
+        
+        CardController attacker = FindCardInSlot(attackerSlotName);
+        CardController target = FindCardInSlot(targetSlotName);
+        
+        if (attacker == null || target == null)
+        {
+            Debug.LogWarning($"[Client] Could not find attacker ({attackerSlotName}) or target ({targetSlotName}) card for ability execution");
+            return;
+        }
+        
+        // Tap the attacker
+        attacker.TapCard();
+        
+        // Apply damage to target
+        if (damageAmount > 0)
+        {
+            target.TakeDamage(damageAmount);
+        }
+        else
+        {
+            // For non-damage abilities, call the ability directly
+            if (isOffensive)
+                attacker.ActivateOffensiveAbility(target);
+            else
+                attacker.ActivateDefensiveAbility(target);
+        }
+    }
+    
+    /// <summary>
+    /// Broadcast to all clients to execute an ability on a player target.
+    /// Uses attacker owner ID + slot index so each client resolves to correct perspective.
+    /// </summary>
+    [ObserversRpc]
+    private void RpcExecuteAbilityOnPlayer(int attackerOwnerId, int attackerSlotIndex, int targetPlayerId, bool isOffensive, int damageAmount)
+    {
+        Debug.Log($"[Client] Executing ability on player: attackerOwner={attackerOwnerId}, attackerSlot={attackerSlotIndex}, targetPlayer={targetPlayerId}, damage={damageAmount}");
+        
+        // Resolve attacker slot name based on local perspective
+        string attackerSlotName = ResolveSlotNameForPlayer(attackerOwnerId, attackerSlotIndex);
+        
+        CardController attacker = FindCardInSlot(attackerSlotName);
+        if (attacker == null)
+        {
+            Debug.LogWarning($"[Client] Could not find attacker card in {attackerSlotName} for ability execution");
+            return;
+        }
+        
+        // Tap the attacker
+        attacker.TapCard();
+        
+        // Player damage is handled by SyncVar on CurrentHealth, no need to apply locally
+    }
+    
+    /// <summary>
+    /// Broadcast to all clients to execute a flip ability (card from hand) on a card target.
+    /// Uses target owner ID + slot index so each client resolves to correct perspective.
+    /// </summary>
+    [ObserversRpc]
+    private void RpcExecuteFlipAbilityOnCard(int handIndex, int targetOwnerId, int targetSlotIndex, bool isOffensive, int damageAmount)
+    {
+        Debug.Log($"[Client] Executing flip ability: hand index={handIndex}, targetOwner={targetOwnerId}, slotIndex={targetSlotIndex}, damage={damageAmount}");
+        
+        // Get the hand controller and card
+        var handController = GetHandController();
+        if (handController == null)
+        {
+            Debug.LogError($"[Client] Could not find HandController");
+            return;
+        }
+        
+        var hand = handController.GetHand();
+        if (handIndex < 0 || handIndex >= hand.Count)
+        {
+            Debug.LogWarning($"[Client] Hand index {handIndex} out of range for hand size {hand.Count}");
+            return;
+        }
+        
+        var attacker = hand[handIndex];
+        
+        // Resolve slot name based on whether target owner is local player or opponent
+        string targetSlotName = ResolveSlotNameForPlayer(targetOwnerId, targetSlotIndex);
+        
+        // Find target card by slot
+        CardController target = FindCardInSlot(targetSlotName);
+        if (target == null)
+        {
+            Debug.LogWarning($"[Client] Could not find target card in slot {targetSlotName}");
+            return;
+        }
+        
+        // Flip the attacker card
+        attacker.FlipCard();
+        
+        // Apply damage to target
+        if (damageAmount > 0)
+        {
+            target.TakeDamage(damageAmount);
+        }
+        else
+        {
+            // For non-damage abilities, call the ability directly
+            if (isOffensive)
+                attacker.ActivateOffensiveAbility(target);
+            else
+                attacker.ActivateDefensiveAbility(target);
+        }
+    }
+    
+    /// <summary>
+    /// Broadcast to all clients to execute a flip ability (card from hand) on a player target.
+    /// </summary>
+    [ObserversRpc]
+    private void RpcExecuteFlipAbilityOnPlayer(int handIndex, int targetPlayerId, bool isOffensive, int damageAmount)
+    {
+        Debug.Log($"[Client] Executing flip ability on player: hand index={handIndex}, targetPlayer={targetPlayerId}, damage={damageAmount}");
+        
+        // Get the hand controller and card
+        var handController = GetHandController();
+        if (handController == null)
+        {
+            Debug.LogError($"[Client] Could not find HandController");
+            return;
+        }
+        
+        var hand = handController.GetHand();
+        if (handIndex < 0 || handIndex >= hand.Count)
+        {
+            Debug.LogWarning($"[Client] Hand index {handIndex} out of range for hand size {hand.Count}");
+            return;
+        }
+        
+        var attacker = hand[handIndex];
+        
+        // Flip the attacker card
+        attacker.FlipCard();
+        
+        // Player damage is handled by SyncVar on CurrentHealth, no need to apply locally
+    }
+    
+    /// <summary>
+    /// Finds a card in a specific slot by slot name.
+    /// Tries the exact slot name first, then tries the flipped perspective if not found.
+    /// This handles the case where slot names are relative to each client's perspective.
+    /// </summary>
+    private CardController FindCardInSlot(string slotName)
+    {
+        // Try the exact slot name first
+        var slot = GameObject.Find(slotName);
+        if (slot != null)
+        {
+            var card = slot.GetComponentInChildren<CardController>();
+            if (card != null) return card;
+        }
+        
+        // Try the flipped perspective (OpponentSlot <-> PlayerSlot)
+        string flippedSlotName = FlipSlotPerspective(slotName);
+        if (flippedSlotName != null)
+        {
+            slot = GameObject.Find(flippedSlotName);
+            if (slot != null)
+            {
+                var card = slot.GetComponentInChildren<CardController>();
+                if (card != null)
+                {
+                    Debug.Log($"Found card in flipped slot: {slotName} -> {flippedSlotName}");
+                    return card;
+                }
+            }
+        }
+        
+        Debug.LogWarning($"Could not find card in slot: {slotName} or {flippedSlotName}");
+        return null;
+    }
+    
+    /// <summary>
+    /// Flips slot perspective: PlayerSlot-X becomes OpponentSlot-X and vice versa.
+    /// </summary>
+    private string FlipSlotPerspective(string slotName)
+    {
+        if (slotName.StartsWith("PlayerSlot-"))
+        {
+            return slotName.Replace("PlayerSlot-", "OpponentSlot-");
+        }
+        else if (slotName.StartsWith("OpponentSlot-"))
+        {
+            return slotName.Replace("OpponentSlot-", "PlayerSlot-");
+        }
+        return null;
+    }
+    
+    /// <summary>
+    /// Finds a NetworkPlayer by their player ID.
+    /// </summary>
+    private NetworkPlayer FindNetworkPlayerById(int playerId)
+    {
+        foreach (var np in GameObject.FindObjectsOfType<NetworkPlayer>())
+        {
+            if (np.PlayerId.Value == playerId) return np;
+        }
+        return null;
+    }
+    
+    /// <summary>
+    /// Extracts the slot index (0, 1, 2) from a slot name like "PlayerSlot-2" or "OpponentSlot-1".
+    /// </summary>
+    private int GetSlotIndex(string slotName)
+    {
+        // Slot names are like "PlayerSlot-1", "OpponentSlot-2", etc.
+        // The number at the end is 1-indexed, so we subtract 1 to get 0-indexed
+        if (string.IsNullOrEmpty(slotName)) return -1;
+        
+        int dashIndex = slotName.LastIndexOf('-');
+        if (dashIndex >= 0 && dashIndex < slotName.Length - 1)
+        {
+            if (int.TryParse(slotName.Substring(dashIndex + 1), out int slotNumber))
+            {
+                return slotNumber - 1; // Convert to 0-indexed
+            }
+        }
+        return -1;
+    }
+    
+    /// <summary>
+    /// Resolves the correct slot name based on target owner ID from each client's perspective.
+    /// If target owner is the local player, returns "PlayerSlot-X", otherwise "OpponentSlot-X".
+    /// </summary>
+    private string ResolveSlotNameForPlayer(int targetOwnerId, int slotIndex)
+    {
+        // Get the local NetworkGameManager to determine who the local player is
+        var gameManager = NetworkGameManager.Instance;
+        if (gameManager == null)
+        {
+            Debug.LogWarning("[ResolveSlotName] No NetworkGameManager found");
+            return $"PlayerSlot-{slotIndex + 1}";
+        }
+        
+        // Find the local player's NetworkPlayer
+        NetworkPlayer localPlayer = null;
+        foreach (var np in GameObject.FindObjectsOfType<NetworkPlayer>())
+        {
+            if (np.IsOwner)
+            {
+                localPlayer = np;
+                break;
+            }
+        }
+        
+        if (localPlayer == null)
+        {
+            Debug.LogWarning("[ResolveSlotName] Could not find local NetworkPlayer");
+            return $"PlayerSlot-{slotIndex + 1}";
+        }
+        
+        // If the target owner is the local player, use PlayerSlot, otherwise OpponentSlot
+        if (targetOwnerId == localPlayer.PlayerId.Value)
+        {
+            return $"PlayerSlot-{slotIndex + 1}";
+        }
+        else
+        {
+            return $"OpponentSlot-{slotIndex + 1}";
+        }
+    }
+    
+    #endregion
+    
     #region Helper Methods
     
     public bool HasEnoughMana(int cost) => CurrentMana.Value >= cost;

@@ -512,8 +512,51 @@ public class HandController : MonoBehaviour
     // Activate Offensive Ability: CardController target
     private void useCardAbilityOffensive(CardController targetCard)
     {
-        if (!CanActivateAbility(targetCard)) return;
+        if (!ValidateAbilityTarget(targetCard)) return;
 
+        // Check if we're in a network game
+        if (owningPlayer.networkPlayer != null)
+        {
+            if (activeCard.isInPlay)
+            {
+                // Card is on board - send request to server using slot names
+                string attackerSlotName = GetCardSlotName(activeCard);
+                string targetSlotName = GetCardSlotName(targetCard);
+                
+                if (attackerSlotName != null && targetSlotName != null)
+                {
+                    Debug.Log($"[HandController] Sending network ability use: {activeCard.cardName} ({attackerSlotName}) -> {targetCard.cardName} ({targetSlotName})");
+                    owningPlayer.networkPlayer.CmdUseAbilityOnCard(attackerSlotName, targetSlotName, true);
+                    return;
+                }
+                else
+                {
+                    Debug.LogError($"[HandController] Could not find slot for attacker or target card");
+                    return;
+                }
+            }
+            else
+            {
+                // Card is in hand (flip ability) - use hand index and target slot
+                int handIndex = playerHand.IndexOf(activeCard);
+                string targetSlotName = GetCardSlotName(targetCard);
+                
+                if (handIndex >= 0 && targetSlotName != null)
+                {
+                    Debug.Log($"[HandController] Sending network flip ability: {activeCard.cardName} (hand index {handIndex}) -> {targetCard.cardName} ({targetSlotName})");
+                    owningPlayer.networkPlayer.CmdUseFlipAbilityOnCard(handIndex, targetSlotName, true);
+                    return;
+                }
+                else
+                {
+                    Debug.LogError($"[HandController] Could not find hand index or target slot for flip ability");
+                    return;
+                }
+            }
+        }
+        
+        // Local play - apply effects
+        ApplyAbilityEffects();
         activeCard.ActivateOffensiveAbility(targetCard);
         Debug.Log("Offense action triggered on card!");
     }
@@ -521,14 +564,64 @@ public class HandController : MonoBehaviour
     // Activate Offensive Ability: PlayerController target
     private void useCardAbilityOffensive(PlayerController targetPlayer)
     {
-        if (!CanActivateAbility(targetPlayer)) return;
+        if (!ValidateAbilityTarget(targetPlayer)) return;
 
+        // Check if we're in a network game
+        if (owningPlayer.networkPlayer != null)
+        {
+            if (activeCard.isInPlay)
+            {
+                // Card is on board - send request to server using slot name
+                string attackerSlotName = GetCardSlotName(activeCard);
+                int targetPlayerId = targetPlayer.networkPlayer?.PlayerId.Value ?? -1;
+                
+                if (attackerSlotName != null && targetPlayerId >= 0)
+                {
+                    Debug.Log($"[HandController] Sending network ability use on player: {activeCard.cardName} ({attackerSlotName}) -> Player {targetPlayerId}");
+                    owningPlayer.networkPlayer.CmdUseAbilityOnPlayer(attackerSlotName, targetPlayerId, true);
+                    return;
+                }
+            }
+            else
+            {
+                // Card is in hand (flip ability) - use hand index
+                int handIndex = playerHand.IndexOf(activeCard);
+                int targetPlayerId = targetPlayer.networkPlayer?.PlayerId.Value ?? -1;
+                
+                if (handIndex >= 0 && targetPlayerId >= 0)
+                {
+                    Debug.Log($"[HandController] Sending network flip ability on player: {activeCard.cardName} (hand index {handIndex}) -> Player {targetPlayerId}");
+                    owningPlayer.networkPlayer.CmdUseFlipAbilityOnPlayer(handIndex, targetPlayerId, true);
+                    return;
+                }
+            }
+        }
+
+        // Local play - apply effects
+        ApplyAbilityEffects();
         activeCard.ActivateOffensiveAbility(targetPlayer);
         Debug.Log("Offense action triggered on player!");
     }
+    
+    /// <summary>
+    /// Gets the slot name for a card that is in play.
+    /// </summary>
+    private string GetCardSlotName(CardController card)
+    {
+        if (card == null || !card.isInPlay) return null;
+        
+        // The card's parent should be the slot
+        Transform parent = card.transform.parent;
+        if (parent != null && parent.name.Contains("Slot"))
+        {
+            return parent.name;
+        }
+        
+        return null;
+    }
 
-    // Helper method to validate and prepare ability activation
-    private bool CanActivateAbility(object target)
+    // Helper method to validate ability target (without applying effects)
+    private bool ValidateAbilityTarget(object target)
     {
         if (target == activeCard)
         {
@@ -566,13 +659,12 @@ public class HandController : MonoBehaviour
             return false;
         }
 
-        // Example for checking target validity (expand as needed)
-        // if (!activeCard.CheckAbilityTarget(target))
-        // {
-        //     Debug.LogWarning("Target is invalid for this ability.");
-        //     return false;
-        // }
-
+        return true;
+    }
+    
+    // Apply side effects of using an ability (tap/flip, spend mana)
+    private void ApplyAbilityEffects()
+    {
         if (activeCard.isInPlay)
         {
             activeCard.TapCard();
@@ -582,13 +674,17 @@ public class HandController : MonoBehaviour
             activeCard.FlipCard();
             encounterController.currentPlayer.SpendMana(activeCard.manaCost);
         }
-
-        return true;
     }
 
+    // Legacy helper method for defensive abilities (not yet networked)
+    private bool CanActivateAbility(object target)
+    {
+        if (!ValidateAbilityTarget(target)) return false;
 
-
-
+        // Apply effects for local play
+        ApplyAbilityEffects();
+        return true;
+    }
 
     // Offensive: CardController target
     private void show_useCardAbilityOffensive(CardController targetCard)
