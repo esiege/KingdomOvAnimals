@@ -506,18 +506,23 @@ public class NetworkPlayer : NetworkBehaviour
             return;
         }
         
-        // Find attacker card by slot
-        CardController attacker = FindCardInSlot(attackerSlotName);
+        // Translate client slot names to server perspective
+        string serverAttackerSlot = TranslateClientSlotToServer(attackerSlotName, PlayerId.Value);
+        string serverTargetSlot = TranslateClientSlotToServer(targetSlotName, PlayerId.Value);
+        Debug.Log($"[Server] CmdUseAbilityOnCard: client sent attacker='{attackerSlotName}', target='{targetSlotName}'; server resolved to attacker='{serverAttackerSlot}', target='{serverTargetSlot}' for Player {PlayerId.Value}");
+        
+        // Find attacker card by slot (using server perspective)
+        CardController attacker = FindCardInSlot(serverAttackerSlot);
         if (attacker == null)
         {
-            Debug.LogWarning($"[Server] Could not find attacker card in slot {attackerSlotName}");
+            Debug.LogWarning($"[Server] Could not find attacker card in slot {serverAttackerSlot} (client: {attackerSlotName})");
             return;
         }
         
         // Validate attacker belongs to this player
         if (attacker.owningPlayer != LinkedPlayerController)
         {
-            Debug.LogWarning($"[Server] {PlayerName.Value} tried to use a card they don't own!");
+            Debug.LogWarning($"[Server] {PlayerName.Value} tried to use a card they don't own! Card owner: {attacker.owningPlayer?.name}, Expected: {LinkedPlayerController?.name}");
             return;
         }
         
@@ -534,19 +539,19 @@ public class NetworkPlayer : NetworkBehaviour
             return;
         }
         
-        // Find target card by slot
-        CardController target = FindCardInSlot(targetSlotName);
+        // Find target card by slot (using server perspective)
+        CardController target = FindCardInSlot(serverTargetSlot);
         if (target == null)
         {
-            Debug.LogWarning($"[Server] Could not find target card in slot {targetSlotName}");
+            Debug.LogWarning($"[Server] Could not find target card in slot {serverTargetSlot} (client: {targetSlotName})");
             return;
         }
         
         // Get owner IDs and slot indices for perspective-independent RPC
         int attackerOwnerId = attacker.owningPlayer?.networkPlayer?.PlayerId.Value ?? -1;
-        int attackerSlotIndex = GetSlotIndex(attackerSlotName);
+        int attackerSlotIndex = GetSlotIndex(serverAttackerSlot);
         int targetOwnerId = target.owningPlayer?.networkPlayer?.PlayerId.Value ?? -1;
-        int targetSlotIndex = GetSlotIndex(targetSlotName);
+        int targetSlotIndex = GetSlotIndex(serverTargetSlot);
         
         // Get the ability and damage amount
         GameObject abilityObj = isOffensive ? attacker.offensiveAbility : attacker.supportAbility;
@@ -613,17 +618,21 @@ public class NetworkPlayer : NetworkBehaviour
             return;
         }
         
+        // Translate client target slot name to server perspective
+        string serverTargetSlot = TranslateClientSlotToServer(targetSlotName, PlayerId.Value);
+        Debug.Log($"[Server] CmdUseFlipAbilityOnCard: client sent target='{targetSlotName}', server resolved to '{serverTargetSlot}' for Player {PlayerId.Value}");
+        
         // Find target card by slot and get owner info
-        CardController target = FindCardInSlot(targetSlotName);
+        CardController target = FindCardInSlot(serverTargetSlot);
         if (target == null)
         {
-            Debug.LogWarning($"[Server] Could not find target card in slot {targetSlotName}");
+            Debug.LogWarning($"[Server] Could not find target card in slot {serverTargetSlot} (client: {targetSlotName})");
             return;
         }
         
         // Get target owner's player ID and slot index for perspective-independent RPC
         int targetOwnerId = target.owningPlayer?.networkPlayer?.PlayerId.Value ?? -1;
-        int targetSlotIndex = GetSlotIndex(targetSlotName);
+        int targetSlotIndex = GetSlotIndex(serverTargetSlot);
         
         // Get the ability and damage amount
         GameObject abilityObj = isOffensive ? attacker.offensiveAbility : attacker.supportAbility;
@@ -731,18 +740,22 @@ public class NetworkPlayer : NetworkBehaviour
             return;
         }
         
-        // Find attacker card by slot
-        CardController attacker = FindCardInSlot(attackerSlotName);
+        // Translate client slot name to server perspective
+        string serverSlotName = TranslateClientSlotToServer(attackerSlotName, PlayerId.Value);
+        Debug.Log($"[Server] CmdUseAbilityOnPlayer: client sent '{attackerSlotName}', server resolved to '{serverSlotName}' for Player {PlayerId.Value}");
+        
+        // Find attacker card by slot (using server perspective)
+        CardController attacker = FindCardInSlot(serverSlotName);
         if (attacker == null)
         {
-            Debug.LogWarning($"[Server] Could not find attacker card in slot {attackerSlotName}");
+            Debug.LogWarning($"[Server] Could not find attacker card in slot {serverSlotName} (client: {attackerSlotName})");
             return;
         }
         
         // Validate attacker belongs to this player
         if (attacker.owningPlayer != LinkedPlayerController)
         {
-            Debug.LogWarning($"[Server] {PlayerName.Value} tried to use a card they don't own!");
+            Debug.LogWarning($"[Server] {PlayerName.Value} tried to use a card they don't own! Card owner: {attacker.owningPlayer?.name}, Expected: {LinkedPlayerController?.name}");
             return;
         }
         
@@ -774,7 +787,7 @@ public class NetworkPlayer : NetworkBehaviour
         
         // Get attacker owner ID and slot index for perspective-independent RPC
         int attackerOwnerId = attacker.owningPlayer?.networkPlayer?.PlayerId.Value ?? -1;
-        int attackerSlotIndex = GetSlotIndex(attackerSlotName);
+        int attackerSlotIndex = GetSlotIndex(serverSlotName);
         
         // Apply damage to target player via their NetworkPlayer
         NetworkPlayer targetNetworkPlayer = FindNetworkPlayerById(targetPlayerId);
@@ -987,6 +1000,26 @@ public class NetworkPlayer : NetworkBehaviour
             return slotName.Replace("OpponentSlot-", "PlayerSlot-");
         }
         return null;
+    }
+    
+    /// <summary>
+    /// Translates a client's slot name to the server's perspective.
+    /// On server, Player 0 is always the "local" view, so:
+    /// - If Player 0 sends "PlayerSlot-X", server sees it as "PlayerSlot-X"
+    /// - If Player 1 sends "PlayerSlot-X", server sees it as "OpponentSlot-X" (their cards are on opponent side from server view)
+    /// </summary>
+    private string TranslateClientSlotToServer(string clientSlotName, int clientPlayerId)
+    {
+        // Server perspective is always Player 0's view
+        // If the client is Player 0, no translation needed
+        if (clientPlayerId == 0)
+        {
+            return clientSlotName;
+        }
+        
+        // If client is not Player 0, flip the perspective
+        // Their "PlayerSlot" is server's "OpponentSlot" and vice versa
+        return FlipSlotPerspective(clientSlotName) ?? clientSlotName;
     }
     
     /// <summary>

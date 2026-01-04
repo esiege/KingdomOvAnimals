@@ -5,10 +5,10 @@
 - **Story ID**: 006
 - **Priority**: High
 - **Sprint**: Sprint 01
-- **Status**: In Progress
+- **Status**: Done
 - **Created**: 2026-01-04
 - **Started**: 2026-01-04
-- **Completed**: -
+- **Completed**: 2026-01-04
 
 ## User Story
 

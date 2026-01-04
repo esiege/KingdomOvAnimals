@@ -196,6 +196,16 @@ public class EncounterController : MonoBehaviour
         {
             StartTurn();
         }
+        else
+        {
+            // Network mode: Now that cards are drawn, visualize playable cards for Turn 1
+            // This is needed because OnNetworkTurnChanged fires before cards are drawn
+            if (isCurrentPlayerTurn)
+            {
+                playerHandController.VisualizePlayableHand();
+                playerHandController.VisualizePlayableBoard();
+            }
+        }
     }
 
     // Method to start a player's turn
@@ -290,6 +300,10 @@ public class EncounterController : MonoBehaviour
         {
             // It's opponent's turn - draw for opponent (keeps decks in sync)
             currentPlayer = opponent;
+            
+            // Reset opponent's board (clear summoning sickness, untap) so server state matches
+            // This is important for server-side validation of abilities
+            opponent.ResetBoard();
             
             // Draw for opponent so their hand stays in sync
             DrawCard(opponent);
