@@ -27,9 +27,9 @@ public class MainMenuSceneSetup : EditorWindow
             "This will create a complete MainMenu scene with:\n" +
             "• NetworkManager prefab\n" +
             "• PlayerConnectionHandler\n" +
-            "• Main Menu UI (Host/Join/Quit)\n" +
-            "• Lobby UI (Status, Player Count, Start/Cancel)\n" +
-            "• MainMenuController wired up",
+            "• Main Menu UI (Play/Quit)\n" +
+            "• Lobby UI (Status, Player Count, Cancel)\n" +
+            "• Auto-matchmaking (first player hosts, second joins)",
             MessageType.Info);
 
         GUILayout.Space(10);
@@ -131,30 +131,24 @@ public class MainMenuSceneSetup : EditorWindow
         // Title
         CreateText(mainMenuPanel.transform, "TitleText", "Kingdom Ov Animals", 48, new Vector2(0, 150));
         
-        // Host Button
-        Button hostBtn = CreateButton(mainMenuPanel.transform, "HostButton", "Host Game", new Vector2(0, 50));
-        
-        // Join Button
-        Button joinBtn = CreateButton(mainMenuPanel.transform, "JoinButton", "Join Game", new Vector2(0, -20));
+        // Play Button (handles auto-matchmaking)
+        Button joinBtn = CreateButton(mainMenuPanel.transform, "PlayButton", "Play", new Vector2(0, 20));
         
         // Quit Button
-        Button quitBtn = CreateButton(mainMenuPanel.transform, "QuitButton", "Quit", new Vector2(0, -90));
+        Button quitBtn = CreateButton(mainMenuPanel.transform, "QuitButton", "Quit", new Vector2(0, -50));
 
         // Create Lobby Panel (hidden by default)
         GameObject lobbyPanel = CreatePanel(canvasObj.transform, "LobbyPanel");
         lobbyPanel.SetActive(false);
         
         // Status Text
-        TextMeshProUGUI statusText = CreateText(lobbyPanel.transform, "StatusText", "Waiting...", 24, new Vector2(0, 100));
+        TextMeshProUGUI statusText = CreateText(lobbyPanel.transform, "StatusText", "Finding match...", 24, new Vector2(0, 80));
         
         // Player Count Text
-        TextMeshProUGUI playerCountText = CreateText(lobbyPanel.transform, "PlayerCountText", "Players: 0/2", 20, new Vector2(0, 50));
-        
-        // Start Match Button
-        Button startBtn = CreateButton(lobbyPanel.transform, "StartMatchButton", "Start Match", new Vector2(0, -20));
+        TextMeshProUGUI playerCountText = CreateText(lobbyPanel.transform, "PlayerCountText", "Players: 0/2", 20, new Vector2(0, 30));
         
         // Cancel Button
-        Button cancelBtn = CreateButton(lobbyPanel.transform, "CancelButton", "Cancel", new Vector2(0, -90));
+        Button cancelBtn = CreateButton(lobbyPanel.transform, "CancelButton", "Cancel", new Vector2(0, -40));
 
         // Create MainMenuController and wire everything up
         GameObject controllerObj = new GameObject("MainMenuController");
@@ -163,12 +157,10 @@ public class MainMenuSceneSetup : EditorWindow
         SerializedObject controllerSO = new SerializedObject(controller);
         controllerSO.FindProperty("mainMenuPanel").objectReferenceValue = mainMenuPanel;
         controllerSO.FindProperty("lobbyPanel").objectReferenceValue = lobbyPanel;
-        controllerSO.FindProperty("hostButton").objectReferenceValue = hostBtn;
         controllerSO.FindProperty("joinButton").objectReferenceValue = joinBtn;
         controllerSO.FindProperty("quitButton").objectReferenceValue = quitBtn;
         controllerSO.FindProperty("statusText").objectReferenceValue = statusText;
         controllerSO.FindProperty("playerCountText").objectReferenceValue = playerCountText;
-        controllerSO.FindProperty("startMatchButton").objectReferenceValue = startBtn;
         controllerSO.FindProperty("cancelButton").objectReferenceValue = cancelBtn;
         controllerSO.ApplyModifiedProperties();
 

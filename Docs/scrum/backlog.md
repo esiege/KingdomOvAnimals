@@ -12,7 +12,7 @@ Stories in priority order. We commit to **1 story at a time per sprint**.
 4. [x] **Story 004**: Sync player health and mana *(Sprint 01 - Complete)*
 5. [x] **Story 005**: Sync card plays *(Sprint 01 - Complete)*
 6. [x] **Story 006**: Sync combat and abilities *(Sprint 01 - Complete)*
-7. [ ] **Story 007**: Implement matchmaking queue
+7. [x] **Story 007**: Implement matchmaking queue *(Sprint 01 - Complete)*
 8. [ ] **Story 008**: Network-authorize turn switching
 9. [ ] **Story 009**: Handle player disconnect
 10. [ ] **Story 010**: Add reconnection support
@@ -30,3 +30,4 @@ Stories in priority order. We commit to **1 story at a time per sprint**.
 | 004 - Sync player health and mana | Sprint 01 | 2026-01-03 |
 | 005 - Sync card plays | Sprint 01 | 2026-01-04 |
 | 006 - Sync combat and abilities | Sprint 01 | 2026-01-04 |
+| 007 - Implement matchmaking queue | Sprint 01 | 2026-01-04 |

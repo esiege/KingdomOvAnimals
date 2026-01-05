@@ -7,9 +7,11 @@ using FishNet.Transporting;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 /// <summary>
-/// Main menu controller - handles hosting, joining, and transitioning to game.
+/// Main menu controller - handles matchmaking and transitioning to game.
+/// First player becomes host, second player joins automatically.
 /// </summary>
 public class MainMenuController : MonoBehaviour
 {
@@ -18,32 +20,31 @@ public class MainMenuController : MonoBehaviour
     public GameObject lobbyPanel;
     
     [Header("Main Menu Buttons")]
-    public Button hostButton;
-    public Button joinButton;
+    public Button joinButton;  // Single button for matchmaking
     public Button quitButton;
     
     [Header("Lobby UI")]
     public TextMeshProUGUI statusText;
     public TextMeshProUGUI playerCountText;
-    public Button startMatchButton;
     public Button cancelButton;
     
     [Header("Settings")]
     public string gameSceneName = "DuelScreen";
     public int requiredPlayers = 2;
+    public float connectionTimeout = 3f;  // Seconds to wait before becoming host
 
     private NetworkManager _networkManager;
     private bool _isHost;
+    private bool _isConnecting;
+    private Coroutine _connectionAttempt;
 
     private void Start()
     {
         _networkManager = InstanceFinder.NetworkManager;
         
         // Wire up buttons
-        hostButton?.onClick.AddListener(OnHostClicked);
         joinButton?.onClick.AddListener(OnJoinClicked);
         quitButton?.onClick.AddListener(OnQuitClicked);
-        startMatchButton?.onClick.AddListener(OnStartMatchClicked);
         cancelButton?.onClick.AddListener(OnCancelClicked);
         
         // Subscribe to network events
@@ -69,27 +70,57 @@ public class MainMenuController : MonoBehaviour
 
     #region Button Handlers
     
-    private void OnHostClicked()
-    {
-        Debug.Log("[MainMenu] Starting host...");
-        _isHost = true;
-        
-        _networkManager.ServerManager.StartConnection();
-        _networkManager.ClientManager.StartConnection();
-        
-        ShowLobby();
-        UpdateStatus("Starting server...");
-    }
-
     private void OnJoinClicked()
     {
-        Debug.Log("[MainMenu] Joining game...");
+        Debug.Log("[MainMenu] Finding match...");
+        ShowLobby();
+        UpdateStatus("Finding match...");
+        
+        // Try to join first, become host if no one is hosting
+        _connectionAttempt = StartCoroutine(TryJoinOrHost());
+    }
+
+    private IEnumerator TryJoinOrHost()
+    {
+        _isConnecting = true;
         _isHost = false;
         
+        // Try to connect as client first
+        Debug.Log("[MainMenu] Attempting to join existing game...");
         _networkManager.ClientManager.StartConnection();
         
-        ShowLobby();
-        UpdateStatus("Connecting...");
+        // Wait for connection or timeout
+        float elapsed = 0f;
+        while (elapsed < connectionTimeout && _isConnecting)
+        {
+            // If we successfully connected as client, we're done
+            if (_networkManager.ClientManager.Started && !_isHost)
+            {
+                Debug.Log("[MainMenu] Successfully joined existing game!");
+                _isConnecting = false;
+                yield break;
+            }
+            
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        
+        // Connection timed out or failed - become host instead
+        if (_isConnecting)
+        {
+            Debug.Log("[MainMenu] No existing game found, becoming host...");
+            
+            // Stop client attempt if still going
+            if (_networkManager.ClientManager.Started)
+                _networkManager.ClientManager.StopConnection();
+            
+            // Start as host (server + client)
+            _isHost = true;
+            _networkManager.ServerManager.StartConnection();
+            _networkManager.ClientManager.StartConnection();
+            
+            _isConnecting = false;
+        }
     }
 
     private void OnQuitClicked()
@@ -102,17 +133,16 @@ public class MainMenuController : MonoBehaviour
         #endif
     }
 
-    private void OnStartMatchClicked()
-    {
-        if (!_isHost) return;
-        
-        Debug.Log("[MainMenu] Starting match!");
-        LoadGameScene();
-    }
-
     private void OnCancelClicked()
     {
         Debug.Log("[MainMenu] Cancelling...");
+        
+        _isConnecting = false;
+        if (_connectionAttempt != null)
+        {
+            StopCoroutine(_connectionAttempt);
+            _connectionAttempt = null;
+        }
         
         if (_networkManager.ServerManager.Started)
             _networkManager.ServerManager.StopConnection(true);
@@ -131,8 +161,8 @@ public class MainMenuController : MonoBehaviour
     {
         if (args.ConnectionState == LocalConnectionState.Started)
         {
-            Debug.Log("[MainMenu] Server started!");
-            UpdateStatus("Waiting for opponent...");
+            Debug.Log("[MainMenu] Server started - hosting game!");
+            UpdateStatus("Hosting game... Waiting for opponent...");
             UpdatePlayerCount();
         }
         else if (args.ConnectionState == LocalConnectionState.Stopped)
@@ -146,15 +176,19 @@ public class MainMenuController : MonoBehaviour
         if (args.ConnectionState == LocalConnectionState.Started)
         {
             Debug.Log("[MainMenu] Connected to server!");
+            _isConnecting = false;  // Successfully connected
+            
             if (!_isHost)
             {
-                UpdateStatus("Connected! Waiting for host to start...");
+                UpdateStatus("Connected! Waiting for match to start...");
             }
         }
         else if (args.ConnectionState == LocalConnectionState.Stopped)
         {
             Debug.Log("[MainMenu] Disconnected from server");
-            if (lobbyPanel.activeSelf)
+            
+            // If we're still trying to connect, this is expected (failed join attempt)
+            if (!_isConnecting && lobbyPanel.activeSelf)
             {
                 UpdateStatus("Disconnected");
                 ShowMainMenu();
@@ -177,7 +211,6 @@ public class MainMenuController : MonoBehaviour
         {
             Debug.Log($"[MainMenu] Player left: {conn.ClientId}");
             UpdatePlayerCount();
-            CheckCanStartMatch();
         }
     }
     
@@ -195,10 +228,6 @@ public class MainMenuController : MonoBehaviour
     {
         mainMenuPanel?.SetActive(false);
         lobbyPanel?.SetActive(true);
-        
-        // Only host can start match
-        if (startMatchButton != null)
-            startMatchButton.gameObject.SetActive(_isHost);
     }
 
     private void UpdateStatus(string status)
@@ -217,10 +246,7 @@ public class MainMenuController : MonoBehaviour
 
     private void CheckCanStartMatch()
     {
-        if (startMatchButton == null) return;
-        
         int count = _networkManager.ServerManager.Clients.Count;
-        startMatchButton.interactable = count >= requiredPlayers;
         
         if (count >= requiredPlayers)
         {
