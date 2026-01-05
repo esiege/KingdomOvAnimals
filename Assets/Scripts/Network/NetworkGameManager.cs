@@ -127,6 +127,16 @@ public class NetworkGameManager : NetworkBehaviour
                     encounterController.OnOpponentForfeited();
                 }
                 
+                // Clean up the disconnected player (server only)
+                if (IsServerInitialized && disconnectedPlayerId >= 0)
+                {
+                    var connectionHandler = FindObjectOfType<PlayerConnectionHandler>();
+                    if (connectionHandler != null)
+                    {
+                        connectionHandler.ForfeitDisconnectedPlayer(disconnectedPlayerId);
+                    }
+                }
+                
                 // Return to main menu after a short delay
                 StartCoroutine(ReturnToMainMenuDelayed(3f));
             }
@@ -237,7 +247,8 @@ public class NetworkGameManager : NetworkBehaviour
         // Link local player
         if (localNetworkPlayer != null && localPlayerController != null)
         {
-            if (localPlayerController.networkPlayer == null)
+            // Always re-link (needed for reconnection scenarios)
+            if (localPlayerController.networkPlayer != localNetworkPlayer)
             {
                 localNetworkPlayer.LinkToPlayerController(localPlayerController);
                 localPlayerController.networkPlayer = localNetworkPlayer;
@@ -248,7 +259,8 @@ public class NetworkGameManager : NetworkBehaviour
         // Link opponent
         if (opponentNetworkPlayer != null && opponentPlayerController != null)
         {
-            if (opponentPlayerController.networkPlayer == null)
+            // Always re-link (needed for reconnection scenarios)
+            if (opponentPlayerController.networkPlayer != opponentNetworkPlayer)
             {
                 opponentNetworkPlayer.LinkToPlayerController(opponentPlayerController);
                 opponentPlayerController.networkPlayer = opponentNetworkPlayer;
@@ -407,12 +419,16 @@ public class NetworkGameManager : NetworkBehaviour
         ShuffleSeed.Value = UnityEngine.Random.Range(1, int.MaxValue);
         Debug.Log($"[Server] Generated shuffle seed: {ShuffleSeed.Value}");
         
-        // Find the lowest ObjectId (first spawned player) to go first
+        // Find the player with lowest PlayerId (first connected player, i.e. the host) to go first
         int firstObjectId = -1;
+        int lowestPlayerId = int.MaxValue;
+        
         foreach (var kvp in networkPlayers)
         {
-            if (firstObjectId == -1 || kvp.Key < firstObjectId)
+            NetworkPlayer player = kvp.Value;
+            if (player.PlayerId.Value < lowestPlayerId)
             {
+                lowestPlayerId = player.PlayerId.Value;
                 firstObjectId = kvp.Key;
             }
         }
@@ -427,7 +443,7 @@ public class NetworkGameManager : NetworkBehaviour
         TurnNumber.Value = 1;
         GameStarted.Value = true;
         
-        Debug.Log($"[Server] Game started! ObjectId {firstObjectId} goes first.");
+        Debug.Log($"[Server] Game started! PlayerId {lowestPlayerId} (ObjectId {firstObjectId}) goes first.");
     }
     
     private int GetNextPlayerObjectId()

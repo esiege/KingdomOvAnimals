@@ -62,6 +62,21 @@ public class CardController : MonoBehaviour
         if (cardNameText != null) cardNameText.text = cardName;
         if (manaCostText != null) manaCostText.text = manaCost.ToString();
         if (healthText != null) healthText.text = health.ToString();
+        
+        // Also update health on the Condensed view if it exists (for in-play cards)
+        Transform condensedView = transform.Find("Canvas/Condensed");
+        if (condensedView != null)
+        {
+            Transform healthTransform = condensedView.Find("Health");
+            if (healthTransform != null)
+            {
+                TextMeshProUGUI condensedHealthText = healthTransform.GetComponent<TextMeshProUGUI>();
+                if (condensedHealthText != null)
+                {
+                    condensedHealthText.text = health.ToString();
+                }
+            }
+        }
     }
 
     // Update card's visual effects based on status

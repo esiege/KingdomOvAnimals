@@ -113,6 +113,14 @@ public class MainMenuSceneSetup : EditorWindow
             so.ApplyModifiedProperties();
         }
 
+        // Add ConsoleLogToFile for debugging
+        GameObject loggerObj = new GameObject("ConsoleLogger");
+        ConsoleLogToFile logger = loggerObj.AddComponent<ConsoleLogToFile>();
+        logger.logFilePath = "Docs/log.txt";
+        logger.includeStackTrace = true;
+        logger.includeTimestamp = true;
+        Debug.Log("[MainMenuSetup] Added ConsoleLogToFile component");
+
         // Create Canvas
         GameObject canvasObj = new GameObject("Canvas");
         Canvas canvas = canvasObj.AddComponent<Canvas>();

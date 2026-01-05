@@ -1,3 +1,4 @@
+using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
@@ -127,6 +128,25 @@ public class NetworkPlayer : NetworkBehaviour
         else
         {
             Debug.Log($"[NetworkPlayer] Other player joined: {PlayerName.Value} (ID: {PlayerId.Value})");
+        }
+    }
+    
+    /// <summary>
+    /// Called when ownership changes (used for reconnection).
+    /// </summary>
+    public override void OnOwnershipClient(NetworkConnection prevOwner)
+    {
+        base.OnOwnershipClient(prevOwner);
+        
+        if (IsOwner)
+        {
+            Debug.Log($"[NetworkPlayer] Ownership gained! You are now: {PlayerName.Value} (ID: {PlayerId.Value})");
+            
+            // Re-register with NetworkGameManager (for reconnection)
+            if (NetworkGameManager.Instance != null)
+            {
+                NetworkGameManager.Instance.RegisterNetworkPlayer(this);
+            }
         }
     }
 

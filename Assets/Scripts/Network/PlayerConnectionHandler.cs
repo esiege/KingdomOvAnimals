@@ -9,6 +9,7 @@ using UnityEngine;
 /// <summary>
 /// Handles player connections - spawns player objects when clients connect,
 /// tracks all connected players, and handles cleanup on disconnect.
+/// Supports reconnection during grace period.
 /// </summary>
 public class PlayerConnectionHandler : MonoBehaviour
 {
@@ -23,6 +24,11 @@ public class PlayerConnectionHandler : MonoBehaviour
     /// All currently connected players, keyed by their connection ID.
     /// </summary>
     public Dictionary<int, NetworkPlayer> ConnectedPlayers { get; private set; } = new Dictionary<int, NetworkPlayer>();
+    
+    /// <summary>
+    /// Disconnected players awaiting reconnection, keyed by their PlayerId.
+    /// </summary>
+    private Dictionary<int, NetworkPlayer> _disconnectedPlayers = new Dictionary<int, NetworkPlayer>();
 
     /// <summary>
     /// Number of currently connected players.
@@ -118,7 +124,18 @@ public class PlayerConnectionHandler : MonoBehaviour
         if (logConnections)
             Debug.Log($"[PlayerConnectionHandler] Player connected: Connection ID {conn.ClientId}");
 
-        // Spawn player object for this connection
+        // Check if this is a reconnecting player
+        // For now, we use a simple approach: if there's a disconnected player waiting, reconnect them
+        NetworkPlayer reconnectingPlayer = TryGetReconnectingPlayer();
+        
+        if (reconnectingPlayer != null)
+        {
+            // Reconnection!
+            HandleReconnection(conn, reconnectingPlayer);
+            return;
+        }
+
+        // New player - spawn player object for this connection
         if (playerPrefab != null)
         {
             NetworkObject nob = _networkManager.GetPooledInstantiated(playerPrefab, true);
@@ -143,6 +160,45 @@ public class PlayerConnectionHandler : MonoBehaviour
             Debug.LogWarning("[PlayerConnectionHandler] No player prefab assigned!");
         }
     }
+    
+    /// <summary>
+    /// Try to find a disconnected player waiting for reconnection.
+    /// </summary>
+    private NetworkPlayer TryGetReconnectingPlayer()
+    {
+        // Return the first disconnected player (simple 1v1 game)
+        foreach (var kvp in _disconnectedPlayers)
+        {
+            return kvp.Value;
+        }
+        return null;
+    }
+    
+    /// <summary>
+    /// Handle a player reconnecting to their existing session.
+    /// </summary>
+    private void HandleReconnection(NetworkConnection conn, NetworkPlayer player)
+    {
+        int playerId = player.PlayerId.Value;
+        Debug.Log($"[PlayerConnectionHandler] Player {playerId} reconnecting with Connection ID {conn.ClientId}");
+        
+        // Remove from disconnected list
+        _disconnectedPlayers.Remove(playerId);
+        
+        // Add to connected players with new connection ID
+        ConnectedPlayers[conn.ClientId] = player;
+        
+        // Transfer ownership back to the reconnecting client
+        player.GiveOwnership(conn);
+        
+        Debug.Log($"[PlayerConnectionHandler] Player {playerId} reconnected! Ownership transferred.");
+        
+        // Notify NetworkGameManager
+        if (NetworkGameManager.Instance != null)
+        {
+            NetworkGameManager.Instance.ServerOnPlayerReconnected(playerId);
+        }
+    }
 
     /// <summary>
     /// Called when a player disconnects from the server.
@@ -152,29 +208,63 @@ public class PlayerConnectionHandler : MonoBehaviour
         if (logConnections)
             Debug.Log($"[PlayerConnectionHandler] Player disconnected: Connection ID {conn.ClientId}");
 
-        // Get the player ID before removing from tracking
+        // Get the player before removing from tracking
+        NetworkPlayer disconnectedPlayer = null;
         int disconnectedPlayerId = -1;
-        if (ConnectedPlayers.TryGetValue(conn.ClientId, out NetworkPlayer disconnectedPlayer))
+        
+        if (ConnectedPlayers.TryGetValue(conn.ClientId, out disconnectedPlayer))
         {
             disconnectedPlayerId = disconnectedPlayer.PlayerId.Value;
+            
+            // Transfer ownership to server to prevent despawn
+            disconnectedPlayer.RemoveOwnership();
+            
+            // Move to disconnected players for potential reconnection
+            _disconnectedPlayers[disconnectedPlayerId] = disconnectedPlayer;
+            
+            Debug.Log($"[PlayerConnectionHandler] Player {disconnectedPlayerId} preserved for reconnection");
         }
 
-        // Remove from tracking
+        // Remove from active connections
         if (ConnectedPlayers.ContainsKey(conn.ClientId))
         {
             ConnectedPlayers.Remove(conn.ClientId);
         }
 
         if (logConnections)
-            Debug.Log($"[PlayerConnectionHandler] Remaining players: {PlayerCount}");
+            Debug.Log($"[PlayerConnectionHandler] Remaining connected players: {PlayerCount}, Disconnected awaiting reconnect: {_disconnectedPlayers.Count}");
 
         // Notify NetworkGameManager about the disconnect (server-side)
         if (disconnectedPlayerId >= 0 && NetworkGameManager.Instance != null)
         {
             NetworkGameManager.Instance.ServerOnPlayerDisconnected(disconnectedPlayerId);
         }
-
-        // Note: FishNet automatically despawns objects owned by disconnected clients
+    }
+    
+    /// <summary>
+    /// Called when grace period expires - permanently remove the disconnected player.
+    /// </summary>
+    public void ForfeitDisconnectedPlayer(int playerId)
+    {
+        if (_disconnectedPlayers.TryGetValue(playerId, out NetworkPlayer player))
+        {
+            Debug.Log($"[PlayerConnectionHandler] Removing forfeited player {playerId}");
+            _disconnectedPlayers.Remove(playerId);
+            
+            // Now despawn since they forfeited
+            if (player != null && player.IsSpawned)
+            {
+                _networkManager.ServerManager.Despawn(player.NetworkObject);
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Check if a player is disconnected and awaiting reconnection.
+    /// </summary>
+    public bool IsPlayerDisconnected(int playerId)
+    {
+        return _disconnectedPlayers.ContainsKey(playerId);
     }
 
     /// <summary>
