@@ -513,10 +513,14 @@ public class NetworkGameManager : NetworkBehaviour
     [ObserversRpc(BufferLast = true)]
     private void RpcBroadcastTurnState(int turnObjectId, int turnNumber, bool gameStarted, int shuffleSeed)
     {
-        Debug.Log($"[Client RPC] Received turn state: TurnObjectId={turnObjectId}, TurnNumber={turnNumber}, GameStarted={gameStarted}");
+        Debug.Log($"[Client RPC] Received turn state: TurnObjectId={turnObjectId}, TurnNumber={turnNumber}, GameStarted={gameStarted}, cachedTurn={_cachedTurnNumber}");
         
         // Only process on non-server clients
         if (IsServerInitialized) return;
+        
+        // Check if this is a duplicate/same turn (important for buffered RPCs after reconnection)
+        bool isNewTurn = turnNumber != _cachedTurnNumber;
+        Debug.Log($"[Client RPC] isNewTurn={isNewTurn}, localNetworkPlayer={(localNetworkPlayer != null ? localNetworkPlayer.PlayerName.Value : "null")}");
         
         // Update local cache of turn state (these are used by IsLocalPlayerTurn)
         _cachedTurnObjectId = turnObjectId;
@@ -543,7 +547,7 @@ public class NetworkGameManager : NetworkBehaviour
             if (encounterController != null)
             {
                 bool isLocalTurn = IsLocalPlayerTurnFromCache();
-                Debug.Log($"[Client RPC] Calling OnNetworkTurnChanged. isLocalTurn={isLocalTurn}, turnNumber={turnNumber}");
+                Debug.Log($"[Client RPC] Calling OnNetworkTurnChanged. isLocalTurn={isLocalTurn}, turnNumber={turnNumber}, isNewTurn={isNewTurn}");
                 encounterController.OnNetworkTurnChanged(isLocalTurn, turnNumber);
             }
             else
@@ -738,7 +742,7 @@ public class NetworkGameManager : NetworkBehaviour
     /// Server: Called when a player reconnects.
     /// </summary>
     [Server]
-    public void ServerOnPlayerReconnected(int playerId)
+    public void ServerOnPlayerReconnected(int playerId, NetworkConnection conn = null)
     {
         if (disconnectedPlayerId == playerId)
         {
@@ -747,7 +751,7 @@ public class NetworkGameManager : NetworkBehaviour
             disconnectedPlayerId = -1;
             
             // Send current game state to the reconnected player
-            StartCoroutine(SendGameStateToReconnectedPlayer(playerId));
+            StartCoroutine(SendGameStateToReconnectedPlayer(playerId, conn));
         }
     }
     
@@ -755,10 +759,11 @@ public class NetworkGameManager : NetworkBehaviour
     /// Send the current game state to a reconnected player after a short delay.
     /// </summary>
     [Server]
-    private System.Collections.IEnumerator SendGameStateToReconnectedPlayer(int playerId)
+    private System.Collections.IEnumerator SendGameStateToReconnectedPlayer(int playerId, NetworkConnection conn)
     {
-        // Wait a moment for the client to fully reconnect and sync
-        yield return new WaitForSeconds(0.5f);
+        // Wait longer for the client to fully reconnect, load scenes, and sync
+        // The client needs time to load DuelScreen scene and initialize NetworkGameManager
+        yield return new WaitForSeconds(2.0f);
         
         Debug.Log($"[Server] Sending game state to reconnected player {playerId}");
         
@@ -767,7 +772,19 @@ public class NetworkGameManager : NetworkBehaviour
         if (snapshot != null)
         {
             string snapshotJson = snapshot.ToJson();
-            RpcRestoreFullGameState(snapshotJson);
+            Debug.Log($"[Server] Captured snapshot: Turn={snapshot.turnNumber}, LocalHand={snapshot.localPlayer?.handCardIds?.Count ?? 0}, OpponentHand={snapshot.opponent?.handCardIds?.Count ?? 0}");
+            
+            // Send to specific reconnected client if we have the connection
+            if (conn != null && conn.IsValid)
+            {
+                Debug.Log($"[Server] Sending targeted RPC to connection {conn.ClientId}");
+                TargetRpcRestoreFullGameState(conn, snapshotJson);
+            }
+            else
+            {
+                Debug.LogWarning("[Server] Connection invalid or null, using broadcast RPC");
+                RpcRestoreFullGameState(snapshotJson);
+            }
         }
         else
         {
@@ -962,7 +979,27 @@ public class NetworkGameManager : NetworkBehaviour
     [ObserversRpc]
     private void RpcRestoreFullGameState(string snapshotJson)
     {
-        Debug.Log("[Client] Received full game state restoration RPC");
+        Debug.Log("[Client] Received full game state restoration RPC (broadcast)");
+        ProcessGameStateRestoration(snapshotJson);
+    }
+    
+    /// <summary>
+    /// Send game state restoration to a specific reconnected client.
+    /// </summary>
+    [TargetRpc]
+    private void TargetRpcRestoreFullGameState(NetworkConnection conn, string snapshotJson)
+    {
+        Debug.Log($"[Client] Received targeted game state restoration RPC");
+        ProcessGameStateRestoration(snapshotJson);
+    }
+    
+    /// <summary>
+    /// Process the game state restoration (shared by both broadcast and targeted RPCs).
+    /// </summary>
+    private void ProcessGameStateRestoration(string snapshotJson)
+    {
+        Debug.Log("[Client] Processing game state restoration...");
+        Debug.Log($"[Client] State: isServer={IsServer}, localPlayer={(localNetworkPlayer != null ? localNetworkPlayer.name : "null")}, encounterController={(encounterController != null)}");
         
         var snapshot = GameStateSnapshot.FromJson(snapshotJson);
         if (snapshot == null)
@@ -971,12 +1008,39 @@ public class NetworkGameManager : NetworkBehaviour
             return;
         }
         
+        Debug.Log($"[Client] Snapshot: Turn={snapshot.turnNumber}, LocalHand={snapshot.localPlayer?.handCardIds?.Count ?? 0}, OpponentHand={snapshot.opponent?.handCardIds?.Count ?? 0}, FromServer={snapshot.isFromServerPerspective}");
+        
         // Clear reconnection flag since we're now restoring
         if (_isReconnecting)
         {
             Debug.Log("[Client] Reconnection state restoration - clearing reconnect flag");
             _isReconnecting = false;
-            _encounterInitialized = true; // Mark as initialized since we're restoring
+        }
+        
+        // Mark encounter as initialized for reconnecting clients
+        _encounterInitialized = true;
+        
+        // CRITICAL: Re-register and re-link NetworkPlayers after reconnection
+        // This ensures RPCs like RpcExecuteCardPlay can find the correct HandController
+        Debug.Log("[Client] Re-registering NetworkPlayers after reconnection...");
+        ReRegisterNetworkPlayers();
+        
+        // Ensure CardLibrary is populated before restoring cards
+        if (CardLibrary.Instance != null)
+        {
+            // Force re-populate in case the library wasn't properly initialized
+            if (CardLibrary.Instance.GetAllCards()?.Count == 0)
+            {
+                Debug.Log("[Client] CardLibrary empty, forcing re-populate...");
+                CardLibrary.Instance.ForceRepopulate();
+            }
+            Debug.Log($"[Client] CardLibrary has {CardLibrary.Instance.GetAllCards()?.Count ?? 0} cards");
+        }
+        else
+        {
+            Debug.LogWarning("[Client] CardLibrary.Instance is null! Creating...");
+            CardLibrary.EnsureInitialized();
+            Debug.Log($"[Client] CardLibrary now has {CardLibrary.Instance.GetAllCards()?.Count ?? 0} cards");
         }
         
         // Restore cards on this client
@@ -989,6 +1053,81 @@ public class NetworkGameManager : NetworkBehaviour
             bool isLocalTurn = IsLocalPlayerTurn();
             encounterController.RestoreTurnState(isLocalTurn, snapshot.turnNumber);
             encounterController.OnGameStateRestored();
+            Debug.Log($"[Client] Game state restoration complete! Turn={snapshot.turnNumber}, IsLocalTurn={isLocalTurn}");
+        }
+        else
+        {
+            Debug.LogWarning("[Client] EncounterController is null, cannot restore turn state!");
+        }
+    }
+    
+    /// <summary>
+    /// Re-register and re-link all NetworkPlayers. Called after reconnection to ensure
+    /// RPCs can correctly find the HandController for each player.
+    /// </summary>
+    private void ReRegisterNetworkPlayers()
+    {
+        // First, ensure we have references to the scene objects
+        // These are needed for linking and restoration
+        if (encounterController == null)
+        {
+            encounterController = FindObjectOfType<EncounterController>();
+            Debug.Log($"[Client] Found EncounterController: {(encounterController != null ? "yes" : "no")}");
+        }
+        
+        // Find PlayerControllers if not set (they're scene objects named "Player" and "Opponent")
+        if (localPlayerController == null || opponentPlayerController == null)
+        {
+            PlayerController[] controllers = FindObjectsOfType<PlayerController>();
+            foreach (var controller in controllers)
+            {
+                if (controller.gameObject.name == "Player" && localPlayerController == null)
+                {
+                    localPlayerController = controller;
+                    Debug.Log("[Client] Found localPlayerController");
+                }
+                else if (controller.gameObject.name == "Opponent" && opponentPlayerController == null)
+                {
+                    opponentPlayerController = controller;
+                    Debug.Log("[Client] Found opponentPlayerController");
+                }
+            }
+        }
+        
+        // Clear existing NetworkPlayer registrations
+        networkPlayers.Clear();
+        localNetworkPlayer = null;
+        opponentNetworkPlayer = null;
+        
+        // Find all NetworkPlayer objects in the scene
+        NetworkPlayer[] players = FindObjectsOfType<NetworkPlayer>();
+        Debug.Log($"[Client] Found {players.Length} NetworkPlayer(s) to re-register");
+        
+        foreach (var player in players)
+        {
+            RegisterNetworkPlayer(player);
+        }
+        
+        // Force re-link to controllers
+        LinkPlayersToControllers();
+        
+        // Log the state after re-linking
+        Debug.Log($"[Client] After re-registration: localNetworkPlayer={(localNetworkPlayer != null ? localNetworkPlayer.PlayerName.Value : "null")}, opponentNetworkPlayer={(opponentNetworkPlayer != null ? opponentNetworkPlayer.PlayerName.Value : "null")}");
+        
+        // Verify LinkedPlayerController is set
+        if (localNetworkPlayer != null)
+        {
+            Debug.Log($"[Client] localNetworkPlayer.LinkedPlayerController={(localNetworkPlayer.LinkedPlayerController != null ? localNetworkPlayer.LinkedPlayerController.gameObject.name : "null")}");
+        }
+        if (opponentNetworkPlayer != null)
+        {
+            Debug.Log($"[Client] opponentNetworkPlayer.LinkedPlayerController={(opponentNetworkPlayer.LinkedPlayerController != null ? opponentNetworkPlayer.LinkedPlayerController.gameObject.name : "null")}");
+        }
+        
+        // Also verify PlayerController.networkPlayer is set (needed for HandController to send commands)
+        if (localPlayerController != null)
+        {
+            Debug.Log($"[Client] localPlayerController.networkPlayer={(localPlayerController.networkPlayer != null ? localPlayerController.networkPlayer.PlayerName.Value : "null")}");
         }
     }
     
@@ -1189,19 +1328,29 @@ public class NetworkGameManager : NetworkBehaviour
     
     /// <summary>
     /// Translate a slot name from one perspective to the other.
-    /// PlayerSlot-X <-> OpponentSlot-X
+    /// PlayerSlot-X <-> OpponentSlot-X, with slot mirroring (1<->3 swap for front/back)
     /// </summary>
     private string TranslateSlotName(string slotName)
     {
         if (string.IsNullOrEmpty(slotName)) return slotName;
         
+        // Extract the slot number and mirror it (1<->3, 2 stays)
+        string MirrorSlotNumber(string name)
+        {
+            if (name.EndsWith("-1")) return name.Substring(0, name.Length - 1) + "3";
+            if (name.EndsWith("-3")) return name.Substring(0, name.Length - 1) + "1";
+            return name; // -2 stays the same
+        }
+        
         if (slotName.StartsWith("PlayerSlot-"))
         {
-            return slotName.Replace("PlayerSlot-", "OpponentSlot-");
+            string translated = slotName.Replace("PlayerSlot-", "OpponentSlot-");
+            return MirrorSlotNumber(translated);
         }
         else if (slotName.StartsWith("OpponentSlot-"))
         {
-            return slotName.Replace("OpponentSlot-", "PlayerSlot-");
+            string translated = slotName.Replace("OpponentSlot-", "PlayerSlot-");
+            return MirrorSlotNumber(translated);
         }
         
         return slotName;
@@ -1338,7 +1487,7 @@ public class NetworkGameManager : NetworkBehaviour
                     controller.deck.Add(newCard);
                 }
             }
-            Debug.Log($"[Client] Restored {controller.deck.Count} deck cards");
+            Debug.Log($"[Client] Restored {controller.deck.Count} deck cards to {controller.gameObject.name}");
         }
     }
     

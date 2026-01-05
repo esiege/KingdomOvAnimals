@@ -1,331 +1,349 @@
-=== Log started: 2026-01-05 09:36:10 (BUILD/CLIENT) ===
+=== Log started: 2026-01-05 10:46:04 (BUILD/CLIENT) ===
 === Log file: D:/Google Drive/Unity/KingdomOvAnimals/KingdomOvAnimals/Build/KingdomOvAnimals_Data\..\..\Docs\log_build.txt ===
 
-[0.04s] [ERROR] No cloud project ID was found by the Analytics SDK. This means Analytics events will not be sent. Please make sure to link your cloud project in the Unity editor to fix this problem.
-[6.57s] [MainMenu] Finding match...
-[6.58s] [MainMenu] Attempting to join existing game...
-[6.58s] [PlayerConnectionHandler] OnClientConnectionState: Starting, _isWaitingForHostReconnect=False
-[9.59s] [MainMenu] No existing game found, becoming host...
-[9.63s] [MainMenu] Server started - hosting game!
-[9.86s] [PlayerConnectionHandler] OnRemoteConnectionState: ClientId=0, State=Started
-[9.86s] [PlayerConnectionHandler] Player connected: Connection ID 0
-[9.86s] [WARN] NetworkPlayer(Clone) was spawned but it's recommended to not spawn objects for connections until they have loaded start scenes. You can be notified when a connection loads start scenes by using connection.OnLoadedStartScenes on the connection, or SceneManager.OnClientLoadStartScenes.
-[9.87s] [NetworkPlayer] Server: PlayerId set to Owner.ClientId=0
-[9.87s] [NetworkPlayer] Spawned: Player 0 (ID: 0)
-[9.87s] [PlayerConnectionHandler] Spawned player object for Connection ID 0. Total players: 1
-[9.87s] [MainMenu] Player joined: 0
-[9.87s] [PlayerConnectionHandler] OnRemoteConnectionState: ClientId=1, State=Started
-[9.87s] [PlayerConnectionHandler] Player connected: Connection ID 1
-[9.87s] [WARN] NetworkPlayer(Clone) was spawned but it's recommended to not spawn objects for connections until they have loaded start scenes. You can be notified when a connection loads start scenes by using connection.OnLoadedStartScenes on the connection, or SceneManager.OnClientLoadStartScenes.
-[9.87s] [NetworkPlayer] PlayerId changed: 0 -> 1 (asServer: True, IsOwner: False)
-[9.87s] [NetworkPlayer] Server: PlayerId set to Owner.ClientId=1
-[9.87s] [NetworkPlayer] Spawned: Player 1 (ID: 1)
-[9.87s] [PlayerConnectionHandler] Spawned player object for Connection ID 1. Total players: 2
-[9.87s] [MainMenu] Player joined: 1
-[9.88s] [MainMenu] Loading scene: DuelScreen
-[9.88s] [MainMenu] Moving NetworkObject: NetworkPlayer(Clone) (Owner: 0)
-[9.88s] [MainMenu] Moving NetworkObject: NetworkPlayer(Clone) (Owner: 1)
-[9.88s] [MainMenu] Moving 2 NetworkObjects to DuelScreen
-[9.88s] [PlayerConnectionHandler] OnClientConnectionState: Started, _isWaitingForHostReconnect=False
-[9.88s] [PlayerConnectionHandler] Connection started (normal connect, not reconnect)
-[9.88s] [MainMenu] Connected to server!
-[10.35s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
-[10.35s] [PlayerConnectionHandler] Duplicate instance found, destroying this one
-[10.35s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
-[10.35s] [WARN] HealAmountText is not assigned in HealAbility.
-[10.35s] [CardLibrary] Auto-registered card from scene: Card
-[10.35s] [CardLibrary] Auto-registered card from scene: Owl
-[10.35s] [CardLibrary] Auto-registered card from scene: Chip 'N Wail
-[10.35s] [CardLibrary] Auto-registered card from scene: Flying Fox
-[10.35s] [CardLibrary] Auto-populate complete. Total cards: 4
-[10.35s] [EncounterController] Network game detected, waiting for network to start game...
-[10.35s] [WARN] [TargetingController] Board slots not found - scene may still be loading
-[10.35s] No open slots available.
-[10.60s] [WARN] Player prefab is empty and cannot be spawned for connection 1.
-[10.66s] [NetworkPlayer] Other player joined: Player 0 (ID: 0)
-[10.66s] [WARN] SyncType not found for index 168 on NetworkPlayer(Clone), component NetworkPlayer. Remainder of packet may become corrupt.
-[10.66s] [NetworkPlayer] You are: Player 1 (ID: 1)
-[10.66s] [NetworkPlayer] Ownership gained! You are now: Player 1 (ID: 1)
-[10.66s] [NetworkGameManager] Registered NetworkPlayer: Player 1 (ObjectId: 65109, PlayerId: 1, IsOwner: True)
-[10.66s] [NetworkGameManager] Local player identified: Player 1 (ObjectId: 65109)
-[10.66s] [NetworkPlayer] UpdateLinkedController: Player 1 pushing Health=20, Mana=1 to Player
-[10.66s] [PlayerController] Player UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
-[10.66s] [NetworkPlayer] Player 1 linked to Player
-[10.66s] [NetworkGameManager] Linked local NetworkPlayer to PlayerController
-[10.66s] [NetworkGameManager] Client started, looking for NetworkPlayers...
-[10.66s] [NetworkPlayer] Player 0 health: 20 -> 0 (asServer: False)
-[10.66s] [NetworkPlayer] Ignoring client-side health=0 callback
-[10.66s] [NetworkPlayer] PlayerId changed: 5 -> 0 (asServer: False, IsOwner: False)
-[10.66s] [PlayerController] Player UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
-[10.66s] [NetworkPlayer] Player 1 health: 20 -> 0 (asServer: False)
-[10.66s] [NetworkPlayer] Ignoring client-side health=0 callback
-[10.66s] [NetworkPlayer] PlayerId changed: 1 -> 0 (asServer: False, IsOwner: True)
-[10.76s] [NetworkGameManager] Found 2 NetworkPlayer(s) after 1 attempts
-[10.76s] [NetworkGameManager] Local player identified: Player 1 (ObjectId: 65109)
-[10.76s] [NetworkGameManager] Registered NetworkPlayer: Player 0 (ObjectId: 24195, PlayerId: 0, IsOwner: False)
-[10.76s] [NetworkGameManager] Opponent identified: Player 0 (ObjectId: 24195)
-[10.76s] [NetworkPlayer] UpdateLinkedController: Player 0 pushing Health=20, Mana=1 to Opponent
-[10.76s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
-[10.76s] [NetworkPlayer] Player 0 linked to Opponent
-[10.76s] [NetworkGameManager] Linked opponent NetworkPlayer to OpponentController
-[10.76s] [NetworkGameManager] Both players ready, starting game...
-[10.76s] [Server] Generated shuffle seed: 893987369
-[10.76s] [NetworkGameManager] Turn changed: ObjectId -1 -> ObjectId 24195 (asServer=True)
-[10.76s] [NetworkGameManager] Turn number: 0 -> 1
-[10.76s] [NetworkGameManager] Game started: True
-[10.76s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=24195, localObjectId=65109, result=False
-[10.76s] [NetworkGameManager] Initializing encounter with seed 893987369
-[10.76s] [EncounterController] Network game started! Local player goes first: False, Seed: 893987369
-[10.76s] Deck shuffled with seed 893987369!
-[10.76s] Deck shuffled with seed 893987370!
-[10.76s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[10.76s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[10.76s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[10.76s] Player draws Chip 'N Wail.
-[10.76s] [Server] Game started! PlayerId 0 (ObjectId 24195) goes first.
-[10.86s] [Client RPC] Received turn state: TurnObjectId=24195, TurnNumber=1, GameStarted=True
-[10.86s] [NetworkGameManager] Game started: True
-[10.86s] [NetworkGameManager] Turn number: 0 -> 1
-[10.86s] [NetworkGameManager] Turn changed: ObjectId -1 -> ObjectId 24195 (asServer=False)
-[10.87s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[10.87s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[10.87s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[10.87s] Opponent draws Card.
-[10.97s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[10.97s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[10.97s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[10.97s] Player draws Flying Fox.
-[11.09s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[11.09s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[11.09s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[11.09s] Opponent draws Chip 'N Wail.
-[11.12s] [WARN] Player prefab is empty and cannot be spawned for connection 0.
-[11.19s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[11.19s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[11.19s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[11.19s] Player draws Chip 'N Wail.
-[11.31s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[11.31s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[11.31s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[11.31s] Opponent draws Flying Fox.
-[23.44s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=24195, localObjectId=65109, result=False
-[24.72s] [Server] Player 0 playing Card to slot 0
-[24.72s] [NetworkPlayer] Player 0 mana: 1 -> 0 (asServer: True)
-[24.72s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
-[24.79s] [Client] Executing card play: Card to slot 0 for Player 0
-[24.79s] Card has been added to the board.
-[24.79s] [Client] Card played to OpponentSlot-1
-[24.79s] [NetworkPlayer] Player 0 mana: 1 -> 0 (asServer: False)
-[24.79s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
-[26.89s] [NetworkGameManager] Turn number: 1 -> 2
-[26.89s] [NetworkGameManager] Turn changed: ObjectId 24195 -> ObjectId 65109 (asServer=True)
-[26.89s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=65109, localObjectId=65109, result=True
-[26.89s] [Server] SyncVar callback - notifying encounter. isLocalTurn=True, turnNumber=2
-[26.89s] [EncounterController] Network turn changed. Local turn: True, Turn #: 2, initialized: True
-[26.89s] [EncounterController] Starting network turn. isCurrentPlayerTurn: True
-[26.89s] [EncounterController] Calling CmdIncreaseMaxMana for Player 1
-[26.89s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[26.89s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[26.89s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[26.89s] Player draws Flying Fox.
-[26.89s] [EncounterController] Your turn! Cards are playable.
-[26.89s] [Server] Turn ended. Now ObjectId 65109's turn. Turn #2
-[26.92s] [Server] CmdIncreaseMaxMana received for Player 1, amount: 1
-[26.92s] [PlayerController] Player UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
-[26.92s] [NetworkPlayer] Player 1 mana: 1 -> 2 (asServer: True)
-[26.92s] [PlayerController] Player UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
-[26.92s] [Server] Player 1 max mana increased to 2
-[26.96s] [Client RPC] Received turn state: TurnObjectId=65109, TurnNumber=2, GameStarted=True
-[26.96s] [NetworkGameManager] Turn number: 1 -> 2
-[26.96s] [NetworkGameManager] Turn changed: ObjectId 24195 -> ObjectId 65109 (asServer=False)
-[26.99s] [PlayerController] Player UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
-[26.99s] [NetworkPlayer] Player 1 mana: 1 -> 2 (asServer: False)
-[26.99s] [PlayerController] Player UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
-[27.88s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=65109, localObjectId=65109, result=True
-[27.88s] [ERROR] No support ability found for card Flying Fox
-[28.34s] [HandController] Sending network card play: card 3, slot 2
-[28.39s] [Server] Player 1 playing Flying Fox to slot 2
-[28.39s] [NetworkPlayer] Player 1 mana: 2 -> 0 (asServer: True)
-[28.39s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
-[28.46s] [Client] Executing card play: Flying Fox to slot 2 for Player 1
-[28.46s] Flying Fox has been added to the board.
-[28.46s] [Client] Flying Fox played to PlayerSlot-3
-[28.46s] [NetworkPlayer] Player 1 mana: 2 -> 0 (asServer: False)
-[28.46s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
-[30.22s] [PlayerConnectionHandler] OnRemoteConnectionState: ClientId=0, State=Stopped
-[30.22s] [PlayerConnectionHandler] Player disconnected: Connection ID 0
-[30.22s] [PlayerConnectionHandler] Player 0 preserved for reconnection
-[30.22s] [PlayerConnectionHandler] Remaining connected players: 1, Disconnected awaiting reconnect: 1
-[30.22s] [Server] ServerOnPlayerDisconnected called for player 0. GameStarted=True
-[30.22s] [Server] Player 0 disconnected during game! Setting OpponentDisconnected=true
-[30.22s] [NetworkGameManager] OpponentDisconnected changed: False -> True, asServer=True
-[30.23s] [NetworkGameManager] Calling OnOpponentDisconnected with grace period 30
-[30.23s] [EncounterController] OnOpponentDisconnected called! Waiting 30s for reconnect...
-[30.23s] [EncounterController] disconnectPanel is null: False, disconnectStatusText is null: False
-[30.23s] [EncounterController] DisconnectPanel activated
-[30.29s] [NetworkGameManager] OpponentDisconnected changed: False -> True, asServer=False
-[30.29s] [NetworkGameManager] Calling OnOpponentDisconnected with grace period 30
-[30.29s] [EncounterController] OnOpponentDisconnected called! Waiting 30s for reconnect...
-[30.29s] [EncounterController] disconnectPanel is null: False, disconnectStatusText is null: False
-[30.29s] [EncounterController] DisconnectPanel activated
-[36.92s] [PlayerConnectionHandler] OnRemoteConnectionState: ClientId=2, State=Started
-[36.92s] [PlayerConnectionHandler] Player connected: Connection ID 2
-[36.92s] [PlayerConnectionHandler] Player 0 reconnecting with Connection ID 2
-[36.92s] [WARN] Ownership has been transfered to ConnectionId 2 but this is not recommended until after they have loaded start scenes. You can be notified when a connection loads start scenes by using connection.OnLoadedStartScenes on the connection, or SceneManager.OnClientLoadStartScenes.
-[36.92s] [PlayerConnectionHandler] Player 0 reconnected! Ownership transferred.
-[36.92s] [Server] Player 0 reconnected!
-[36.92s] [NetworkGameManager] OpponentDisconnected changed: True -> False, asServer=True
-[36.92s] [NetworkGameManager] Opponent reconnected!
-[36.92s] [EncounterController] Opponent reconnected! Resuming game...
-[36.99s] [NetworkGameManager] OpponentDisconnected changed: True -> False, asServer=False
-[37.44s] [Server] Sending game state to reconnected player 0
-[37.44s] [Server] Captured game state: Turn 2, LocalHand=3, OpponentHand=2
-[37.52s] [Client] Received full game state restoration RPC
-[37.52s] [Client] Restoring cards from snapshot...
-[37.52s] [Client] RestoreCardsFromSnapshot: isServer=True, snapshotFromServer=True
-[37.52s] [Client] Restoring - mySnapshot hand: 3, theirSnapshot hand: 2
-[37.52s] [Client] Clearing board and hands...
-[37.53s] [Client] Restoring cards for Player: 3 hand, 1 board, 16 deck
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [Client] Restored board card: Flying Fox to PlayerSlot-3 with HP=3
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [Client] Restored hand card: Chip 'N Wail
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [Client] Restored hand card: Flying Fox
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [Client] Restored hand card: Chip 'N Wail
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.53s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [Client] Restored 16 deck cards
-[37.54s] [Client] Restoring cards for Opponent: 2 hand, 1 board, 17 deck
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [Client] Restored board card: Card to OpponentSlot-1 with HP=3
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [Client] Restored hand card: Chip 'N Wail
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [Client] Restored hand card: Flying Fox
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.54s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.55s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.55s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.55s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.55s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.55s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.55s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.55s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[37.55s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.55s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[37.55s] [Client] Restored 17 deck cards
-[37.55s] [Client] Card restoration complete!
-[37.55s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=65109, localObjectId=65109, result=True
-[37.55s] [EncounterController] Restoring turn state: Local turn: True, Turn #: 2
-[37.55s] [EncounterController] Game state restored!
-[37.55s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
-[37.55s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
-[37.62s] [WARN] Player prefab is empty and cannot be spawned for connection 2.
-[39.87s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=65109, localObjectId=65109, result=True
-[40.49s] [NetworkPlayer] Player left: Player 0 (ID: 0)
-[40.49s] [NetworkGameManager] Client stopped - resetting state for potential reconnect
-[40.49s] [NetworkGameManager] Game was in progress - will wait for state restoration on reconnect
+[0.01s] [ERROR] No cloud project ID was found by the Analytics SDK. This means Analytics events will not be sent. Please make sure to link your cloud project in the Unity editor to fix this problem.
+[82.77s] [MainMenu] Finding match...
+[82.77s] [MainMenu] Attempting to join existing game...
+[82.77s] [PlayerConnectionHandler] OnClientConnectionState: Starting, _isWaitingForHostReconnect=False, ReconnectionManager.IsWaiting=False
+[85.78s] [MainMenu] No existing game found, becoming host...
+[85.81s] [MainMenu] Server started - hosting game!
+[86.03s] [PlayerConnectionHandler] OnRemoteConnectionState: ClientId=0, State=Started
+[86.03s] [PlayerConnectionHandler] Player connected: Connection ID 0
+[86.04s] [WARN] NetworkPlayer(Clone) was spawned but it's recommended to not spawn objects for connections until they have loaded start scenes. You can be notified when a connection loads start scenes by using connection.OnLoadedStartScenes on the connection, or SceneManager.OnClientLoadStartScenes.
+[86.05s] [NetworkPlayer] Server: PlayerId set to Owner.ClientId=0
+[86.05s] [NetworkPlayer] Spawned: Player 0 (ID: 0)
+[86.05s] [PlayerConnectionHandler] Spawned player object for Connection ID 0. Total players: 1
+[86.05s] [MainMenu] Player joined: 0
+[86.05s] [PlayerConnectionHandler] OnClientConnectionState: Started, _isWaitingForHostReconnect=False, ReconnectionManager.IsWaiting=False
+[86.05s] [PlayerConnectionHandler] Connection started (normal connect, not reconnect)
+[86.05s] [MainMenu] Connected to server!
+[86.20s] [WARN] Player prefab is empty and cannot be spawned for connection 0.
+[86.27s] [NetworkPlayer] You are: Player 0 (ID: 0)
+[86.27s] [NetworkPlayer] Ownership gained! You are now: Player 0 (ID: 0)
+[86.33s] [PlayerConnectionHandler] OnRemoteConnectionState: ClientId=1, State=Started
+[86.33s] [PlayerConnectionHandler] Player connected: Connection ID 1
+[86.33s] [WARN] NetworkPlayer(Clone) was spawned but it's recommended to not spawn objects for connections until they have loaded start scenes. You can be notified when a connection loads start scenes by using connection.OnLoadedStartScenes on the connection, or SceneManager.OnClientLoadStartScenes.
+[86.33s] [NetworkPlayer] PlayerId changed: 0 -> 1 (asServer: True, IsOwner: False)
+[86.33s] [NetworkPlayer] Server: PlayerId set to Owner.ClientId=1
+[86.33s] [NetworkPlayer] Spawned: Player 1 (ID: 1)
+[86.33s] [PlayerConnectionHandler] Spawned player object for Connection ID 1. Total players: 2
+[86.33s] [MainMenu] Player joined: 1
+[86.33s] [MainMenu] Loading scene: DuelScreen
+[86.33s] [MainMenu] Moving NetworkObject: NetworkPlayer(Clone) (Owner: 0)
+[86.33s] [MainMenu] Moving NetworkObject: NetworkPlayer(Clone) (Owner: 1)
+[86.33s] [MainMenu] Moving 2 NetworkObjects to DuelScreen
+[86.81s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[86.81s] [PlayerConnectionHandler] Duplicate instance 11762 found (original=9016), destroying this one
+[86.81s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[86.81s] [WARN] HealAmountText is not assigned in HealAbility.
+[86.81s] [CardLibrary] Auto-registered card from scene: Card
+[86.81s] [CardLibrary] Auto-registered card from scene: Owl
+[86.81s] [CardLibrary] Auto-registered card from scene: Chip 'N Wail
+[86.81s] [CardLibrary] Auto-registered card from scene: Flying Fox
+[86.81s] [CardLibrary] Auto-populate complete. Total cards: 4
+[86.81s] [EncounterController] Network game detected, waiting for network to start game...
+[86.81s] [WARN] [TargetingController] Board slots not found - scene may still be loading
+[86.81s] No open slots available.
+[87.10s] [WARN] SyncType not found for index 172 on NetworkPlayer(Clone), component NetworkPlayer. Remainder of packet may become corrupt.
+[87.10s] [NetworkPlayer] Other player joined: Player 1 (ID: 1)
+[87.10s] [NetworkGameManager] Client started, looking for NetworkPlayers...
+[87.10s] [NetworkPlayer] Player 1 health: 20 -> 0 (asServer: False)
+[87.10s] [NetworkPlayer] Ignoring client-side health=0 callback
+[87.10s] [NetworkPlayer] PlayerId changed: 1 -> 0 (asServer: False, IsOwner: False)
+[87.22s] [NetworkGameManager] Found 2 NetworkPlayer(s) after 1 attempts
+[87.22s] [NetworkGameManager] Registered NetworkPlayer: Player 1 (ObjectId: 12382, PlayerId: 1, IsOwner: False)
+[87.22s] [NetworkGameManager] Opponent identified: Player 1 (ObjectId: 12382)
+[87.22s] [NetworkPlayer] UpdateLinkedController: Player 1 pushing Health=20, Mana=1 to Opponent
+[87.22s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
+[87.22s] [NetworkPlayer] Player 1 linked to Opponent
+[87.22s] [NetworkGameManager] Linked opponent NetworkPlayer to OpponentController
+[87.22s] [NetworkGameManager] Registered NetworkPlayer: Player 0 (ObjectId: 55804, PlayerId: 0, IsOwner: True)
+[87.22s] [NetworkGameManager] Local player identified: Player 0 (ObjectId: 55804)
+[87.22s] [NetworkPlayer] UpdateLinkedController: Player 0 pushing Health=20, Mana=1 to Player
+[87.22s] [PlayerController] Player UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
+[87.22s] [NetworkPlayer] Player 0 linked to Player
+[87.22s] [NetworkGameManager] Linked local NetworkPlayer to PlayerController
+[87.22s] [NetworkGameManager] Both players ready, starting game...
+[87.22s] [Server] Generated shuffle seed: 1316869009
+[87.22s] [NetworkGameManager] Turn changed: ObjectId -1 -> ObjectId 55804 (asServer=True)
+[87.22s] [NetworkGameManager] Turn number: 0 -> 1
+[87.22s] [NetworkGameManager] Game started: True
+[87.22s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=55804, localObjectId=55804, result=True
+[87.22s] [NetworkGameManager] Initializing encounter with seed 1316869009
+[87.22s] [EncounterController] Network game started! Local player goes first: True, Seed: 1316869009
+[87.22s] Deck shuffled with seed 1316869009!
+[87.22s] Deck shuffled with seed 1316869010!
+[87.22s] Player draws Card.
+[87.22s] [Server] Game started! PlayerId 0 (ObjectId 55804) goes first.
+[87.22s] [WARN] HealAmountText is not assigned in HealAbility.
+[87.30s] [Client RPC] Received turn state: TurnObjectId=55804, TurnNumber=1, GameStarted=True
+[87.30s] [NetworkGameManager] Game started: True
+[87.30s] [NetworkGameManager] Turn number: 0 -> 1
+[87.30s] [NetworkGameManager] Turn changed: ObjectId -1 -> ObjectId 55804 (asServer=False)
+[87.33s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[87.33s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[87.33s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[87.33s] Opponent draws Owl.
+[87.45s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[87.45s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[87.45s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[87.45s] Player draws Owl.
+[87.57s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[87.57s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[87.57s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[87.57s] Opponent draws Card.
+[87.68s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[87.68s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[87.68s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[87.68s] Player draws Flying Fox.
+[87.73s] [WARN] Player prefab is empty and cannot be spawned for connection 1.
+[87.80s] Opponent draws Card.
+[87.80s] [WARN] HealAmountText is not assigned in HealAbility.
+[89.85s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=55804, localObjectId=55804, result=True
+[89.85s] [NetworkGameManager] RequestEndTurn called. localNetworkPlayer=55804, CurrentTurnObjectId=55804
+[89.85s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=55804, localObjectId=55804, result=True
+[89.85s] [NetworkGameManager] Requesting end turn...
+[89.85s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=55804, localObjectId=55804, result=True
+[89.90s] [NetworkGameManager] Turn number: 1 -> 2
+[89.90s] [NetworkGameManager] Turn changed: ObjectId 55804 -> ObjectId 12382 (asServer=True)
+[89.90s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=12382, localObjectId=55804, result=False
+[89.90s] [Server] SyncVar callback - notifying encounter. isLocalTurn=False, turnNumber=2
+[89.90s] [EncounterController] Network turn changed. Local turn: False, Turn #: 2, initialized: True
+[89.90s] [EncounterController] Starting network turn. isCurrentPlayerTurn: False
+[89.90s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[89.90s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[89.90s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[89.90s] Opponent draws Flying Fox.
+[89.90s] [EncounterController] Opponent's turn. Waiting...
+[89.90s] [Server] Turn ended. Now ObjectId 12382's turn. Turn #2
+[89.97s] [Client RPC] Received turn state: TurnObjectId=12382, TurnNumber=2, GameStarted=True
+[89.97s] [NetworkGameManager] Turn number: 1 -> 2
+[89.97s] [NetworkGameManager] Turn changed: ObjectId 55804 -> ObjectId 12382 (asServer=False)
+[90.00s] [Server] CmdIncreaseMaxMana received for Player 1, amount: 1
+[90.00s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
+[90.00s] [NetworkPlayer] Player 1 mana: 1 -> 2 (asServer: True)
+[90.00s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
+[90.00s] [Server] Player 1 max mana increased to 2
+[90.07s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
+[90.07s] [NetworkPlayer] Player 1 mana: 1 -> 2 (asServer: False)
+[90.07s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
+[91.80s] [Server] Player 1 playing Flying Fox to slot 2
+[91.80s] [NetworkPlayer] Player 1 mana: 2 -> 0 (asServer: True)
+[91.80s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[91.87s] [Client] Executing card play: Flying Fox to slot 2 for Player 1
+[91.87s] Flying Fox has been added to the board.
+[91.87s] [Client] Flying Fox played to OpponentSlot-3
+[91.87s] [NetworkPlayer] Player 1 mana: 2 -> 0 (asServer: False)
+[91.87s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[92.40s] [NetworkGameManager] Turn number: 2 -> 3
+[92.40s] [NetworkGameManager] Turn changed: ObjectId 12382 -> ObjectId 55804 (asServer=True)
+[92.40s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=55804, localObjectId=55804, result=True
+[92.40s] [Server] SyncVar callback - notifying encounter. isLocalTurn=True, turnNumber=3
+[92.40s] [EncounterController] Network turn changed. Local turn: True, Turn #: 3, initialized: True
+[92.40s] [EncounterController] Starting network turn. isCurrentPlayerTurn: True
+[92.40s] [EncounterController] Calling CmdIncreaseMaxMana for Player 0
+[92.40s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[92.40s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[92.40s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[92.40s] Player draws Flying Fox.
+[92.40s] [EncounterController] Your turn! Cards are playable.
+[92.40s] [Server] Turn ended. Now ObjectId 55804's turn. Turn #3
+[92.43s] [Server] CmdIncreaseMaxMana received for Player 0, amount: 1
+[92.43s] [PlayerController] Player UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
+[92.43s] [NetworkPlayer] Player 0 mana: 1 -> 2 (asServer: True)
+[92.43s] [PlayerController] Player UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
+[92.43s] [Server] Player 0 max mana increased to 2
+[92.47s] [Client RPC] Received turn state: TurnObjectId=55804, TurnNumber=3, GameStarted=True
+[92.47s] [NetworkGameManager] Turn number: 2 -> 3
+[92.47s] [NetworkGameManager] Turn changed: ObjectId 12382 -> ObjectId 55804 (asServer=False)
+[92.50s] [PlayerController] Player UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
+[92.50s] [NetworkPlayer] Player 0 mana: 1 -> 2 (asServer: False)
+[92.50s] [PlayerController] Player UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
+[93.53s] [PlayerConnectionHandler] OnRemoteConnectionState: ClientId=1, State=Stopped
+[93.53s] [PlayerConnectionHandler] Player disconnected: Connection ID 1
+[93.53s] [PlayerConnectionHandler] Player 1 preserved for reconnection
+[93.53s] [PlayerConnectionHandler] Remaining connected players: 1, Disconnected awaiting reconnect: 1
+[93.53s] [Server] ServerOnPlayerDisconnected called for player 1. GameStarted=True
+[93.53s] [Server] Player 1 disconnected during game! Setting OpponentDisconnected=true
+[93.53s] [NetworkGameManager] OpponentDisconnected changed: False -> True, asServer=True
+[93.53s] [NetworkGameManager] Calling OnOpponentDisconnected with grace period 30
+[93.53s] [EncounterController] OnOpponentDisconnected called! Waiting 30s for reconnect...
+[93.53s] [EncounterController] disconnectPanel is null: False, disconnectStatusText is null: False
+[93.54s] [EncounterController] DisconnectPanel activated
+[93.60s] [NetworkGameManager] OpponentDisconnected changed: False -> True, asServer=False
+[93.60s] [NetworkGameManager] Calling OnOpponentDisconnected with grace period 30
+[93.60s] [EncounterController] OnOpponentDisconnected called! Waiting 30s for reconnect...
+[93.60s] [EncounterController] disconnectPanel is null: False, disconnectStatusText is null: False
+[93.60s] [EncounterController] DisconnectPanel activated
+[101.43s] [PlayerConnectionHandler] OnRemoteConnectionState: ClientId=2, State=Started
+[101.43s] [PlayerConnectionHandler] Player connected: Connection ID 2
+[101.43s] [PlayerConnectionHandler] Player 1 reconnecting with Connection ID 2
+[101.43s] [WARN] Ownership has been transfered to ConnectionId 2 but this is not recommended until after they have loaded start scenes. You can be notified when a connection loads start scenes by using connection.OnLoadedStartScenes on the connection, or SceneManager.OnClientLoadStartScenes.
+[101.43s] [PlayerConnectionHandler] Player 1 reconnected! Ownership transferred.
+[101.43s] [Server] Player 1 reconnected!
+[101.43s] [NetworkGameManager] OpponentDisconnected changed: True -> False, asServer=True
+[101.43s] [NetworkGameManager] Opponent reconnected!
+[101.43s] [EncounterController] Opponent reconnected! Resuming game...
+[101.50s] [NetworkGameManager] OpponentDisconnected changed: True -> False, asServer=False
+[101.93s] [Server] Sending game state to reconnected player 1
+[101.93s] [Server] Captured game state: Turn 3, LocalHand=4, OpponentHand=3
+[102.03s] [Client] Received full game state restoration RPC
+[102.03s] [Client] Restoring cards from snapshot...
+[102.03s] [Client] RestoreCardsFromSnapshot: isServer=True, snapshotFromServer=True
+[102.03s] [Client] Restoring - mySnapshot hand: 4, theirSnapshot hand: 3
+[102.03s] [Client] Clearing board and hands...
+[102.03s] [Client] Restoring cards for Player: 4 hand, 0 board, 16 deck
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [Client] Restored hand card: Card
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [Client] Restored hand card: Owl
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [Client] Restored hand card: Flying Fox
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [Client] Restored hand card: Flying Fox
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.04s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [Client] Restored 16 deck cards
+[102.05s] [Client] Restoring cards for Opponent: 3 hand, 1 board, 16 deck
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [Client] Restored board card: Flying Fox to OpponentSlot-3 with HP=3
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [Client] Restored hand card: Owl
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [Client] Restored hand card: Card
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [Client] Restored hand card: Card
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[102.05s] [Client] Restored 16 deck cards
+[102.05s] [Client] Card restoration complete!
+[102.05s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=55804, localObjectId=55804, result=True
+[102.06s] [EncounterController] Restoring turn state: Local turn: True, Turn #: 3
+[102.06s] [EncounterController] Game state restored!
+[102.06s] [PlayerController] Player UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
+[102.06s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[102.13s] [WARN] Player prefab is empty and cannot be spawned for connection 2.
+[109.12s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=55804, localObjectId=55804, result=True
+[109.92s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=55804, localObjectId=55804, result=True
+[109.92s] [ERROR] No support ability found for card Flying Fox
+[111.72s] [HandController] Sending network card play: card 3, slot 2
+[111.77s] [Server] Player 0 playing Flying Fox to slot 2
+[111.77s] [NetworkPlayer] Player 0 mana: 2 -> 0 (asServer: True)
+[111.77s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[111.83s] [Client] Executing card play: Flying Fox to slot 2 for Player 0
+[111.83s] Flying Fox has been added to the board.
+[111.83s] [Client] Flying Fox played to PlayerSlot-3
+[111.83s] [NetworkPlayer] Player 0 mana: 2 -> 0 (asServer: False)
+[111.83s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[117.00s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=55804, localObjectId=55804, result=True
+[117.63s] [NetworkPlayer] Player left: Player 1 (ID: 1)
 
-=== Log ended: 2026-01-05 09:36:50 ===
+=== Log ended: 2026-01-05 10:48:01 ===

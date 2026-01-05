@@ -119,7 +119,7 @@ public class EncounterController : MonoBehaviour
     /// </summary>
     public void OnNetworkTurnChanged(bool isLocalPlayerTurn, int networkTurnNumber)
     {
-        Debug.Log($"[EncounterController] Network turn changed. Local turn: {isLocalPlayerTurn}, Turn #: {networkTurnNumber}, initialized: {networkInitialized}");
+        Debug.Log($"[EncounterController] Network turn changed. Local turn: {isLocalPlayerTurn}, Turn #: {networkTurnNumber}, current turnNumber: {turnNumber}, initialized: {networkInitialized}");
         
         // Ignore turn changes before the encounter is initialized
         if (!networkInitialized)
@@ -128,6 +128,10 @@ public class EncounterController : MonoBehaviour
             return;
         }
         
+        // Check if this is the same turn we already know about (e.g., from state restoration)
+        // This can happen with buffered RPCs after reconnection
+        bool isSameTurn = (networkTurnNumber == turnNumber);
+        
         // Sync turn state
         isCurrentPlayerTurn = isLocalPlayerTurn;
         turnNumber = networkTurnNumber;
@@ -135,9 +139,25 @@ public class EncounterController : MonoBehaviour
         
         // Turn 1 is handled by OnNetworkGameStarted (initial draw + mana)
         // Only call StartTurnNetwork for turn 2+
-        if (networkTurnNumber > 1)
+        // BUT skip if this is a duplicate of the current turn (state restoration already handled it)
+        if (networkTurnNumber > 1 && !isSameTurn)
         {
             StartTurnNetwork();
+        }
+        else if (networkTurnNumber > 1 && isSameTurn)
+        {
+            Debug.Log($"[EncounterController] Skipping StartTurnNetwork - same turn ({networkTurnNumber}) already restored");
+            // Still need to update UI for current turn state
+            if (isLocalPlayerTurn)
+            {
+                playerHandController.VisualizePlayableHand();
+                playerHandController.VisualizePlayableBoard();
+            }
+            else
+            {
+                playerHandController.HidePlayableHand();
+                playerHandController.HidePlayableBoard();
+            }
         }
         else
         {
@@ -291,7 +311,8 @@ public class EncounterController : MonoBehaviour
     /// </summary>
     private void StartTurnNetwork()
     {
-        Debug.Log($"[EncounterController] Starting network turn. isCurrentPlayerTurn: {isCurrentPlayerTurn}");
+        Debug.Log($"[EncounterController] StartTurnNetwork called! isCurrentPlayerTurn: {isCurrentPlayerTurn}, turnNumber: {turnNumber}");
+        Debug.Log($"[EncounterController] player.deck.Count={player?.deck?.Count ?? -1}, opponent.deck.Count={opponent?.deck?.Count ?? -1}");
         
         // BOTH clients draw for the current player (decks are in same order due to seed)
         // This keeps hands in sync on both sides
@@ -391,6 +412,8 @@ public class EncounterController : MonoBehaviour
 
     private void DrawCard(PlayerController player)
     {
+        Debug.Log($"[EncounterController] DrawCard called for {player?.name ?? "null"}, deck.Count={player?.deck?.Count ?? -1}");
+        
         HandController handController = player == this.player ? playerHandController : opponentHandController;
 
         if (handController.GetHand().Count >= maxHandSize)
@@ -411,11 +434,11 @@ public class EncounterController : MonoBehaviour
             // Add the card to the player's hand using the HandController
             handController.AddCardToHand(drawnCard);
 
-            Debug.Log($"{player.name} draws {drawnCard.cardName}.");
+            Debug.Log($"[EncounterController] {player.name} draws {drawnCard.cardName}. Remaining deck: {player.deck.Count}");
         }
         else
         {
-            Debug.Log($"{player.name} has no more cards to draw.");
+            Debug.Log($"[EncounterController] {player.name} has no more cards to draw.");
         }
     }
     
@@ -576,6 +599,17 @@ public class EncounterController : MonoBehaviour
     public void OnGameStateRestored()
     {
         Debug.Log("[EncounterController] Game state restored!");
+        Debug.Log($"[EncounterController] player.deck.Count={player?.deck?.Count ?? -1}, opponent.deck.Count={opponent?.deck?.Count ?? -1}");
+        
+        // Verify player references match NetworkGameManager
+        var ngm = NetworkGameManager.Instance;
+        if (ngm != null)
+        {
+            Debug.Log($"[EncounterController] player == ngm.localPlayerController: {player == ngm.localPlayerController}");
+            Debug.Log($"[EncounterController] opponent == ngm.opponentPlayerController: {opponent == ngm.opponentPlayerController}");
+            Debug.Log($"[EncounterController] ngm.localPlayerController.deck.Count={ngm.localPlayerController?.deck?.Count ?? -1}");
+        }
+        
         isGamePaused = false;
         networkInitialized = true; // Enable turn processing for reconnected client
         

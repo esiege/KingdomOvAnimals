@@ -1,0 +1,2 @@
+=== ReconnectionManager log started: 2026-01-05 10:48:03 ===
+[10:48:03.455] EditorUpdate: Play mode stopped, canceling reconnection wait

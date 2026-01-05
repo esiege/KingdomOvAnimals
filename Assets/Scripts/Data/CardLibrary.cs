@@ -99,6 +99,14 @@ public class CardLibrary : MonoBehaviour
     }
     
     /// <summary>
+    /// Get all registered cards.
+    /// </summary>
+    public Dictionary<string, CardController>.ValueCollection GetAllCards()
+    {
+        return _cardLookup.Values;
+    }
+    
+    /// <summary>
     /// Auto-populate the library from existing decks in the scene.
     /// Should be called early in game startup (e.g., from EncounterController).
     /// </summary>
@@ -112,8 +120,12 @@ public class CardLibrary : MonoBehaviour
         
         // Find all PlayerControllers and gather their deck cards
         PlayerController[] players = FindObjectsOfType<PlayerController>();
+        Debug.Log($"[CardLibrary] Found {players.Length} PlayerController(s)");
+        
         foreach (var player in players)
         {
+            Debug.Log($"[CardLibrary] Checking {player.name}: deck={(player.deck != null ? player.deck.Count.ToString() : "null")}, board={(player.board != null ? player.board.Count.ToString() : "null")}");
+            
             if (player.deck != null)
             {
                 foreach (var card in player.deck)
@@ -147,8 +159,38 @@ public class CardLibrary : MonoBehaviour
             }
         }
         
+        // Fallback: If still no cards found, search ALL CardControllers in the scene
+        if (_cardLookup.Count == 0)
+        {
+            Debug.Log("[CardLibrary] No cards found in PlayerController decks, searching all CardControllers...");
+            CardController[] allCards = FindObjectsOfType<CardController>(true); // Include inactive
+            Debug.Log($"[CardLibrary] Found {allCards.Length} CardController(s) in scene");
+            
+            foreach (var card in allCards)
+            {
+                if (card != null && !string.IsNullOrEmpty(card.cardName))
+                {
+                    if (!_cardLookup.ContainsKey(card.cardName))
+                    {
+                        _cardLookup[card.cardName] = card;
+                        Debug.Log($"[CardLibrary] Fallback registered: {card.cardName}");
+                    }
+                }
+            }
+        }
+        
         _hasPopulated = true;
         Debug.Log($"[CardLibrary] Auto-populate complete. Total cards: {_cardLookup.Count}");
+    }
+    
+    /// <summary>
+    /// Force re-population (useful for reconnection scenarios).
+    /// </summary>
+    public void ForceRepopulate()
+    {
+        _hasPopulated = false;
+        _cardLookup.Clear();
+        AutoPopulateFromScene();
     }
     
     /// <summary>

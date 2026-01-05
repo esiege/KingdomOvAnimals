@@ -59,14 +59,15 @@ public class PlayerConnectionHandler : MonoBehaviour
     {
         if (_reconnectLog != null) return;
         
+        // Use Logs folder (not Docs) with .log extension - Unity ignores these for domain reload
         string dir = Application.isEditor 
-            ? Path.Combine(Application.dataPath, "..", "Docs")
-            : Path.Combine(Application.dataPath, "..", "..", "Docs");
+            ? Path.Combine(Application.dataPath, "..", "Logs", "GameLogs")
+            : Path.Combine(Application.dataPath, "..", "..", "Logs", "GameLogs");
         
         if (!Directory.Exists(dir))
             Directory.CreateDirectory(dir);
             
-        string filename = Application.isEditor ? "reconnect_editor.txt" : "reconnect_build.txt";
+        string filename = Application.isEditor ? "reconnect_editor.log" : "reconnect_build.log";
         _reconnectLogPath = Path.Combine(dir, filename);
         
         _reconnectLog = new StreamWriter(_reconnectLogPath, false);
@@ -109,6 +110,9 @@ public class PlayerConnectionHandler : MonoBehaviour
             return;
         }
 
+        // Initialize the static reconnection manager
+        ReconnectionManager.Initialize();
+
         // Subscribe to server events for remote client connections
         _networkManager.ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
         Debug.Log("[PlayerConnectionHandler] Subscribed to ServerManager.OnRemoteConnectionState");
@@ -150,13 +154,16 @@ public class PlayerConnectionHandler : MonoBehaviour
     /// </summary>
     private void OnClientConnectionState(ClientConnectionStateArgs args)
     {
-        Debug.Log($"[PlayerConnectionHandler] OnClientConnectionState: {args.ConnectionState}, _isWaitingForHostReconnect={_isWaitingForHostReconnect}");
-        LogReconnect($"OnClientConnectionState: {args.ConnectionState}, _isWaitingForHostReconnect={_isWaitingForHostReconnect}");
+        // Check both local state and ReconnectionManager state
+        bool isWaiting = _isWaitingForHostReconnect || ReconnectionManager.IsWaitingForReconnect;
+        
+        Debug.Log($"[PlayerConnectionHandler] OnClientConnectionState: {args.ConnectionState}, _isWaitingForHostReconnect={_isWaitingForHostReconnect}, ReconnectionManager.IsWaiting={ReconnectionManager.IsWaitingForReconnect}");
+        LogReconnect($"OnClientConnectionState: {args.ConnectionState}, _isWaitingForHostReconnect={_isWaitingForHostReconnect}, ReconnectionManager.IsWaiting={ReconnectionManager.IsWaitingForReconnect}");
         
         if (args.ConnectionState == LocalConnectionState.Started)
         {
             // Successfully connected/reconnected
-            if (_isWaitingForHostReconnect)
+            if (isWaiting)
             {
                 Debug.Log("[PlayerConnectionHandler] Connection started while waiting for reconnect - triggering OnReconnectedToHost!");
                 LogReconnect("Connection started while waiting for reconnect - triggering OnReconnectedToHost!");
@@ -176,7 +183,7 @@ public class PlayerConnectionHandler : MonoBehaviour
             
             // If we're not the server (i.e., we're the client that lost connection)
             // and we're not already in a reconnection wait
-            if (!_networkManager.IsServerStarted && !_isWaitingForHostReconnect)
+            if (!_networkManager.IsServerStarted && !isWaiting)
             {
                 OnHostDisconnected();
             }
@@ -197,9 +204,11 @@ public class PlayerConnectionHandler : MonoBehaviour
         
         // Save current game state
         EncounterController encounterController = FindObjectOfType<EncounterController>();
+        GameStateSnapshot savedState = null;
         if (encounterController != null && NetworkGameManager.Instance != null)
         {
-            _savedGameState = GameStateSnapshot.CaptureState(encounterController, NetworkGameManager.Instance);
+            savedState = GameStateSnapshot.CaptureState(encounterController, NetworkGameManager.Instance);
+            _savedGameState = savedState;
             Debug.Log($"[PlayerConnectionHandler] Game state saved: {_savedGameState != null}");
             LogReconnect($"Game state saved: {_savedGameState != null}");
         }
@@ -214,11 +223,14 @@ public class PlayerConnectionHandler : MonoBehaviour
             LogReconnect($"Saved connection info: {_lastServerAddress}:{_lastServerPort}");
         }
         
-        // Start waiting for reconnect
+        // Start waiting for reconnect using BOTH local state AND static manager
         _isWaitingForHostReconnect = true;
         _hostReconnectTimer = 0f;
         _nextReconnectAttempt = _reconnectAttemptInterval;
         LogReconnect($"Set _isWaitingForHostReconnect = true, timer = 0, nextAttempt = {_reconnectAttemptInterval}");
+        
+        // Also start the static reconnection manager as a fallback
+        ReconnectionManager.StartReconnectionWait(_networkManager, _lastServerAddress, _lastServerPort, savedState);
         
         // Show waiting UI
         if (encounterController != null)
@@ -294,10 +306,14 @@ public class PlayerConnectionHandler : MonoBehaviour
     /// </summary>
     public void OnReconnectedToHost()
     {
-        Debug.Log($"[PlayerConnectionHandler] OnReconnectedToHost called! _isWaitingForHostReconnect={_isWaitingForHostReconnect}, _savedGameState={((_savedGameState != null) ? "exists" : "null")}");
-        LogReconnect($"OnReconnectedToHost called! _isWaitingForHostReconnect={_isWaitingForHostReconnect}, _savedGameState={((_savedGameState != null) ? "exists" : "null")}");
+        // Check both local state and ReconnectionManager state
+        bool wasWaiting = _isWaitingForHostReconnect || ReconnectionManager.IsWaitingForReconnect;
+        GameStateSnapshot savedState = _savedGameState ?? ReconnectionManager.SavedState;
         
-        if (!_isWaitingForHostReconnect) 
+        Debug.Log($"[PlayerConnectionHandler] OnReconnectedToHost called! _isWaitingForHostReconnect={_isWaitingForHostReconnect}, ReconnectionManager.IsWaiting={ReconnectionManager.IsWaitingForReconnect}, savedState={(savedState != null ? "exists" : "null")}");
+        LogReconnect($"OnReconnectedToHost called! wasWaiting={wasWaiting}, savedState={(savedState != null ? "exists" : "null")}");
+        
+        if (!wasWaiting) 
         {
             Debug.Log("[PlayerConnectionHandler] Not waiting for reconnect, ignoring");
             LogReconnect("OnReconnectedToHost: Not waiting for reconnect, ignoring");
@@ -307,6 +323,7 @@ public class PlayerConnectionHandler : MonoBehaviour
         Debug.Log("[PlayerConnectionHandler] Reconnected to host! Processing...");
         LogReconnect("Reconnected to host! Processing...");
         _isWaitingForHostReconnect = false;
+        ReconnectionManager.OnReconnected();
         
         // Hide disconnect UI
         EncounterController encounterController = FindObjectOfType<EncounterController>();
@@ -316,10 +333,10 @@ public class PlayerConnectionHandler : MonoBehaviour
         }
         
         // Restore game state locally AND send to host
-        if (_savedGameState != null)
+        if (savedState != null)
         {
             Debug.Log("[PlayerConnectionHandler] Starting game state restoration coroutine...");
-            StartCoroutine(RestoreAndSendGameState(encounterController));
+            StartCoroutine(RestoreAndSendGameState(encounterController, savedState));
         }
         else
         {
@@ -330,28 +347,30 @@ public class PlayerConnectionHandler : MonoBehaviour
     /// <summary>
     /// Restore game state locally and send to host for sync.
     /// </summary>
-    private IEnumerator RestoreAndSendGameState(EncounterController encounterController)
+    private IEnumerator RestoreAndSendGameState(EncounterController encounterController, GameStateSnapshot savedState)
     {
         // Wait for NetworkPlayer to be ready
         yield return new WaitForSeconds(0.5f);
         
         // Restore locally first - client needs to see the game state
-        if (_savedGameState != null && NetworkGameManager.Instance != null)
+        if (savedState != null && NetworkGameManager.Instance != null)
         {
             Debug.Log("[PlayerConnectionHandler] Restoring game state locally after host reconnect...");
-            NetworkGameManager.Instance.RestoreGameStateLocally(_savedGameState);
+            NetworkGameManager.Instance.RestoreGameStateLocally(savedState);
         }
         
         // Also send to host so it can sync (in case host lost state)
         var localPlayer = NetworkGameManager.Instance?.GetLocalPlayer();
-        if (localPlayer != null && _savedGameState != null)
+        if (localPlayer != null && savedState != null)
         {
             Debug.Log("[PlayerConnectionHandler] Sending saved game state to host...");
-            string stateJson = _savedGameState.ToJson();
+            string stateJson = savedState.ToJson();
             localPlayer.ServerRestoreGameState(stateJson);
         }
         
+        // Clear the saved states
         _savedGameState = null;
+        ReconnectionManager.ClearSavedState();
     }
     
     private IEnumerator ReturnToMainMenuDelayed(float delay)
@@ -454,10 +473,10 @@ public class PlayerConnectionHandler : MonoBehaviour
         
         Debug.Log($"[PlayerConnectionHandler] Player {playerId} reconnected! Ownership transferred.");
         
-        // Notify NetworkGameManager
+        // Notify NetworkGameManager with the connection for targeted RPC
         if (NetworkGameManager.Instance != null)
         {
-            NetworkGameManager.Instance.ServerOnPlayerReconnected(playerId);
+            NetworkGameManager.Instance.ServerOnPlayerReconnected(playerId, conn);
         }
     }
 

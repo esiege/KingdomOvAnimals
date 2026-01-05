@@ -12,8 +12,8 @@ using System;
 /// </summary>
 public class ConsoleLogToFile : MonoBehaviour
 {
-    [Tooltip("Base path relative to project root. Filename will be replaced with 'log_editor.txt' or 'log_build.txt'")]
-    public string logFilePath = "Logs/GameLogs/log.txt";
+    [Tooltip("Base path relative to project root. Filename will be replaced with 'log_editor.log' or 'log_build.log'")]
+    public string logFilePath = "Logs/GameLogs/log.log";
     
     [Tooltip("Include stack traces in log file")]
     public bool includeStackTrace = true;
@@ -41,9 +41,9 @@ public class ConsoleLogToFile : MonoBehaviour
         // Determine if we're in editor or build
         bool isEditor = Application.isEditor;
         
-        // Set filename based on editor vs build
+        // Set filename based on editor vs build - use .log extension to avoid Unity domain reload
         string dir = Path.GetDirectoryName(logFilePath);
-        string filename = isEditor ? "log_editor.txt" : "log_build.txt";
+        string filename = isEditor ? "log_editor.log" : "log_build.log";
         string basePath = Path.Combine(dir ?? "", filename);
         
         // Resolve path - use different base for editor vs build

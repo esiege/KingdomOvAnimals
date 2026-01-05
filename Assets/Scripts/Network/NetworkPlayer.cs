@@ -448,10 +448,18 @@ public class NetworkPlayer : NetworkBehaviour
         var card = hand[cardIndex];
         
         // Find the slot
+        // For opponent cards, mirror the slot index so front/back perspective is correct
+        // Slot 1 (front) <-> Slot 3 (back) swap for opponent view
+        int displaySlotIndex = slotIndex;
         string slotName = $"PlayerSlot-{slotIndex + 1}";
         if (LinkedPlayerController != null && LinkedPlayerController.gameObject.name == "Opponent")
         {
-            slotName = $"OpponentSlot-{slotIndex + 1}";
+            // Mirror slots: 0->2, 1->1, 2->0 (slot 1 stays, slots 0 and 2 swap)
+            if (slotIndex == 0) displaySlotIndex = 2;
+            else if (slotIndex == 2) displaySlotIndex = 0;
+            // slotIndex 1 (middle) stays the same
+            
+            slotName = $"OpponentSlot-{displaySlotIndex + 1}";
         }
         
         var slot = GameObject.Find(slotName);
@@ -503,9 +511,19 @@ public class NetworkPlayer : NetworkBehaviour
     private HandController GetHandController()
     {
         var encounterController = GameObject.FindObjectOfType<EncounterController>();
-        if (encounterController == null) return null;
+        if (encounterController == null)
+        {
+            Debug.LogWarning($"[NetworkPlayer] GetHandController: EncounterController is null!");
+            return null;
+        }
         
         // Determine which hand controller based on whether this is the local player
+        if (LinkedPlayerController == null)
+        {
+            Debug.LogWarning($"[NetworkPlayer] GetHandController: LinkedPlayerController is null for {PlayerName.Value}!");
+            return null;
+        }
+        
         if (LinkedPlayerController == encounterController.player)
         {
             return encounterController.playerHandController;
@@ -515,6 +533,7 @@ public class NetworkPlayer : NetworkBehaviour
             return encounterController.opponentHandController;
         }
         
+        Debug.LogWarning($"[NetworkPlayer] GetHandController: LinkedPlayerController ({LinkedPlayerController.name}) doesn't match player ({encounterController.player?.name}) or opponent ({encounterController.opponent?.name})");
         return null;
     }
     
@@ -1048,16 +1067,27 @@ public class NetworkPlayer : NetworkBehaviour
     
     /// <summary>
     /// Flips slot perspective: PlayerSlot-X becomes OpponentSlot-X and vice versa.
+    /// Also mirrors slot numbers (1<->3) for front/back visual consistency.
     /// </summary>
     private string FlipSlotPerspective(string slotName)
     {
+        // Helper to mirror slot numbers: 1<->3, 2 stays
+        string MirrorSlotNumber(string name)
+        {
+            if (name.EndsWith("-1")) return name.Substring(0, name.Length - 1) + "3";
+            if (name.EndsWith("-3")) return name.Substring(0, name.Length - 1) + "1";
+            return name; // -2 stays the same
+        }
+        
         if (slotName.StartsWith("PlayerSlot-"))
         {
-            return slotName.Replace("PlayerSlot-", "OpponentSlot-");
+            string translated = slotName.Replace("PlayerSlot-", "OpponentSlot-");
+            return MirrorSlotNumber(translated);
         }
         else if (slotName.StartsWith("OpponentSlot-"))
         {
-            return slotName.Replace("OpponentSlot-", "PlayerSlot-");
+            string translated = slotName.Replace("OpponentSlot-", "PlayerSlot-");
+            return MirrorSlotNumber(translated);
         }
         return null;
     }
@@ -1146,13 +1176,19 @@ public class NetworkPlayer : NetworkBehaviour
         }
         
         // If the target owner is the local player, use PlayerSlot, otherwise OpponentSlot
+        // For opponent slots, mirror the index: 0<->2 (front/back swap for visual consistency)
         if (targetOwnerId == localPlayer.PlayerId.Value)
         {
             return $"PlayerSlot-{slotIndex + 1}";
         }
         else
         {
-            return $"OpponentSlot-{slotIndex + 1}";
+            // Mirror slots for opponent: 0->2, 1->1, 2->0
+            int mirroredIndex = slotIndex;
+            if (slotIndex == 0) mirroredIndex = 2;
+            else if (slotIndex == 2) mirroredIndex = 0;
+            
+            return $"OpponentSlot-{mirroredIndex + 1}";
         }
     }
     

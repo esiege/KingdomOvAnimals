@@ -1,3 +1,4 @@
-=== Reconnect log started: 2026-01-05 09:36:50 ===
-[09:36:50.612] OnDestroy called! _isWaitingForHostReconnect=False
-=== Reconnect log ended: 2026-01-05 09:36:50 ===
+=== Reconnect log started: 2026-01-05 10:48:01 ===
+[10:48:01.964] OnDestroy called on instance 9016! _isWaitingForHostReconnect=False, Instance=this
+[10:48:01.964] WARNING: Singleton instance 9016 is being destroyed!
+=== Reconnect log ended: 2026-01-05 10:48:01 ===
