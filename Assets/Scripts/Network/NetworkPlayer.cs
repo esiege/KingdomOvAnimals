@@ -460,6 +460,9 @@ public class NetworkPlayer : NetworkBehaviour
             LinkedPlayerController.AddCardToBoard(card);
         }
         
+        // Refresh hand highlighting (clear stuck highlights)
+        handController.VisualizePlayableHand();
+        
         Debug.Log($"[Client] {card.cardName} played to {slot.name}");
     }
     

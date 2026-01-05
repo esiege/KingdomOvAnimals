@@ -28,14 +28,23 @@ public class EncounterController : MonoBehaviour
     [Header("Turn Indicator")]
     public TextMeshProUGUI turnIndicatorText;
     
+    [Header("Disconnect UI")]
+    public GameObject disconnectPanel;
+    public TextMeshProUGUI disconnectStatusText;
+    
     // Network mode flag
     private bool isNetworkGame = false;
     private bool networkInitialized = false;
     private NetworkGameManager networkGameManager;
+    private bool isGamePaused = false;
 
     // Initialization method
     void Start()
     {
+        // Hide disconnect panel at start
+        if (disconnectPanel != null)
+            disconnectPanel.SetActive(false);
+            
         // Check if we're in a network game
         networkGameManager = NetworkGameManager.Instance;
         isNetworkGame = networkGameManager != null;
@@ -343,9 +352,16 @@ public class EncounterController : MonoBehaviour
     
     /// <summary>
     /// Check if it's currently the local player's turn.
+    /// Returns false if game is paused (opponent disconnected).
     /// </summary>
     public bool IsLocalPlayerTurn()
     {
+        // Can't take actions while game is paused
+        if (isGamePaused)
+        {
+            return false;
+        }
+        
         if (isNetworkGame && networkGameManager != null)
         {
             return networkGameManager.IsLocalPlayerTurn();
@@ -382,5 +398,114 @@ public class EncounterController : MonoBehaviour
             Debug.Log($"{player.name} has no more cards to draw.");
         }
     }
-
+    
+    #region Disconnect Handling
+    
+    /// <summary>
+    /// Called when opponent disconnects from the game.
+    /// </summary>
+    public void OnOpponentDisconnected(float gracePeriod)
+    {
+        Debug.Log($"[EncounterController] Opponent disconnected! Waiting {gracePeriod}s for reconnect...");
+        isGamePaused = true;
+        
+        // Show disconnect UI
+        if (disconnectPanel != null)
+        {
+            disconnectPanel.SetActive(true);
+        }
+        
+        if (disconnectStatusText != null)
+        {
+            disconnectStatusText.text = $"Opponent disconnected!\nWaiting for reconnect... {gracePeriod:F0}s";
+        }
+        
+        // Hide playable indicators
+        playerHandController?.HidePlayableHand();
+        playerHandController?.HidePlayableBoard();
+        playerHandController?.HideBoardTargets();
+    }
+    
+    /// <summary>
+    /// Called every frame while waiting for reconnect to update timer display.
+    /// </summary>
+    public void UpdateDisconnectTimer(float remainingTime)
+    {
+        if (disconnectStatusText != null)
+        {
+            disconnectStatusText.text = $"Opponent disconnected!\nWaiting for reconnect... {remainingTime:F0}s";
+        }
+    }
+    
+    /// <summary>
+    /// Called when opponent reconnects.
+    /// </summary>
+    public void OnOpponentReconnected()
+    {
+        Debug.Log("[EncounterController] Opponent reconnected! Resuming game...");
+        isGamePaused = false;
+        
+        // Hide disconnect UI
+        if (disconnectPanel != null)
+        {
+            disconnectPanel.SetActive(false);
+        }
+        
+        // Re-show playable indicators if it's our turn
+        if (isCurrentPlayerTurn)
+        {
+            playerHandController?.VisualizePlayableHand();
+            playerHandController?.VisualizePlayableBoard();
+        }
+    }
+    
+    /// <summary>
+    /// Called when opponent forfeits (grace period expired).
+    /// </summary>
+    public void OnOpponentForfeited()
+    {
+        Debug.Log("[EncounterController] Opponent forfeited! You win!");
+        
+        if (disconnectStatusText != null)
+        {
+            disconnectStatusText.text = "Opponent forfeited!\n\nYOU WIN!\n\nReturning to menu...";
+        }
+        
+        // Could trigger victory animation/sound here
+    }
+    
+    /// <summary>
+    /// Called when the host disconnects (client only).
+    /// </summary>
+    public void OnHostDisconnected()
+    {
+        Debug.Log("[EncounterController] Host disconnected!");
+        isGamePaused = true;
+        
+        if (disconnectPanel != null)
+        {
+            disconnectPanel.SetActive(true);
+        }
+        
+        if (disconnectStatusText != null)
+        {
+            disconnectStatusText.text = "Host disconnected!\n\nReturning to menu...";
+        }
+        
+        // Return to menu after a short delay
+        StartCoroutine(ReturnToMenuAfterDelay(3f));
+    }
+    
+    private System.Collections.IEnumerator ReturnToMenuAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+    }
+    
+    /// <summary>
+    /// Check if the game is currently paused (e.g., opponent disconnected).
+    /// </summary>
+    public bool IsGamePaused => isGamePaused;
+    
+    #endregion
 }

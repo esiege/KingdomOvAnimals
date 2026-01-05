@@ -3,12 +3,13 @@ using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
 /// <summary>
 /// Manages the networked game state in the DuelScreen scene.
 /// Links spawned NetworkPlayer objects to local PlayerController objects.
-/// Also handles turn synchronization.
+/// Also handles turn synchronization and disconnect handling.
 /// </summary>
 public class NetworkGameManager : NetworkBehaviour
 {
@@ -44,12 +45,26 @@ public class NetworkGameManager : NetworkBehaviour
     /// Random seed for deterministic deck shuffling. Set by server, synced to clients.
     /// </summary>
     public readonly SyncVar<int> ShuffleSeed = new SyncVar<int>(0);
+    
+    /// <summary>
+    /// Whether an opponent has disconnected (synced to all clients).
+    /// </summary>
+    public readonly SyncVar<bool> OpponentDisconnected = new SyncVar<bool>(false);
 
+    [Header("Disconnect Settings")]
+    [Tooltip("Seconds to wait for reconnection before declaring victory")]
+    public float reconnectGracePeriod = 30f;
+    
     [Header("Runtime State")]
     private NetworkPlayer localNetworkPlayer;
     private NetworkPlayer opponentNetworkPlayer;
     
     private Dictionary<int, NetworkPlayer> networkPlayers = new Dictionary<int, NetworkPlayer>();
+    
+    // Disconnect handling
+    private float disconnectTimer = 0f;
+    private bool isWaitingForReconnect = false;
+    private int disconnectedPlayerId = -1;
 
     private void Awake()
     {
@@ -64,6 +79,7 @@ public class NetworkGameManager : NetworkBehaviour
         CurrentTurnObjectId.OnChange += OnTurnChanged;
         TurnNumber.OnChange += OnTurnNumberChanged;
         GameStarted.OnChange += OnGameStartedChanged;
+        OpponentDisconnected.OnChange += OnOpponentDisconnectedChanged;
     }
     
     private void OnDestroy()
@@ -71,6 +87,50 @@ public class NetworkGameManager : NetworkBehaviour
         CurrentTurnObjectId.OnChange -= OnTurnChanged;
         TurnNumber.OnChange -= OnTurnNumberChanged;
         GameStarted.OnChange -= OnGameStartedChanged;
+        OpponentDisconnected.OnChange -= OnOpponentDisconnectedChanged;
+    }
+    
+    private void Update()
+    {
+        // Handle reconnect grace period timer
+        if (isWaitingForReconnect && !OpponentDisconnected.Value)
+        {
+            // Opponent reconnected!
+            isWaitingForReconnect = false;
+            disconnectTimer = 0f;
+            Debug.Log("[NetworkGameManager] Opponent reconnected!");
+            
+            if (encounterController != null)
+            {
+                encounterController.OnOpponentReconnected();
+            }
+        }
+        else if (isWaitingForReconnect)
+        {
+            disconnectTimer += Time.deltaTime;
+            
+            // Update UI with remaining time
+            float remainingTime = reconnectGracePeriod - disconnectTimer;
+            if (encounterController != null)
+            {
+                encounterController.UpdateDisconnectTimer(remainingTime);
+            }
+            
+            // Grace period expired
+            if (disconnectTimer >= reconnectGracePeriod)
+            {
+                Debug.Log("[NetworkGameManager] Reconnect grace period expired - opponent forfeits!");
+                isWaitingForReconnect = false;
+                
+                if (encounterController != null)
+                {
+                    encounterController.OnOpponentForfeited();
+                }
+                
+                // Return to main menu after a short delay
+                StartCoroutine(ReturnToMainMenuDelayed(3f));
+            }
+        }
     }
 
     public override void OnStartClient()
@@ -139,19 +199,33 @@ public class NetworkGameManager : NetworkBehaviour
         if (!networkPlayers.ContainsKey(objectId))
         {
             networkPlayers[objectId] = player;
-            Debug.Log($"[NetworkGameManager] Registered NetworkPlayer: {player.PlayerName.Value} (ObjectId: {objectId}, PlayerId: {player.PlayerId.Value})");
+            Debug.Log($"[NetworkGameManager] Registered NetworkPlayer: {player.PlayerName.Value} (ObjectId: {objectId}, PlayerId: {player.PlayerId.Value}, IsOwner: {player.IsOwner})");
         }
         
-        // Check if this is our local player
+        // Check if this is our local player - only set if not already set
         if (player.IsOwner)
         {
-            localNetworkPlayer = player;
-            Debug.Log($"[NetworkGameManager] Local player identified: {player.PlayerName.Value}");
+            if (localNetworkPlayer == null || localNetworkPlayer == player)
+            {
+                localNetworkPlayer = player;
+                Debug.Log($"[NetworkGameManager] Local player identified: {player.PlayerName.Value} (ObjectId: {objectId})");
+            }
+            else
+            {
+                Debug.LogWarning($"[NetworkGameManager] Local player already set to {localNetworkPlayer.PlayerName.Value}, ignoring {player.PlayerName.Value}");
+            }
         }
         else
         {
-            opponentNetworkPlayer = player;
-            Debug.Log($"[NetworkGameManager] Opponent identified: {player.PlayerName.Value}");
+            if (opponentNetworkPlayer == null || opponentNetworkPlayer == player)
+            {
+                opponentNetworkPlayer = player;
+                Debug.Log($"[NetworkGameManager] Opponent identified: {player.PlayerName.Value} (ObjectId: {objectId})");
+            }
+            else
+            {
+                Debug.LogWarning($"[NetworkGameManager] Opponent already set to {opponentNetworkPlayer.PlayerName.Value}, ignoring {player.PlayerName.Value}");
+            }
         }
         
         // Try to link after each registration
@@ -236,7 +310,17 @@ public class NetworkGameManager : NetworkBehaviour
     /// </summary>
     public bool IsLocalPlayerTurn()
     {
-        if (localNetworkPlayer == null) return false;
+        if (localNetworkPlayer == null)
+        {
+            Debug.LogWarning("[NetworkGameManager] IsLocalPlayerTurn called but localNetworkPlayer is NULL! Trying to find it...");
+            TryFindLocalPlayer();
+            
+            if (localNetworkPlayer == null)
+            {
+                Debug.LogError("[NetworkGameManager] Could not find localNetworkPlayer!");
+                return false;
+            }
+        }
         
         // Simply check if the current turn ObjectId matches local player's ObjectId
         bool isLocal = CurrentTurnObjectId.Value == localNetworkPlayer.ObjectId;
@@ -245,13 +329,32 @@ public class NetworkGameManager : NetworkBehaviour
     }
     
     /// <summary>
+    /// Try to find and set the local player if not already set.
+    /// </summary>
+    private void TryFindLocalPlayer()
+    {
+        NetworkPlayer[] players = FindObjectsOfType<NetworkPlayer>();
+        foreach (var player in players)
+        {
+            if (player.IsOwner)
+            {
+                localNetworkPlayer = player;
+                Debug.Log($"[NetworkGameManager] Found local player: {player.PlayerName.Value} (ObjectId: {player.ObjectId})");
+                return;
+            }
+        }
+    }
+    
+    /// <summary>
     /// Request to end the current turn (client calls this).
     /// </summary>
     public void RequestEndTurn()
     {
+        Debug.Log($"[NetworkGameManager] RequestEndTurn called. localNetworkPlayer={(localNetworkPlayer != null ? localNetworkPlayer.ObjectId.ToString() : "NULL")}, CurrentTurnObjectId={CurrentTurnObjectId.Value}");
+        
         if (!IsLocalPlayerTurn())
         {
-            Debug.LogWarning("[NetworkGameManager] Cannot end turn - not your turn!");
+            Debug.LogWarning($"[NetworkGameManager] Cannot end turn - not your turn! localPlayer={(localNetworkPlayer != null ? localNetworkPlayer.ObjectId.ToString() : "NULL")}, currentTurn={CurrentTurnObjectId.Value}");
             return;
         }
         
@@ -405,6 +508,73 @@ public class NetworkGameManager : NetworkBehaviour
         {
             Debug.Log($"[NetworkGameManager] Cannot init encounter yet - encounterController={(encounterController != null)}, localPlayer={(localNetworkPlayer != null)}");
         }
+    }
+    
+    /// <summary>
+    /// Called when OpponentDisconnected SyncVar changes.
+    /// </summary>
+    private void OnOpponentDisconnectedChanged(bool oldValue, bool newValue, bool asServer)
+    {
+        Debug.Log($"[NetworkGameManager] OpponentDisconnected changed: {oldValue} -> {newValue}");
+        
+        if (newValue && !oldValue)
+        {
+            // Opponent just disconnected
+            isWaitingForReconnect = true;
+            disconnectTimer = 0f;
+            
+            if (encounterController != null)
+            {
+                encounterController.OnOpponentDisconnected(reconnectGracePeriod);
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Server: Called when a player disconnects during the game.
+    /// </summary>
+    [Server]
+    public void ServerOnPlayerDisconnected(int playerId)
+    {
+        if (!GameStarted.Value) return;
+        
+        Debug.Log($"[Server] Player {playerId} disconnected during game!");
+        disconnectedPlayerId = playerId;
+        OpponentDisconnected.Value = true;
+    }
+    
+    /// <summary>
+    /// Server: Called when a player reconnects.
+    /// </summary>
+    [Server]
+    public void ServerOnPlayerReconnected(int playerId)
+    {
+        if (disconnectedPlayerId == playerId)
+        {
+            Debug.Log($"[Server] Player {playerId} reconnected!");
+            OpponentDisconnected.Value = false;
+            disconnectedPlayerId = -1;
+        }
+    }
+    
+    /// <summary>
+    /// Return to main menu after a delay.
+    /// </summary>
+    private System.Collections.IEnumerator ReturnToMainMenuDelayed(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        
+        // Stop networking
+        if (InstanceFinder.NetworkManager != null)
+        {
+            if (InstanceFinder.NetworkManager.IsServerStarted)
+                InstanceFinder.NetworkManager.ServerManager.StopConnection(true);
+            if (InstanceFinder.NetworkManager.IsClientStarted)
+                InstanceFinder.NetworkManager.ClientManager.StopConnection();
+        }
+        
+        // Load main menu (use full namespace to avoid FishNet.SceneManager conflict)
+        UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
     }
     
     #endregion
