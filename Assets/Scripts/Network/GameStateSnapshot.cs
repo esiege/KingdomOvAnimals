@@ -14,9 +14,16 @@ public class GameStateSnapshot
     public int currentTurnObjectId;
     public int shuffleSeed;
     
-    // Player states
+    // Player states - named from capturing client's perspective
+    // localPlayer = whoever captured the snapshot's local player
+    // opponent = whoever captured the snapshot's opponent
     public PlayerSnapshot localPlayer;
     public PlayerSnapshot opponent;
+    
+    // Flag to indicate if this snapshot was captured from server (host) perspective
+    // When true: localPlayer = host's data, opponent = client's data
+    // When false: localPlayer = client's data, opponent = host's data
+    public bool isFromServerPerspective;
     
     // Timestamp for validation
     public long timestamp;

@@ -1,0 +1,3 @@
+=== Reconnect log started: 2026-01-05 09:36:50 ===
+[09:36:50.612] OnDestroy called! _isWaitingForHostReconnect=False
+=== Reconnect log ended: 2026-01-05 09:36:50 ===

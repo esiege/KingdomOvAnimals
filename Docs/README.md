@@ -63,11 +63,37 @@ Abilities are modular and support various targeting types:
 
 ## Documentation Index
 
+### Core Systems
 - [Architecture Overview](./architecture.md)
-- [Targeting System](./targeting.md) ⭐ *Core mechanic*
+- [Game Flow](./game-flow.md)
 - [Card System](./cards.md)
 - [Ability System](./abilities.md)
-- [Game Flow](./game-flow.md)
+- [Targeting System](./targeting.md)
+- [Utilities](./utilities.md)
+
+### Networking
+- [Networking Overview](./networking/README.md)
+- [NetworkGameManager](./networking/network-game-manager.md)
+- [PlayerConnectionHandler](./networking/player-connection-handler.md)
+- [NetworkPlayer](./networking/network-player.md)
+- [Turn Synchronization](./networking/turn-synchronization.md)
+- [Reconnection](./networking/reconnection.md)
+- [State Snapshot](./networking/state-snapshot.md)
+
+### Controllers
+- [Controllers Overview](./controllers/README.md)
+- [EncounterController](./controllers/encounter-controller.md)
+- [PlayerController](./controllers/player-controller.md)
+- [HandController](./controllers/hand-controller.md)
+- [TargetingController](./controllers/targeting-controller.md)
+- [CardController](./controllers/card-controller.md)
+- [EndTurnController](./controllers/end-turn-controller.md)
+
+### Troubleshooting
+- [Troubleshooting Index](./troubleshooting/README.md)
+- [Reconnection Debugging](./troubleshooting/reconnection-debugging.md)
+- [Turn Sync Issues](./troubleshooting/turn-sync-issues.md)
+- [DontDestroyOnLoad Issues](./troubleshooting/dont-destroy-on-load.md)
 
 ## Getting Started
 

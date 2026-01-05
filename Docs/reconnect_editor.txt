@@ -1,0 +1,10 @@
+=== Reconnect log started: 2026-01-05 09:36:50 ===
+[09:36:50.622] OnClientConnectionState: Stopping, _isWaitingForHostReconnect=False
+[09:36:50.652] OnClientConnectionState: Stopped, _isWaitingForHostReconnect=False
+[09:36:50.652] Lost connection to host! IsServerStarted=False, _isWaitingForHostReconnect=False
+[09:36:50.653] OnHostDisconnected called - starting reconnection wait
+[09:36:50.658] Game state saved: True
+[09:36:50.659] Saved connection info: localhost:7770
+[09:36:50.659] Set _isWaitingForHostReconnect = true, timer = 0, nextAttempt = 3
+[09:36:51.722] OnDestroy called! _isWaitingForHostReconnect=True
+=== Reconnect log ended: 2026-01-05 09:36:51 ===

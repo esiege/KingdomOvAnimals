@@ -5,7 +5,12 @@ This folder contains documentation for issues encountered during development and
 ## Index
 
 ### FishNet Networking
-- [fishnet-syncvar-issues.md](fishnet-syncvar-issues.md) - SyncVar synchronization problems and fixes
+- [SyncVar Issues](./fishnet-syncvar-issues.md) - Default values, dirty state, initial sync
+- [Reconnection Debugging](./reconnection-debugging.md) - Object lifecycle, logging issues
+- [Turn Sync Issues](./turn-sync-issues.md) - Duplicate actions, wrong player execution
+
+### Unity Lifecycle
+- [DontDestroyOnLoad Issues](./dont-destroy-on-load.md) - Persistence and destruction problems
 
 ## How to Use This Guide
 

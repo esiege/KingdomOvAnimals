@@ -161,6 +161,23 @@ public class EncounterController : MonoBehaviour
     }
     
     /// <summary>
+    /// Restore turn state after reconnection (without triggering turn effects).
+    /// </summary>
+    public void RestoreTurnState(bool isLocalPlayerTurn, int networkTurnNumber)
+    {
+        Debug.Log($"[EncounterController] Restoring turn state: Local turn: {isLocalPlayerTurn}, Turn #: {networkTurnNumber}");
+        
+        // Set turn state without triggering new turn effects
+        isCurrentPlayerTurn = isLocalPlayerTurn;
+        turnNumber = networkTurnNumber;
+        currentPlayer = isLocalPlayerTurn ? player : opponent;
+        networkInitialized = true; // Enable turn processing
+        
+        // Update turn indicator UI
+        UpdateTurnIndicator();
+    }
+    
+    /// <summary>
     /// Updates the turn indicator UI to show whose turn it is.
     /// </summary>
     private void UpdateTurnIndicator()
@@ -560,6 +577,7 @@ public class EncounterController : MonoBehaviour
     {
         Debug.Log("[EncounterController] Game state restored!");
         isGamePaused = false;
+        networkInitialized = true; // Enable turn processing for reconnected client
         
         // Hide disconnect panel
         if (disconnectPanel != null)
@@ -570,6 +588,21 @@ public class EncounterController : MonoBehaviour
         // Refresh UI
         player?.UpdatePlayerUI();
         opponent?.UpdatePlayerUI();
+        
+        // Update turn indicator
+        UpdateTurnIndicator();
+        
+        // Update playable cards based on current turn
+        if (isCurrentPlayerTurn)
+        {
+            playerHandController?.VisualizePlayableHand();
+            playerHandController?.VisualizePlayableBoard();
+        }
+        else
+        {
+            playerHandController?.HidePlayableHand();
+            playerHandController?.HidePlayableBoard();
+        }
     }
     
     private System.Collections.IEnumerator ReturnToMenuAfterDelay(float delay)

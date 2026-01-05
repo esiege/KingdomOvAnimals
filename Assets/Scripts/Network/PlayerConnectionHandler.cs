@@ -5,6 +5,7 @@ using FishNet.Object;
 using FishNet.Transporting;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 /// <summary>
@@ -49,22 +50,57 @@ public class PlayerConnectionHandler : MonoBehaviour
     private GameStateSnapshot _savedGameState;
     private string _lastServerAddress;
     private ushort _lastServerPort;
+    
+    // Direct file logging for debugging reconnection (independent of Unity logging)
+    private static StreamWriter _reconnectLog;
+    private static string _reconnectLogPath;
+    
+    private static void InitReconnectLog()
+    {
+        if (_reconnectLog != null) return;
+        
+        string dir = Application.isEditor 
+            ? Path.Combine(Application.dataPath, "..", "Docs")
+            : Path.Combine(Application.dataPath, "..", "..", "Docs");
+        
+        if (!Directory.Exists(dir))
+            Directory.CreateDirectory(dir);
+            
+        string filename = Application.isEditor ? "reconnect_editor.txt" : "reconnect_build.txt";
+        _reconnectLogPath = Path.Combine(dir, filename);
+        
+        _reconnectLog = new StreamWriter(_reconnectLogPath, false);
+        _reconnectLog.AutoFlush = true;
+        _reconnectLog.WriteLine($"=== Reconnect log started: {System.DateTime.Now:yyyy-MM-dd HH:mm:ss} ===");
+    }
+    
+    private static void LogReconnect(string message)
+    {
+        InitReconnectLog();
+        string timestamp = System.DateTime.Now.ToString("HH:mm:ss.fff");
+        _reconnectLog?.WriteLine($"[{timestamp}] {message}");
+    }
 
     private void Awake()
     {
+        LogReconnect($"Awake called on instance {GetInstanceID()}, gameObject={gameObject.name}, scene={gameObject.scene.name}");
+        
         // Singleton pattern - destroy duplicate instances
         if (Instance != null && Instance != this)
         {
-            Debug.Log("[PlayerConnectionHandler] Duplicate instance found, destroying this one");
+            Debug.Log($"[PlayerConnectionHandler] Duplicate instance {GetInstanceID()} found (original={Instance.GetInstanceID()}), destroying this one");
+            LogReconnect($"Duplicate instance {GetInstanceID()} found (original={Instance.GetInstanceID()}), destroying this one");
             Destroy(gameObject);
             return;
         }
         Instance = this;
         
-        Debug.Log("[PlayerConnectionHandler] Awake - initializing...");
+        Debug.Log($"[PlayerConnectionHandler] Awake - initializing instance {GetInstanceID()}...");
+        LogReconnect($"Instance {GetInstanceID()} set as singleton");
         
         // Persist across scene loads
         DontDestroyOnLoad(gameObject);
+        LogReconnect($"DontDestroyOnLoad called for instance {GetInstanceID()}");
         
         _networkManager = InstanceFinder.NetworkManager;
         if (_networkManager == null)
@@ -84,10 +120,27 @@ public class PlayerConnectionHandler : MonoBehaviour
 
     private void OnDestroy()
     {
+        LogReconnect($"OnDestroy called on instance {GetInstanceID()}! _isWaitingForHostReconnect={_isWaitingForHostReconnect}, Instance={(Instance == this ? "this" : (Instance == null ? "null" : Instance.GetInstanceID().ToString()))}");
+        
+        // Don't clear Instance if we're not the singleton (we're being destroyed as a duplicate)
+        if (Instance == this)
+        {
+            LogReconnect($"WARNING: Singleton instance {GetInstanceID()} is being destroyed!");
+            Instance = null;
+        }
+        
         if (_networkManager != null)
         {
             _networkManager.ServerManager.OnRemoteConnectionState -= OnRemoteConnectionState;
             _networkManager.ClientManager.OnClientConnectionState -= OnClientConnectionState;
+        }
+        
+        // Close reconnect log
+        if (_reconnectLog != null)
+        {
+            _reconnectLog.WriteLine($"=== Reconnect log ended: {System.DateTime.Now:yyyy-MM-dd HH:mm:ss} ===");
+            _reconnectLog.Close();
+            _reconnectLog = null;
         }
     }
 
@@ -97,26 +150,39 @@ public class PlayerConnectionHandler : MonoBehaviour
     /// </summary>
     private void OnClientConnectionState(ClientConnectionStateArgs args)
     {
-        Debug.Log($"[PlayerConnectionHandler] OnClientConnectionState: {args.ConnectionState}");
+        Debug.Log($"[PlayerConnectionHandler] OnClientConnectionState: {args.ConnectionState}, _isWaitingForHostReconnect={_isWaitingForHostReconnect}");
+        LogReconnect($"OnClientConnectionState: {args.ConnectionState}, _isWaitingForHostReconnect={_isWaitingForHostReconnect}");
         
         if (args.ConnectionState == LocalConnectionState.Started)
         {
             // Successfully connected/reconnected
             if (_isWaitingForHostReconnect)
             {
+                Debug.Log("[PlayerConnectionHandler] Connection started while waiting for reconnect - triggering OnReconnectedToHost!");
+                LogReconnect("Connection started while waiting for reconnect - triggering OnReconnectedToHost!");
                 OnReconnectedToHost();
+            }
+            else
+            {
+                Debug.Log("[PlayerConnectionHandler] Connection started (normal connect, not reconnect)");
+                LogReconnect("Connection started (normal connect, not reconnect)");
             }
         }
         else if (args.ConnectionState == LocalConnectionState.Stopped)
         {
             // We lost connection to the server (host disconnected)
             Debug.Log("[PlayerConnectionHandler] Lost connection to host!");
+            LogReconnect($"Lost connection to host! IsServerStarted={_networkManager.IsServerStarted}, _isWaitingForHostReconnect={_isWaitingForHostReconnect}");
             
             // If we're not the server (i.e., we're the client that lost connection)
             // and we're not already in a reconnection wait
             if (!_networkManager.IsServerStarted && !_isWaitingForHostReconnect)
             {
                 OnHostDisconnected();
+            }
+            else
+            {
+                LogReconnect($"Skipping OnHostDisconnected because IsServerStarted={_networkManager.IsServerStarted} or already waiting");
             }
         }
     }
@@ -127,6 +193,7 @@ public class PlayerConnectionHandler : MonoBehaviour
     private void OnHostDisconnected()
     {
         Debug.Log("[PlayerConnectionHandler] Host disconnected! Starting reconnection wait...");
+        LogReconnect("OnHostDisconnected called - starting reconnection wait");
         
         // Save current game state
         EncounterController encounterController = FindObjectOfType<EncounterController>();
@@ -134,6 +201,7 @@ public class PlayerConnectionHandler : MonoBehaviour
         {
             _savedGameState = GameStateSnapshot.CaptureState(encounterController, NetworkGameManager.Instance);
             Debug.Log($"[PlayerConnectionHandler] Game state saved: {_savedGameState != null}");
+            LogReconnect($"Game state saved: {_savedGameState != null}");
         }
         
         // Save server connection info for reconnection
@@ -143,12 +211,14 @@ public class PlayerConnectionHandler : MonoBehaviour
             _lastServerAddress = transport.GetClientAddress();
             _lastServerPort = transport.GetPort();
             Debug.Log($"[PlayerConnectionHandler] Saved connection info: {_lastServerAddress}:{_lastServerPort}");
+            LogReconnect($"Saved connection info: {_lastServerAddress}:{_lastServerPort}");
         }
         
         // Start waiting for reconnect
         _isWaitingForHostReconnect = true;
         _hostReconnectTimer = 0f;
         _nextReconnectAttempt = _reconnectAttemptInterval;
+        LogReconnect($"Set _isWaitingForHostReconnect = true, timer = 0, nextAttempt = {_reconnectAttemptInterval}");
         
         // Show waiting UI
         if (encounterController != null)
@@ -177,6 +247,8 @@ public class PlayerConnectionHandler : MonoBehaviour
             if (_nextReconnectAttempt <= 0f)
             {
                 _nextReconnectAttempt = _reconnectAttemptInterval;
+                Debug.Log($"[PlayerConnectionHandler] Reconnect timer expired, attempting reconnect... (timer={_hostReconnectTimer:F1}s)");
+                LogReconnect($"Reconnect timer expired, attempting reconnect (timer={_hostReconnectTimer:F1}s)");
                 AttemptReconnect();
             }
             
@@ -206,10 +278,12 @@ public class PlayerConnectionHandler : MonoBehaviour
         if (string.IsNullOrEmpty(_lastServerAddress))
         {
             Debug.Log("[PlayerConnectionHandler] No server address saved, cannot reconnect");
+            LogReconnect("AttemptReconnect: No server address saved, cannot reconnect");
             return;
         }
         
         Debug.Log($"[PlayerConnectionHandler] Attempting to reconnect to {_lastServerAddress}:{_lastServerPort}...");
+        LogReconnect($"AttemptReconnect: Calling StartConnection to {_lastServerAddress}:{_lastServerPort}");
         
         // Try to connect
         _networkManager.ClientManager.StartConnection(_lastServerAddress, _lastServerPort);
@@ -220,9 +294,18 @@ public class PlayerConnectionHandler : MonoBehaviour
     /// </summary>
     public void OnReconnectedToHost()
     {
-        if (!_isWaitingForHostReconnect) return;
+        Debug.Log($"[PlayerConnectionHandler] OnReconnectedToHost called! _isWaitingForHostReconnect={_isWaitingForHostReconnect}, _savedGameState={((_savedGameState != null) ? "exists" : "null")}");
+        LogReconnect($"OnReconnectedToHost called! _isWaitingForHostReconnect={_isWaitingForHostReconnect}, _savedGameState={((_savedGameState != null) ? "exists" : "null")}");
         
-        Debug.Log("[PlayerConnectionHandler] Reconnected to host!");
+        if (!_isWaitingForHostReconnect) 
+        {
+            Debug.Log("[PlayerConnectionHandler] Not waiting for reconnect, ignoring");
+            LogReconnect("OnReconnectedToHost: Not waiting for reconnect, ignoring");
+            return;
+        }
+        
+        Debug.Log("[PlayerConnectionHandler] Reconnected to host! Processing...");
+        LogReconnect("Reconnected to host! Processing...");
         _isWaitingForHostReconnect = false;
         
         // Hide disconnect UI
@@ -232,21 +315,34 @@ public class PlayerConnectionHandler : MonoBehaviour
             encounterController.OnHostReconnected();
         }
         
-        // Send saved game state to restore
+        // Restore game state locally AND send to host
         if (_savedGameState != null)
         {
-            StartCoroutine(SendGameStateToHost());
+            Debug.Log("[PlayerConnectionHandler] Starting game state restoration coroutine...");
+            StartCoroutine(RestoreAndSendGameState(encounterController));
+        }
+        else
+        {
+            Debug.LogWarning("[PlayerConnectionHandler] No saved game state to restore!");
         }
     }
     
     /// <summary>
-    /// Send the saved game state to the host for restoration.
+    /// Restore game state locally and send to host for sync.
     /// </summary>
-    private IEnumerator SendGameStateToHost()
+    private IEnumerator RestoreAndSendGameState(EncounterController encounterController)
     {
         // Wait for NetworkPlayer to be ready
         yield return new WaitForSeconds(0.5f);
         
+        // Restore locally first - client needs to see the game state
+        if (_savedGameState != null && NetworkGameManager.Instance != null)
+        {
+            Debug.Log("[PlayerConnectionHandler] Restoring game state locally after host reconnect...");
+            NetworkGameManager.Instance.RestoreGameStateLocally(_savedGameState);
+        }
+        
+        // Also send to host so it can sync (in case host lost state)
         var localPlayer = NetworkGameManager.Instance?.GetLocalPlayer();
         if (localPlayer != null && _savedGameState != null)
         {

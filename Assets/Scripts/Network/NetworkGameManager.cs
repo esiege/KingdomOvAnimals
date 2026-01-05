@@ -68,6 +68,9 @@ public class NetworkGameManager : NetworkBehaviour
     private float disconnectTimer = 0f;
     private bool isWaitingForReconnect = false;
     private int disconnectedPlayerId = -1;
+    
+    // Reconnection flag - client sets this when it was disconnected and is reconnecting
+    private bool _isReconnecting = false;
 
     private void Awake()
     {
@@ -150,8 +153,37 @@ public class NetworkGameManager : NetworkBehaviour
         base.OnStartClient();
         Debug.Log("[NetworkGameManager] Client started, looking for NetworkPlayers...");
         
+        // Reset cached state for reconnection scenarios
+        // This ensures a reconnecting client gets fresh state from the server
+        _cachedTurnObjectId = -1;
+        _cachedTurnNumber = 0;
+        _cachedGameStarted = false;
+        _cachedShuffleSeed = 0;
+        
+        // Note: Don't reset _encounterInitialized here - it will be handled by RPC
+        // The BufferLast RPC will re-send the game state to the reconnecting client
+        
         // Find all NetworkPlayer objects that have been spawned
         StartCoroutine(FindAndLinkPlayers());
+    }
+
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+        Debug.Log("[NetworkGameManager] Client stopped - resetting state for potential reconnect");
+        
+        // If game was in progress, mark as reconnecting so we don't re-initialize from scratch
+        if (GameStarted.Value && _encounterInitialized)
+        {
+            _isReconnecting = true;
+            Debug.Log("[NetworkGameManager] Game was in progress - will wait for state restoration on reconnect");
+        }
+        
+        // Reset state so reconnection works properly
+        _encounterInitialized = false;
+        localNetworkPlayer = null;
+        opponentNetworkPlayer = null;
+        networkPlayers.Clear();
     }
 
     private System.Collections.IEnumerator FindAndLinkPlayers()
@@ -625,6 +657,13 @@ public class NetworkGameManager : NetworkBehaviour
         if (_encounterInitialized) return;
         if (!GameStarted.Value) return;
         
+        // If we're reconnecting, don't do normal initialization - wait for state restoration RPC
+        if (_isReconnecting)
+        {
+            Debug.Log("[NetworkGameManager] Reconnecting - skipping normal initialization, waiting for state restoration");
+            return;
+        }
+        
         // Try to find encounterController if not set
         if (encounterController == null)
         {
@@ -706,7 +745,142 @@ public class NetworkGameManager : NetworkBehaviour
             Debug.Log($"[Server] Player {playerId} reconnected!");
             OpponentDisconnected.Value = false;
             disconnectedPlayerId = -1;
+            
+            // Send current game state to the reconnected player
+            StartCoroutine(SendGameStateToReconnectedPlayer(playerId));
         }
+    }
+    
+    /// <summary>
+    /// Send the current game state to a reconnected player after a short delay.
+    /// </summary>
+    [Server]
+    private System.Collections.IEnumerator SendGameStateToReconnectedPlayer(int playerId)
+    {
+        // Wait a moment for the client to fully reconnect and sync
+        yield return new WaitForSeconds(0.5f);
+        
+        Debug.Log($"[Server] Sending game state to reconnected player {playerId}");
+        
+        // Capture current game state from server's perspective
+        var snapshot = CaptureServerGameState();
+        if (snapshot != null)
+        {
+            string snapshotJson = snapshot.ToJson();
+            RpcRestoreFullGameState(snapshotJson);
+        }
+        else
+        {
+            Debug.LogWarning("[Server] Failed to capture game state for reconnected player");
+        }
+    }
+    
+    /// <summary>
+    /// Capture the current game state from the server's perspective.
+    /// </summary>
+    [Server]
+    private GameStateSnapshot CaptureServerGameState()
+    {
+        if (encounterController == null)
+        {
+            Debug.LogError("[Server] Cannot capture game state - no EncounterController!");
+            return null;
+        }
+        
+        var snapshot = new GameStateSnapshot
+        {
+            turnNumber = TurnNumber.Value,
+            currentTurnObjectId = CurrentTurnObjectId.Value,
+            shuffleSeed = ShuffleSeed.Value,
+            isFromServerPerspective = true, // Mark that this was captured from server
+            
+            // Host player (server's local) = "local" in snapshot
+            localPlayer = CapturePlayerSnapshot(encounterController.player, encounterController.playerHandController),
+            // Client player (opponent from server view) = "opponent" in snapshot  
+            opponent = CapturePlayerSnapshot(encounterController.opponent, encounterController.opponentHandController)
+        };
+        
+        Debug.Log($"[Server] Captured game state: Turn {snapshot.turnNumber}, LocalHand={snapshot.localPlayer?.handCardIds?.Count ?? 0}, OpponentHand={snapshot.opponent?.handCardIds?.Count ?? 0}");
+        
+        return snapshot;
+    }
+    
+    /// <summary>
+    /// Capture a player's current state into a snapshot.
+    /// </summary>
+    private PlayerSnapshot CapturePlayerSnapshot(PlayerController controller, HandController handController)
+    {
+        if (controller == null) return null;
+        
+        var snapshot = new PlayerSnapshot
+        {
+            health = controller.currentHealth,
+            mana = controller.currentMana,
+            maxMana = controller.maxMana,
+            handCardIds = new System.Collections.Generic.List<string>(),
+            boardCards = new System.Collections.Generic.List<BoardCardSnapshot>(),
+            deckCardIds = new System.Collections.Generic.List<string>()
+        };
+        
+        // Capture hand cards using GetHand() method
+        if (handController != null)
+        {
+            var hand = handController.GetHand();
+            if (hand != null)
+            {
+                foreach (var card in hand)
+                {
+                    if (card != null)
+                    {
+                        snapshot.handCardIds.Add(card.cardName);
+                    }
+                }
+            }
+        }
+        
+        // Capture board cards from PlayerController.board
+        if (controller.board != null)
+        {
+            for (int i = 0; i < controller.board.Count; i++)
+            {
+                var card = controller.board[i];
+                if (card != null)
+                {
+                    string slotName = "";
+                    if (card.transform.parent != null)
+                    {
+                        slotName = card.transform.parent.name;
+                    }
+                    
+                    snapshot.boardCards.Add(new BoardCardSnapshot
+                    {
+                        slotIndex = i,
+                        slotName = slotName,
+                        cardId = card.cardName,
+                        currentHealth = card.health,
+                        maxHealth = card.health,
+                        currentAttack = card.manaCost,
+                        hasAttacked = card.isTapped,
+                        hasSummoningSickness = card.hasSummoningSickness,
+                        canAttack = !card.hasSummoningSickness && !card.isTapped
+                    });
+                }
+            }
+        }
+        
+        // Capture deck
+        if (controller.deck != null)
+        {
+            foreach (var card in controller.deck)
+            {
+                if (card != null)
+                {
+                    snapshot.deckCardIds.Add(card.cardName);
+                }
+            }
+        }
+        
+        return snapshot;
     }
     
     /// <summary>
@@ -797,12 +971,57 @@ public class NetworkGameManager : NetworkBehaviour
             return;
         }
         
+        // Clear reconnection flag since we're now restoring
+        if (_isReconnecting)
+        {
+            Debug.Log("[Client] Reconnection state restoration - clearing reconnect flag");
+            _isReconnecting = false;
+            _encounterInitialized = true; // Mark as initialized since we're restoring
+        }
+        
         // Restore cards on this client
         RestoreCardsFromSnapshot(snapshot);
         
-        // Notify encounter controller
+        // Restore and broadcast turn state after cards are restored
         if (encounterController != null)
         {
+            // Determine whose turn it is
+            bool isLocalTurn = IsLocalPlayerTurn();
+            encounterController.RestoreTurnState(isLocalTurn, snapshot.turnNumber);
+            encounterController.OnGameStateRestored();
+        }
+    }
+    
+    /// <summary>
+    /// Restore game state locally (called by client when host reconnects).
+    /// This allows clients to restore their view without waiting for server RPC.
+    /// </summary>
+    public void RestoreGameStateLocally(GameStateSnapshot snapshot)
+    {
+        if (snapshot == null)
+        {
+            Debug.LogError("[Client] Cannot restore null game state locally!");
+            return;
+        }
+        
+        Debug.Log($"[Client] Restoring game state locally: Turn {snapshot.turnNumber}");
+        
+        // Clear reconnection flag since we're now restoring
+        _isReconnecting = false;
+        _encounterInitialized = true;
+        
+        // The snapshot was captured from THIS client's perspective (before host disconnect)
+        // So isFromServerPerspective should be false
+        snapshot.isFromServerPerspective = false;
+        
+        // Restore cards
+        RestoreCardsFromSnapshot(snapshot);
+        
+        // Restore turn state
+        if (encounterController != null)
+        {
+            bool isLocalTurn = IsLocalPlayerTurn();
+            encounterController.RestoreTurnState(isLocalTurn, snapshot.turnNumber);
             encounterController.OnGameStateRestored();
         }
     }
@@ -824,8 +1043,11 @@ public class NetworkGameManager : NetworkBehaviour
         }
         
         // Determine which snapshot data applies to which local controller
-        // This depends on whether we're the host or client
+        // This depends on whether we're the host or client AND who captured the snapshot
         bool isServer = IsServerInitialized;
+        bool snapshotFromServer = snapshot.isFromServerPerspective;
+        
+        Debug.Log($"[Client] RestoreCardsFromSnapshot: isServer={isServer}, snapshotFromServer={snapshotFromServer}");
         
         PlayerSnapshot mySnapshot;
         PlayerSnapshot theirSnapshot;
@@ -837,39 +1059,59 @@ public class NetworkGameManager : NetworkBehaviour
         string theirSlotPrefix;
         bool needsSlotTranslation;
         
-        if (isServer)
+        if (snapshotFromServer)
         {
-            // On server: "opponent" in snapshot is ME (host), "localPlayer" is the client
-            // The snapshot was captured from the CLIENT's perspective, so:
-            // - snapshot.localPlayer has slots like "PlayerSlot-X" (client's view of their slots)
-            // - snapshot.opponent has slots like "OpponentSlot-X" (client's view of host slots)
-            // On server:
-            // - My slots (host) are "PlayerSlot-X", so snapshot.opponent slots need translation from "OpponentSlot" -> "PlayerSlot"
-            // - Their slots (client) are "OpponentSlot-X", so snapshot.localPlayer slots need translation from "PlayerSlot" -> "OpponentSlot"
-            mySnapshot = snapshot.opponent;
-            theirSnapshot = snapshot.localPlayer;
-            myController = localPlayerController;
-            theirController = opponentPlayerController;
-            myHand = encounterController?.playerHandController;
-            theirHand = encounterController?.opponentHandController;
-            mySlotPrefix = "PlayerSlot";
-            theirSlotPrefix = "OpponentSlot";
-            needsSlotTranslation = true; // Server needs to translate client's slot names
+            // Snapshot was captured from SERVER (host) perspective:
+            // - snapshot.localPlayer = HOST's data
+            // - snapshot.opponent = CLIENT's data
+            
+            if (isServer)
+            {
+                // We ARE the server - snapshot.localPlayer is our data
+                mySnapshot = snapshot.localPlayer;
+                theirSnapshot = snapshot.opponent;
+                needsSlotTranslation = false;
+            }
+            else
+            {
+                // We are CLIENT - snapshot.opponent is our data
+                mySnapshot = snapshot.opponent;
+                theirSnapshot = snapshot.localPlayer;
+                needsSlotTranslation = true; // Need to swap slot names since perspective is different
+            }
         }
         else
         {
-            // On client: "localPlayer" in snapshot is ME, "opponent" is the host
-            // The snapshot was captured from THIS client's perspective, so no translation needed
-            mySnapshot = snapshot.localPlayer;
-            theirSnapshot = snapshot.opponent;
-            myController = localPlayerController;
-            theirController = opponentPlayerController;
-            myHand = encounterController?.playerHandController;
-            theirHand = encounterController?.opponentHandController;
-            mySlotPrefix = "PlayerSlot";
-            theirSlotPrefix = "OpponentSlot";
-            needsSlotTranslation = false; // Client uses its own perspective
+            // Snapshot was captured from CLIENT perspective (original logic):
+            // - snapshot.localPlayer = CAPTURING CLIENT's data
+            // - snapshot.opponent = HOST's data
+            
+            if (isServer)
+            {
+                // On server receiving client snapshot:
+                // - snapshot.opponent is the HOST (us)
+                // - snapshot.localPlayer is the CLIENT
+                mySnapshot = snapshot.opponent;
+                theirSnapshot = snapshot.localPlayer;
+                needsSlotTranslation = true;
+            }
+            else
+            {
+                // On client: snapshot.localPlayer is ME
+                mySnapshot = snapshot.localPlayer;
+                theirSnapshot = snapshot.opponent;
+                needsSlotTranslation = false;
+            }
         }
+        
+        myController = localPlayerController;
+        theirController = opponentPlayerController;
+        myHand = encounterController?.playerHandController;
+        theirHand = encounterController?.opponentHandController;
+        mySlotPrefix = "PlayerSlot";
+        theirSlotPrefix = "OpponentSlot";
+        
+        Debug.Log($"[Client] Restoring - mySnapshot hand: {mySnapshot?.handCardIds?.Count ?? 0}, theirSnapshot hand: {theirSnapshot?.handCardIds?.Count ?? 0}");
         
         // Clear current board and hands before restoring
         ClearBoardAndHands();
@@ -877,7 +1119,6 @@ public class NetworkGameManager : NetworkBehaviour
         // Restore my state
         if (mySnapshot != null && myController != null)
         {
-            // On server: mySnapshot is from opponent's perspective, needs translation
             RestorePlayerCards(mySnapshot, myController, myHand, mySlotPrefix, needsSlotTranslation);
         }
         
