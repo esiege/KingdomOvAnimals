@@ -1,105 +1,256 @@
-=== Log started: 2026-01-04 20:20:13 (BUILD/CLIENT) ===
+=== Log started: 2026-01-04 22:42:41 (BUILD/CLIENT) ===
 === Log file: D:/Google Drive/Unity/KingdomOvAnimals/KingdomOvAnimals/Build/KingdomOvAnimals_Data\..\..\Docs\log_build.txt ===
 
 [0.04s] [ERROR] No cloud project ID was found by the Analytics SDK. This means Analytics events will not be sent. Please make sure to link your cloud project in the Unity editor to fix this problem.
-[9.53s] [MainMenu] Finding match...
-[9.54s] [MainMenu] Attempting to join existing game...
-[11.75s] [MainMenu] Connected to server!
-[12.53s] [NetworkPlayer] You are: Player 0 (ID: 0)
-[12.53s] [NetworkPlayer] Ownership gained! You are now: Player 0 (ID: 0)
-[12.68s] [WARN] Spawned NetworkObject was expected to exist but does not for Id 1. This may occur if you sent a NetworkObject reference which does not exist, be it destroyed or if the client does not have visibility.
-[13.19s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
-[13.19s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
-[13.19s] [WARN] HealAmountText is not assigned in HealAbility.
-[13.19s] [EncounterController] Network game detected, waiting for network to start game...
-[13.19s] [WARN] [TargetingController] Board slots not found - scene may still be loading
-[13.19s] No open slots available.
-[13.37s] [NetworkPlayer] Other player joined: Player 1 (ID: -8082)
-[13.37s] [NetworkGameManager] Client started, looking for NetworkPlayers...
-[13.37s] [NetworkPlayer] Player 1 health: 20 -> 0 (asServer: False)
-[13.37s] [NetworkPlayer] PlayerId changed: -1 -> -8082 (asServer: False, IsOwner: False)
-[13.37s] [NetworkGameManager] Game started: True
-[13.37s] [NetworkGameManager] Cannot init encounter yet - encounterController=True, localPlayer=False
-[13.37s] [NetworkGameManager] Turn number: 0 -> 1
-[13.37s] [NetworkGameManager] Turn changed: ObjectId -1 -> ObjectId 0
-[13.37s] [WARN] [NetworkGameManager] IsLocalPlayerTurn called but localNetworkPlayer is NULL! Trying to find it...
-[13.37s] [NetworkGameManager] Found local player: Player 0 (ObjectId: 0)
-[13.37s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=0, localObjectId=0, result=True
-[13.37s] [EncounterController] Network turn changed. Local turn: True, Turn #: 1, initialized: False
-[13.37s] [EncounterController] Ignoring turn change - not initialized yet
-[13.48s] [NetworkGameManager] Found 2 NetworkPlayer(s) after 1 attempts
-[13.48s] [NetworkGameManager] Registered NetworkPlayer: Player 1 (ObjectId: 1, PlayerId: -8082, IsOwner: False)
-[13.48s] [NetworkGameManager] Opponent identified: Player 1 (ObjectId: 1)
-[13.49s] [NetworkPlayer] UpdateLinkedController: Player 0 pushing Health=20, Mana=1 to Player
-[13.49s] [PlayerController] Player UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
-[13.49s] [NetworkPlayer] Player 0 linked to Player
-[13.49s] [NetworkGameManager] Linked local NetworkPlayer to PlayerController
-[13.49s] [NetworkPlayer] UpdateLinkedController: Player 1 pushing Health=20, Mana=1 to Opponent
-[13.49s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
-[13.49s] [NetworkPlayer] Player 1 linked to Opponent
-[13.49s] [NetworkGameManager] Linked opponent NetworkPlayer to OpponentController
-[13.49s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=0, localObjectId=0, result=True
-[13.49s] [NetworkGameManager] Initializing encounter with seed 51690866
-[13.49s] [EncounterController] Network game started! Local player goes first: True, Seed: 51690866
-[13.49s] Deck shuffled with seed 51690866!
-[13.49s] Deck shuffled with seed 51690867!
-[13.49s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[13.49s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[13.49s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[13.49s] Player draws Owl.
-[13.49s] [NetworkGameManager] Registered NetworkPlayer: Player 0 (ObjectId: 0, PlayerId: 0, IsOwner: True)
-[13.49s] [NetworkGameManager] Local player identified: Player 0 (ObjectId: 0)
-[13.60s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[13.60s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[13.60s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[13.60s] Opponent draws Card.
-[13.72s] Player draws Card.
-[13.72s] [WARN] HealAmountText is not assigned in HealAbility.
-[13.82s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[13.82s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[13.82s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[13.82s] Opponent draws Chip 'N Wail.
-[13.93s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[13.93s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[13.93s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[13.93s] Player draws Card.
-[14.03s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[14.03s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[14.03s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[14.03s] Opponent draws Card.
-[18.30s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=0, localObjectId=0, result=True
-[18.62s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=0, localObjectId=0, result=True
-[18.62s] [ERROR] No support ability found for card Card
-[18.97s] [HandController] Sending network card play: card 2, slot 1
-[19.10s] [Client] Executing card play: Card to slot 1 for Player 0
-[19.10s] Card has been added to the board.
-[19.10s] [Client] Card played to PlayerSlot-2
-[19.10s] [NetworkPlayer] Player 0 mana: 1 -> 0 (asServer: False)
-[19.10s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
-[23.68s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=0, localObjectId=0, result=True
-[23.68s] [NetworkGameManager] RequestEndTurn called. localNetworkPlayer=0, CurrentTurnObjectId=0
-[23.68s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=0, localObjectId=0, result=True
-[23.68s] [NetworkGameManager] Requesting end turn...
-[23.68s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=0, localObjectId=0, result=True
-[23.80s] [NetworkGameManager] Turn number: 1 -> 2
-[23.80s] [NetworkGameManager] Turn changed: ObjectId 0 -> ObjectId 1
-[23.80s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=1, localObjectId=0, result=False
-[23.80s] [EncounterController] Network turn changed. Local turn: False, Turn #: 2, initialized: True
-[23.80s] [EncounterController] Starting network turn. isCurrentPlayerTurn: False
-[23.80s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
-[23.80s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[23.80s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
-[23.80s] Opponent draws Owl.
-[23.80s] [EncounterController] Opponent's turn. Waiting...
-[23.90s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
-[23.90s] [NetworkPlayer] Player 1 mana: 1 -> 2 (asServer: False)
-[23.90s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
-[28.63s] [Client] Executing card play: Chip 'N Wail to slot 1 for Player 1
-[28.63s] Chip 'N Wail has been added to the board.
-[28.63s] [Client] Chip 'N Wail played to OpponentSlot-2
-[28.63s] [NetworkPlayer] Player 1 mana: 2 -> 0 (asServer: False)
-[28.63s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
-[29.62s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=1, localObjectId=0, result=False
-[30.30s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=1, localObjectId=0, result=False
+[6.55s] [MainMenu] Finding match...
+[6.55s] [MainMenu] Attempting to join existing game...
+[6.56s] [PlayerConnectionHandler] OnClientConnectionState: Starting
+[9.55s] [MainMenu] No existing game found, becoming host...
+[9.57s] [MainMenu] Server started - hosting game!
+[9.77s] [PlayerConnectionHandler] OnRemoteConnectionState: ClientId=0, State=Started
+[9.77s] [PlayerConnectionHandler] Player connected: Connection ID 0
+[9.78s] [WARN] NetworkPlayer(Clone) was spawned but it's recommended to not spawn objects for connections until they have loaded start scenes. You can be notified when a connection loads start scenes by using connection.OnLoadedStartScenes on the connection, or SceneManager.OnClientLoadStartScenes.
+[9.79s] [NetworkPlayer] Server: PlayerId set to Owner.ClientId=0
+[9.79s] [NetworkPlayer] Spawned: Player 0 (ID: 0)
+[9.79s] [PlayerConnectionHandler] Spawned player object for Connection ID 0. Total players: 1
+[9.79s] [MainMenu] Player joined: 0
+[9.83s] [PlayerConnectionHandler] OnRemoteConnectionState: ClientId=1, State=Started
+[9.83s] [PlayerConnectionHandler] Player connected: Connection ID 1
+[9.83s] [WARN] NetworkPlayer(Clone) was spawned but it's recommended to not spawn objects for connections until they have loaded start scenes. You can be notified when a connection loads start scenes by using connection.OnLoadedStartScenes on the connection, or SceneManager.OnClientLoadStartScenes.
+[9.83s] [NetworkPlayer] PlayerId changed: 0 -> 1 (asServer: True, IsOwner: False)
+[9.83s] [NetworkPlayer] Server: PlayerId set to Owner.ClientId=1
+[9.83s] [NetworkPlayer] Spawned: Player 1 (ID: 1)
+[9.83s] [PlayerConnectionHandler] Spawned player object for Connection ID 1. Total players: 2
+[9.83s] [MainMenu] Player joined: 1
+[9.83s] [MainMenu] Loading scene: DuelScreen
+[9.83s] [MainMenu] Moving NetworkObject: NetworkPlayer(Clone) (Owner: 0)
+[9.83s] [MainMenu] Moving NetworkObject: NetworkPlayer(Clone) (Owner: 1)
+[9.83s] [MainMenu] Moving 2 NetworkObjects to DuelScreen
+[9.84s] [PlayerConnectionHandler] OnClientConnectionState: Started
+[9.84s] [MainMenu] Connected to server!
+[9.87s] [WARN] Player prefab is empty and cannot be spawned for connection 0.
+[10.34s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[10.34s] [PlayerConnectionHandler] Duplicate instance found, destroying this one
+[10.34s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[10.34s] [WARN] HealAmountText is not assigned in HealAbility.
+[10.34s] [CardLibrary] Auto-registered card from scene: Card
+[10.34s] [CardLibrary] Auto-registered card from scene: Owl
+[10.34s] [CardLibrary] Auto-registered card from scene: Chip 'N Wail
+[10.34s] [CardLibrary] Auto-registered card from scene: Flying Fox
+[10.34s] [CardLibrary] Auto-populate complete. Total cards: 4
+[10.34s] [EncounterController] Network game detected, waiting for network to start game...
+[10.34s] [WARN] [TargetingController] Board slots not found - scene may still be loading
+[10.34s] No open slots available.
+[10.57s] [WARN] Player prefab is empty and cannot be spawned for connection 1.
+[10.64s] [NetworkPlayer] Other player joined: Player 0 (ID: 0)
+[10.64s] [WARN] SyncType not found for index 237 on NetworkPlayer(Clone), component NetworkPlayer. Remainder of packet may become corrupt.
+[10.64s] [WARN] SyncType not found for index 7 on NetworkPlayer(Clone), component NetworkPlayer. Remainder of packet may become corrupt.
+[10.64s] [NetworkPlayer] You are: Player 1 (ID: 1)
+[10.64s] [NetworkPlayer] Ownership gained! You are now: Player 1 (ID: 1)
+[10.64s] [NetworkGameManager] Registered NetworkPlayer: Player 1 (ObjectId: 2802, PlayerId: 1, IsOwner: True)
+[10.64s] [NetworkGameManager] Local player identified: Player 1 (ObjectId: 2802)
+[10.64s] [NetworkPlayer] UpdateLinkedController: Player 1 pushing Health=20, Mana=1 to Player
+[10.64s] [PlayerController] Player UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
+[10.64s] [NetworkPlayer] Player 1 linked to Player
+[10.64s] [NetworkGameManager] Linked local NetworkPlayer to PlayerController
+[10.64s] [NetworkGameManager] Client started, looking for NetworkPlayers...
+[10.64s] [NetworkPlayer] Player 0 health: 20 -> 0 (asServer: False)
+[10.64s] [NetworkPlayer] Ignoring client-side health=0 callback
+[10.64s] [NetworkPlayer] PlayerId changed: 5 -> 0 (asServer: False, IsOwner: False)
+[10.64s] [NetworkPlayer] Player 1 health: 20 -> 0 (asServer: False)
+[10.64s] [NetworkPlayer] Ignoring client-side health=0 callback
+[10.64s] [NetworkPlayer] PlayerId changed: 1 -> 0 (asServer: False, IsOwner: True)
+[10.75s] [NetworkGameManager] Found 2 NetworkPlayer(s) after 1 attempts
+[10.75s] [NetworkGameManager] Local player identified: Player 1 (ObjectId: 2802)
+[10.75s] [NetworkGameManager] Registered NetworkPlayer: Player 0 (ObjectId: 9655, PlayerId: 0, IsOwner: False)
+[10.75s] [NetworkGameManager] Opponent identified: Player 0 (ObjectId: 9655)
+[10.75s] [NetworkPlayer] UpdateLinkedController: Player 0 pushing Health=20, Mana=1 to Opponent
+[10.75s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
+[10.75s] [NetworkPlayer] Player 0 linked to Opponent
+[10.75s] [NetworkGameManager] Linked opponent NetworkPlayer to OpponentController
+[10.75s] [NetworkGameManager] Both players ready, starting game...
+[10.75s] [Server] Generated shuffle seed: 1765201192
+[10.75s] [NetworkGameManager] Turn changed: ObjectId -1 -> ObjectId 9655 (asServer=True)
+[10.75s] [NetworkGameManager] Turn number: 0 -> 1
+[10.75s] [NetworkGameManager] Game started: True
+[10.75s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=9655, localObjectId=2802, result=False
+[10.75s] [NetworkGameManager] Initializing encounter with seed 1765201192
+[10.75s] [EncounterController] Network game started! Local player goes first: False, Seed: 1765201192
+[10.75s] Deck shuffled with seed 1765201192!
+[10.75s] Deck shuffled with seed 1765201193!
+[10.75s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[10.75s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[10.75s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[10.75s] Player draws Flying Fox.
+[10.75s] [Server] Game started! PlayerId 0 (ObjectId 9655) goes first.
+[10.83s] [Client RPC] Received turn state: TurnObjectId=9655, TurnNumber=1, GameStarted=True
+[10.83s] [NetworkGameManager] Game started: True
+[10.83s] [NetworkGameManager] Turn number: 0 -> 1
+[10.83s] [NetworkGameManager] Turn changed: ObjectId -1 -> ObjectId 9655 (asServer=False)
+[10.87s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[10.87s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[10.87s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[10.87s] Opponent draws Chip 'N Wail.
+[10.98s] Player draws Card.
+[10.98s] [WARN] HealAmountText is not assigned in HealAbility.
+[11.10s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[11.10s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[11.10s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[11.10s] Opponent draws Owl.
+[11.20s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[11.20s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[11.20s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[11.20s] Player draws Card.
+[11.32s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[11.32s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[11.32s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[11.32s] Opponent draws Flying Fox.
+[20.03s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=9655, localObjectId=2802, result=False
+[22.80s] [NetworkGameManager] Turn number: 1 -> 2
+[22.80s] [NetworkGameManager] Turn changed: ObjectId 9655 -> ObjectId 2802 (asServer=True)
+[22.80s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=2802, localObjectId=2802, result=True
+[22.80s] [Server] SyncVar callback - notifying encounter. isLocalTurn=True, turnNumber=2
+[22.80s] [EncounterController] Network turn changed. Local turn: True, Turn #: 2, initialized: True
+[22.80s] [EncounterController] Starting network turn. isCurrentPlayerTurn: True
+[22.80s] [EncounterController] Calling CmdIncreaseMaxMana for Player 1
+[22.80s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[22.80s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[22.80s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[22.80s] Player draws Chip 'N Wail.
+[22.80s] [EncounterController] Your turn! Cards are playable.
+[22.80s] [Server] Turn ended. Now ObjectId 2802's turn. Turn #2
+[22.83s] [Server] CmdIncreaseMaxMana received for Player 1, amount: 1
+[22.83s] [PlayerController] Player UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
+[22.83s] [NetworkPlayer] Player 1 mana: 1 -> 2 (asServer: True)
+[22.83s] [PlayerController] Player UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
+[22.83s] [Server] Player 1 max mana increased to 2
+[22.87s] [Client RPC] Received turn state: TurnObjectId=2802, TurnNumber=2, GameStarted=True
+[22.87s] [NetworkGameManager] Turn number: 1 -> 2
+[22.87s] [NetworkGameManager] Turn changed: ObjectId 9655 -> ObjectId 2802 (asServer=False)
+[22.90s] [PlayerController] Player UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
+[22.90s] [NetworkPlayer] Player 1 mana: 1 -> 2 (asServer: False)
+[22.90s] [PlayerController] Player UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
+[24.47s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=2802, localObjectId=2802, result=True
+[24.83s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=2802, localObjectId=2802, result=True
+[24.83s] [ERROR] No support ability found for card Chip 'N Wail
+[25.37s] [HandController] Sending network card play: card 3, slot 2
+[25.43s] [Server] Player 1 playing Chip 'N Wail to slot 2
+[25.43s] [NetworkPlayer] Player 1 mana: 2 -> 0 (asServer: True)
+[25.43s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[25.50s] [Client] Executing card play: Chip 'N Wail to slot 2 for Player 1
+[25.50s] Chip 'N Wail has been added to the board.
+[25.50s] [Client] Chip 'N Wail played to PlayerSlot-3
+[25.50s] [NetworkPlayer] Player 1 mana: 2 -> 0 (asServer: False)
+[25.50s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[27.75s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=2802, localObjectId=2802, result=True
+[27.75s] [NetworkGameManager] RequestEndTurn called. localNetworkPlayer=2802, CurrentTurnObjectId=2802
+[27.75s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=2802, localObjectId=2802, result=True
+[27.75s] [NetworkGameManager] Requesting end turn...
+[27.75s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=2802, localObjectId=2802, result=True
+[27.80s] [NetworkGameManager] Turn number: 2 -> 3
+[27.80s] [NetworkGameManager] Turn changed: ObjectId 2802 -> ObjectId 9655 (asServer=True)
+[27.80s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=9655, localObjectId=2802, result=False
+[27.80s] [Server] SyncVar callback - notifying encounter. isLocalTurn=False, turnNumber=3
+[27.80s] [EncounterController] Network turn changed. Local turn: False, Turn #: 3, initialized: True
+[27.80s] [EncounterController] Starting network turn. isCurrentPlayerTurn: False
+[27.80s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[27.80s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[27.80s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[27.80s] Opponent draws Card.
+[27.80s] [EncounterController] Opponent's turn. Waiting...
+[27.80s] [Server] Turn ended. Now ObjectId 9655's turn. Turn #3
+[27.87s] [Server] CmdIncreaseMaxMana received for Player 0, amount: 1
+[27.87s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
+[27.87s] [NetworkPlayer] Player 0 mana: 1 -> 2 (asServer: True)
+[27.87s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
+[27.87s] [Server] Player 0 max mana increased to 2
+[27.87s] [Client RPC] Received turn state: TurnObjectId=9655, TurnNumber=3, GameStarted=True
+[27.87s] [NetworkGameManager] Turn number: 2 -> 3
+[27.87s] [NetworkGameManager] Turn changed: ObjectId 2802 -> ObjectId 9655 (asServer=False)
+[27.93s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
+[27.93s] [NetworkPlayer] Player 0 mana: 1 -> 2 (asServer: False)
+[27.93s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
+[29.43s] [Server] Player 0 playing Flying Fox to slot 2
+[29.43s] [NetworkPlayer] Player 0 mana: 2 -> 0 (asServer: True)
+[29.43s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[29.50s] [Client] Executing card play: Flying Fox to slot 2 for Player 0
+[29.50s] Flying Fox has been added to the board.
+[29.50s] [Client] Flying Fox played to OpponentSlot-3
+[29.50s] [NetworkPlayer] Player 0 mana: 2 -> 0 (asServer: False)
+[29.50s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[30.47s] [NetworkGameManager] Turn number: 3 -> 4
+[30.47s] [NetworkGameManager] Turn changed: ObjectId 9655 -> ObjectId 2802 (asServer=True)
+[30.47s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=2802, localObjectId=2802, result=True
+[30.47s] [Server] SyncVar callback - notifying encounter. isLocalTurn=True, turnNumber=4
+[30.47s] [EncounterController] Network turn changed. Local turn: True, Turn #: 4, initialized: True
+[30.47s] [EncounterController] Starting network turn. isCurrentPlayerTurn: True
+[30.47s] [EncounterController] Calling CmdIncreaseMaxMana for Player 1
+[30.47s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[30.47s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[30.47s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[30.47s] Player draws Chip 'N Wail.
+[30.47s] [EncounterController] Your turn! Cards are playable.
+[30.47s] [Server] Turn ended. Now ObjectId 2802's turn. Turn #4
+[30.50s] [Server] CmdIncreaseMaxMana received for Player 1, amount: 1
+[30.50s] [PlayerController] Player UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[30.50s] [NetworkPlayer] Player 1 mana: 0 -> 3 (asServer: True)
+[30.50s] [PlayerController] Player UpdatePlayerUI: health=20, mana=3, healthText=assigned, manaText=assigned
+[30.50s] [Server] Player 1 max mana increased to 3
+[30.53s] [Client RPC] Received turn state: TurnObjectId=2802, TurnNumber=4, GameStarted=True
+[30.53s] [NetworkGameManager] Turn number: 3 -> 4
+[30.53s] [NetworkGameManager] Turn changed: ObjectId 9655 -> ObjectId 2802 (asServer=False)
+[30.57s] [PlayerController] Player UpdatePlayerUI: health=20, mana=3, healthText=assigned, manaText=assigned
+[30.57s] [NetworkPlayer] Player 1 mana: 0 -> 3 (asServer: False)
+[30.57s] [PlayerController] Player UpdatePlayerUI: health=20, mana=3, healthText=assigned, manaText=assigned
+[31.45s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=2802, localObjectId=2802, result=True
+[31.45s] [ERROR] No support ability found for card Chip 'N Wail
+[32.55s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=2802, localObjectId=2802, result=True
+[32.55s] [ERROR] No support ability found for card Chip 'N Wail
+[33.73s] [HandController] Sending network card play: card 3, slot 0
+[33.80s] [Server] Player 1 playing Chip 'N Wail to slot 0
+[33.80s] [NetworkPlayer] Player 1 mana: 3 -> 1 (asServer: True)
+[33.80s] [PlayerController] Player UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
+[33.87s] [Client] Executing card play: Chip 'N Wail to slot 0 for Player 1
+[33.87s] Chip 'N Wail has been added to the board.
+[33.87s] [Client] Chip 'N Wail played to PlayerSlot-1
+[33.87s] [NetworkPlayer] Player 1 mana: 3 -> 1 (asServer: False)
+[33.87s] [PlayerController] Player UpdatePlayerUI: health=20, mana=1, healthText=assigned, manaText=assigned
+[36.03s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=2802, localObjectId=2802, result=True
+[36.03s] [NetworkGameManager] RequestEndTurn called. localNetworkPlayer=2802, CurrentTurnObjectId=2802
+[36.03s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=2802, localObjectId=2802, result=True
+[36.03s] [NetworkGameManager] Requesting end turn...
+[36.03s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=2802, localObjectId=2802, result=True
+[36.07s] [NetworkGameManager] Turn number: 4 -> 5
+[36.07s] [NetworkGameManager] Turn changed: ObjectId 2802 -> ObjectId 9655 (asServer=True)
+[36.07s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=9655, localObjectId=2802, result=False
+[36.07s] [Server] SyncVar callback - notifying encounter. isLocalTurn=False, turnNumber=5
+[36.07s] [EncounterController] Network turn changed. Local turn: False, Turn #: 5, initialized: True
+[36.07s] [EncounterController] Starting network turn. isCurrentPlayerTurn: False
+[36.07s] [WARN] The referenced script on this Behaviour (Game Object '<null>') is missing!
+[36.07s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[36.07s] [WARN] The referenced script on this Behaviour (Game Object 'HealAbility') is missing!
+[36.07s] Opponent draws Card.
+[36.07s] [EncounterController] Opponent's turn. Waiting...
+[36.07s] [Server] Turn ended. Now ObjectId 9655's turn. Turn #5
+[36.13s] [Server] CmdIncreaseMaxMana received for Player 0, amount: 1
+[36.13s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=0, healthText=assigned, manaText=assigned
+[36.13s] [NetworkPlayer] Player 0 mana: 0 -> 3 (asServer: True)
+[36.13s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=3, healthText=assigned, manaText=assigned
+[36.13s] [Server] Player 0 max mana increased to 3
+[36.13s] [Client RPC] Received turn state: TurnObjectId=9655, TurnNumber=5, GameStarted=True
+[36.13s] [NetworkGameManager] Turn number: 4 -> 5
+[36.13s] [NetworkGameManager] Turn changed: ObjectId 2802 -> ObjectId 9655 (asServer=False)
+[36.20s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=3, healthText=assigned, manaText=assigned
+[36.20s] [NetworkPlayer] Player 0 mana: 0 -> 3 (asServer: False)
+[36.20s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=3, healthText=assigned, manaText=assigned
+[38.17s] [Server] Player 0 playing Card to slot 0
+[38.17s] [NetworkPlayer] Player 0 mana: 3 -> 2 (asServer: True)
+[38.17s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
+[38.23s] [Client] Executing card play: Card to slot 0 for Player 0
+[38.23s] Card has been added to the board.
+[38.23s] [Client] Card played to OpponentSlot-1
+[38.23s] [NetworkPlayer] Player 0 mana: 3 -> 2 (asServer: False)
+[38.23s] [PlayerController] Opponent UpdatePlayerUI: health=20, mana=2, healthText=assigned, manaText=assigned
+[39.80s] [NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId=9655, localObjectId=2802, result=False
 
-=== Log ended: 2026-01-04 20:20:44 ===
+=== Log ended: 2026-01-04 22:43:21 ===

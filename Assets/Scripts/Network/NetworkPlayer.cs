@@ -3,6 +3,9 @@ using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
 
+// FishNet code regeneration trigger - do not remove
+// Last regenerated: 2026-01-04
+
 /// <summary>
 /// Represents a connected player in the network.
 /// This is spawned for each player that connects.
@@ -184,7 +187,15 @@ public class NetworkPlayer : NetworkBehaviour
             Debug.Log($"[NetworkPlayer] {PlayerName.Value} health: {prev} -> {next} (asServer: {asServer})");
         }
         
-        // Use next parameter (the new value from callback) for UI updates
+        // Ignore bogus health=0 callbacks during initial sync (FishNet timing issue)
+        // ForceUpdateLinkedController sets the correct initial value, don't let sync overwrite it
+        if (next == 0 && !asServer)
+        {
+            Debug.Log($"[NetworkPlayer] Ignoring client-side health=0 callback");
+            return;
+        }
+        
+        // Apply valid health changes to UI
         if (LinkedPlayerController != null && next != prev)
         {
             LinkedPlayerController.currentHealth = next;
@@ -505,6 +516,32 @@ public class NetworkPlayer : NetworkBehaviour
         }
         
         return null;
+    }
+    
+    #endregion
+    
+    #region Reconnection Support
+    
+    /// <summary>
+    /// Client sends saved game state to host for restoration after host reconnects.
+    /// </summary>
+    [ServerRpc]
+    public void ServerRestoreGameState(string gameStateJson)
+    {
+        Debug.Log($"[Server] Received game state for restoration from Player {PlayerId.Value}");
+        
+        GameStateSnapshot snapshot = GameStateSnapshot.FromJson(gameStateJson);
+        if (snapshot == null)
+        {
+            Debug.LogError("[Server] Failed to deserialize game state!");
+            return;
+        }
+        
+        // Restore game state via NetworkGameManager
+        if (NetworkGameManager.Instance != null)
+        {
+            NetworkGameManager.Instance.ServerRestoreGameState(snapshot);
+        }
     }
     
     #endregion

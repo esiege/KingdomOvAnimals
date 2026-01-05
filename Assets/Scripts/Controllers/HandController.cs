@@ -88,6 +88,34 @@ public class HandController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Add an already-instantiated card to the hand. Used for game state restoration.
+    /// Unlike AddCardToHand, this does NOT instantiate a new copy.
+    /// </summary>
+    public void AddExistingCardToHand(CardController card)
+    {
+        if (playerHand.Count >= cardPositions.Count)
+        {
+            Debug.LogError("Hand is full. Cannot add more cards.");
+            Destroy(card.gameObject);
+            return;
+        }
+
+        int positionIndex = playerHand.Count;
+
+        // Position the card correctly in the hand
+        card.transform.position = cardPositions[positionIndex].transform.position;
+        card.transform.rotation = Quaternion.identity;
+        card.transform.SetParent(cardPositions[positionIndex].transform);
+
+        playerHand.Add(card);
+
+        if (card.GetComponent<BoxCollider2D>() == null)
+            card.gameObject.AddComponent<BoxCollider2D>();
+
+        // Re-arrange the cards in hand to ensure proper positioning
+        ArrangeCardsInHand();
+    }
 
     public void AddCardToHand(CardController card)
     {
@@ -280,6 +308,7 @@ public class HandController : MonoBehaviour
     {
         foreach (var t in GetAllBoardTargets())
         {
+            if (t == null) continue;
             CardController c = t.GetComponentInChildren<CardController>();
             if (c != null)
                 c.UnHighlightCard();
@@ -290,6 +319,7 @@ public class HandController : MonoBehaviour
     {
         foreach (var t in GetPlayerPlayableBoard())
         {
+            if (t == null) continue;
             CardController c = t.GetComponentInChildren<CardController>();
             if (c != null)
                 c.UnHighlightCard();
@@ -300,6 +330,7 @@ public class HandController : MonoBehaviour
 
         foreach (var t in GetPlayerPlayableBoard())
         {
+            if (t == null) continue;
             CardController c = t.GetComponentInChildren<CardController>();
             if (c != null && !c.isTapped && !c.hasSummoningSickness)
                 c.HighlightCard();

@@ -41,6 +41,9 @@ public class EncounterController : MonoBehaviour
     // Initialization method
     void Start()
     {
+        // Initialize CardLibrary early to capture all cards before they're drawn/played
+        CardLibrary.EnsureInitialized();
+        
         // Hide disconnect panel at start
         if (disconnectPanel != null)
             disconnectPanel.SetActive(false);
@@ -406,13 +409,19 @@ public class EncounterController : MonoBehaviour
     /// </summary>
     public void OnOpponentDisconnected(float gracePeriod)
     {
-        Debug.Log($"[EncounterController] Opponent disconnected! Waiting {gracePeriod}s for reconnect...");
+        Debug.Log($"[EncounterController] OnOpponentDisconnected called! Waiting {gracePeriod}s for reconnect...");
+        Debug.Log($"[EncounterController] disconnectPanel is null: {disconnectPanel == null}, disconnectStatusText is null: {disconnectStatusText == null}");
         isGamePaused = true;
         
         // Show disconnect UI
         if (disconnectPanel != null)
         {
             disconnectPanel.SetActive(true);
+            Debug.Log("[EncounterController] DisconnectPanel activated");
+        }
+        else
+        {
+            Debug.LogWarning("[EncounterController] disconnectPanel is null! Run 'Tools > Kingdom Ov Animals > Add Disconnect UI' in Unity Editor.");
         }
         
         if (disconnectStatusText != null)
@@ -475,11 +484,11 @@ public class EncounterController : MonoBehaviour
     }
     
     /// <summary>
-    /// Called when the host disconnects (client only).
+    /// Called when the host disconnects (client only). Shows waiting UI.
     /// </summary>
-    public void OnHostDisconnected()
+    public void OnHostDisconnected(float gracePeriod)
     {
-        Debug.Log("[EncounterController] Host disconnected!");
+        Debug.Log($"[EncounterController] Host disconnected! Waiting {gracePeriod}s for reconnect...");
         isGamePaused = true;
         
         if (disconnectPanel != null)
@@ -489,11 +498,78 @@ public class EncounterController : MonoBehaviour
         
         if (disconnectStatusText != null)
         {
-            disconnectStatusText.text = "Host disconnected!\n\nReturning to menu...";
+            disconnectStatusText.text = $"Host disconnected!\nWaiting for reconnect... {gracePeriod:F0}s";
         }
         
-        // Return to menu after a short delay
-        StartCoroutine(ReturnToMenuAfterDelay(3f));
+        // Hide playable indicators
+        playerHandController?.HidePlayableHand();
+        playerHandController?.HidePlayableBoard();
+        playerHandController?.HideBoardTargets();
+    }
+    
+    /// <summary>
+    /// Legacy overload for backward compatibility.
+    /// </summary>
+    public void OnHostDisconnected()
+    {
+        OnHostDisconnected(120f);
+    }
+    
+    /// <summary>
+    /// Update the host disconnect timer display.
+    /// </summary>
+    public void UpdateHostDisconnectTimer(float remainingTime)
+    {
+        if (disconnectStatusText != null)
+        {
+            disconnectStatusText.text = $"Host disconnected!\nWaiting for reconnect... {remainingTime:F0}s";
+        }
+    }
+    
+    /// <summary>
+    /// Called when the host reconnects.
+    /// </summary>
+    public void OnHostReconnected()
+    {
+        Debug.Log("[EncounterController] Host reconnected! Resuming game...");
+        isGamePaused = false;
+        
+        if (disconnectPanel != null)
+        {
+            disconnectPanel.SetActive(false);
+        }
+    }
+    
+    /// <summary>
+    /// Called when host failed to reconnect within grace period.
+    /// </summary>
+    public void OnHostForfeited()
+    {
+        Debug.Log("[EncounterController] Host forfeited! You win!");
+        
+        if (disconnectStatusText != null)
+        {
+            disconnectStatusText.text = "Host forfeited!\n\nYOU WIN!\n\nReturning to menu...";
+        }
+    }
+    
+    /// <summary>
+    /// Called when game state has been restored after reconnection.
+    /// </summary>
+    public void OnGameStateRestored()
+    {
+        Debug.Log("[EncounterController] Game state restored!");
+        isGamePaused = false;
+        
+        // Hide disconnect panel
+        if (disconnectPanel != null)
+        {
+            disconnectPanel.SetActive(false);
+        }
+        
+        // Refresh UI
+        player?.UpdatePlayerUI();
+        opponent?.UpdatePlayerUI();
     }
     
     private System.Collections.IEnumerator ReturnToMenuAfterDelay(float delay)

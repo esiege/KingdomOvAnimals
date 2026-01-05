@@ -3,6 +3,7 @@ using FishNet.Connection;
 using FishNet.Managing;
 using FishNet.Object;
 using FishNet.Transporting;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,6 +14,8 @@ using UnityEngine;
 /// </summary>
 public class PlayerConnectionHandler : MonoBehaviour
 {
+    public static PlayerConnectionHandler Instance { get; private set; }
+    
     [Header("Player Prefab")]
     [Tooltip("The NetworkPlayer prefab to spawn for each connected player")]
     public NetworkObject playerPrefab;
@@ -36,21 +39,47 @@ public class PlayerConnectionHandler : MonoBehaviour
     public int PlayerCount => ConnectedPlayers.Count;
 
     private NetworkManager _networkManager;
+    
+    // Client-side reconnection state
+    private bool _isWaitingForHostReconnect = false;
+    private float _hostReconnectTimer = 0f;
+    private float _hostReconnectGracePeriod = 120f; // 2 minutes
+    private float _reconnectAttemptInterval = 3f; // Try every 3 seconds
+    private float _nextReconnectAttempt = 0f;
+    private GameStateSnapshot _savedGameState;
+    private string _lastServerAddress;
+    private ushort _lastServerPort;
 
     private void Awake()
     {
+        // Singleton pattern - destroy duplicate instances
+        if (Instance != null && Instance != this)
+        {
+            Debug.Log("[PlayerConnectionHandler] Duplicate instance found, destroying this one");
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        
+        Debug.Log("[PlayerConnectionHandler] Awake - initializing...");
+        
+        // Persist across scene loads
+        DontDestroyOnLoad(gameObject);
+        
         _networkManager = InstanceFinder.NetworkManager;
         if (_networkManager == null)
         {
-            Debug.LogError("NetworkManager not found!");
+            Debug.LogError("[PlayerConnectionHandler] NetworkManager not found!");
             return;
         }
 
         // Subscribe to server events for remote client connections
         _networkManager.ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
+        Debug.Log("[PlayerConnectionHandler] Subscribed to ServerManager.OnRemoteConnectionState");
         
         // Subscribe to client events for detecting host disconnect
         _networkManager.ClientManager.OnClientConnectionState += OnClientConnectionState;
+        Debug.Log("[PlayerConnectionHandler] Subscribed to ClientManager.OnClientConnectionState");
     }
 
     private void OnDestroy()
@@ -68,13 +97,24 @@ public class PlayerConnectionHandler : MonoBehaviour
     /// </summary>
     private void OnClientConnectionState(ClientConnectionStateArgs args)
     {
-        if (args.ConnectionState == LocalConnectionState.Stopped)
+        Debug.Log($"[PlayerConnectionHandler] OnClientConnectionState: {args.ConnectionState}");
+        
+        if (args.ConnectionState == LocalConnectionState.Started)
+        {
+            // Successfully connected/reconnected
+            if (_isWaitingForHostReconnect)
+            {
+                OnReconnectedToHost();
+            }
+        }
+        else if (args.ConnectionState == LocalConnectionState.Stopped)
         {
             // We lost connection to the server (host disconnected)
             Debug.Log("[PlayerConnectionHandler] Lost connection to host!");
             
             // If we're not the server (i.e., we're the client that lost connection)
-            if (!_networkManager.IsServerStarted)
+            // and we're not already in a reconnection wait
+            if (!_networkManager.IsServerStarted && !_isWaitingForHostReconnect)
             {
                 OnHostDisconnected();
             }
@@ -86,19 +126,142 @@ public class PlayerConnectionHandler : MonoBehaviour
     /// </summary>
     private void OnHostDisconnected()
     {
-        Debug.Log("[PlayerConnectionHandler] Host disconnected! Returning to main menu...");
+        Debug.Log("[PlayerConnectionHandler] Host disconnected! Starting reconnection wait...");
         
-        // Show message to user and return to menu
+        // Save current game state
+        EncounterController encounterController = FindObjectOfType<EncounterController>();
+        if (encounterController != null && NetworkGameManager.Instance != null)
+        {
+            _savedGameState = GameStateSnapshot.CaptureState(encounterController, NetworkGameManager.Instance);
+            Debug.Log($"[PlayerConnectionHandler] Game state saved: {_savedGameState != null}");
+        }
+        
+        // Save server connection info for reconnection
+        var transport = _networkManager.TransportManager.Transport;
+        if (transport != null)
+        {
+            _lastServerAddress = transport.GetClientAddress();
+            _lastServerPort = transport.GetPort();
+            Debug.Log($"[PlayerConnectionHandler] Saved connection info: {_lastServerAddress}:{_lastServerPort}");
+        }
+        
+        // Start waiting for reconnect
+        _isWaitingForHostReconnect = true;
+        _hostReconnectTimer = 0f;
+        _nextReconnectAttempt = _reconnectAttemptInterval;
+        
+        // Show waiting UI
+        if (encounterController != null)
+        {
+            encounterController.OnHostDisconnected(_hostReconnectGracePeriod);
+        }
+    }
+    
+    private void Update()
+    {
+        // Handle client-side reconnection attempts
+        if (_isWaitingForHostReconnect)
+        {
+            _hostReconnectTimer += Time.deltaTime;
+            
+            // Update UI
+            float remainingTime = _hostReconnectGracePeriod - _hostReconnectTimer;
+            EncounterController encounterController = FindObjectOfType<EncounterController>();
+            if (encounterController != null)
+            {
+                encounterController.UpdateHostDisconnectTimer(remainingTime);
+            }
+            
+            // Try to reconnect periodically
+            _nextReconnectAttempt -= Time.deltaTime;
+            if (_nextReconnectAttempt <= 0f)
+            {
+                _nextReconnectAttempt = _reconnectAttemptInterval;
+                AttemptReconnect();
+            }
+            
+            // Grace period expired
+            if (_hostReconnectTimer >= _hostReconnectGracePeriod)
+            {
+                Debug.Log("[PlayerConnectionHandler] Host reconnect grace period expired!");
+                _isWaitingForHostReconnect = false;
+                _savedGameState = null;
+                
+                if (encounterController != null)
+                {
+                    encounterController.OnHostForfeited();
+                }
+                
+                // Return to main menu
+                StartCoroutine(ReturnToMainMenuDelayed(3f));
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Attempt to reconnect to the host.
+    /// </summary>
+    private void AttemptReconnect()
+    {
+        if (string.IsNullOrEmpty(_lastServerAddress))
+        {
+            Debug.Log("[PlayerConnectionHandler] No server address saved, cannot reconnect");
+            return;
+        }
+        
+        Debug.Log($"[PlayerConnectionHandler] Attempting to reconnect to {_lastServerAddress}:{_lastServerPort}...");
+        
+        // Try to connect
+        _networkManager.ClientManager.StartConnection(_lastServerAddress, _lastServerPort);
+    }
+    
+    /// <summary>
+    /// Called when client successfully reconnects to host.
+    /// </summary>
+    public void OnReconnectedToHost()
+    {
+        if (!_isWaitingForHostReconnect) return;
+        
+        Debug.Log("[PlayerConnectionHandler] Reconnected to host!");
+        _isWaitingForHostReconnect = false;
+        
+        // Hide disconnect UI
         EncounterController encounterController = FindObjectOfType<EncounterController>();
         if (encounterController != null)
         {
-            encounterController.OnHostDisconnected();
+            encounterController.OnHostReconnected();
         }
-        else
+        
+        // Send saved game state to restore
+        if (_savedGameState != null)
         {
-            // Fallback: just return to menu immediately
-            UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+            StartCoroutine(SendGameStateToHost());
         }
+    }
+    
+    /// <summary>
+    /// Send the saved game state to the host for restoration.
+    /// </summary>
+    private IEnumerator SendGameStateToHost()
+    {
+        // Wait for NetworkPlayer to be ready
+        yield return new WaitForSeconds(0.5f);
+        
+        var localPlayer = NetworkGameManager.Instance?.GetLocalPlayer();
+        if (localPlayer != null && _savedGameState != null)
+        {
+            Debug.Log("[PlayerConnectionHandler] Sending saved game state to host...");
+            string stateJson = _savedGameState.ToJson();
+            localPlayer.ServerRestoreGameState(stateJson);
+        }
+        
+        _savedGameState = null;
+    }
+    
+    private IEnumerator ReturnToMainMenuDelayed(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
     }
 
     /// <summary>
@@ -106,6 +269,8 @@ public class PlayerConnectionHandler : MonoBehaviour
     /// </summary>
     private void OnRemoteConnectionState(NetworkConnection conn, RemoteConnectionStateArgs args)
     {
+        Debug.Log($"[PlayerConnectionHandler] OnRemoteConnectionState: ClientId={conn.ClientId}, State={args.ConnectionState}");
+        
         if (args.ConnectionState == RemoteConnectionState.Started)
         {
             OnPlayerConnected(conn);

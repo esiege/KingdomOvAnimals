@@ -6,6 +6,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
+// FishNet code regeneration trigger - do not remove
+// Last regenerated: 2026-01-04
+
 /// <summary>
 /// Manages the networked game state in the DuelScreen scene.
 /// Links spawned NetworkPlayer objects to local PlayerController objects.
@@ -53,7 +56,7 @@ public class NetworkGameManager : NetworkBehaviour
 
     [Header("Disconnect Settings")]
     [Tooltip("Seconds to wait for reconnection before declaring victory")]
-    public float reconnectGracePeriod = 30f;
+    public float reconnectGracePeriod = 120f;
     
     [Header("Runtime State")]
     private NetworkPlayer localNetworkPlayer;
@@ -130,10 +133,9 @@ public class NetworkGameManager : NetworkBehaviour
                 // Clean up the disconnected player (server only)
                 if (IsServerInitialized && disconnectedPlayerId >= 0)
                 {
-                    var connectionHandler = FindObjectOfType<PlayerConnectionHandler>();
-                    if (connectionHandler != null)
+                    if (PlayerConnectionHandler.Instance != null)
                     {
-                        connectionHandler.ForfeitDisconnectedPlayer(disconnectedPlayerId);
+                        PlayerConnectionHandler.Instance.ForfeitDisconnectedPlayer(disconnectedPlayerId);
                     }
                 }
                 
@@ -334,9 +336,29 @@ public class NetworkGameManager : NetworkBehaviour
             }
         }
         
+        // On clients (non-server), prefer using cached turn state from RPC
+        // This works around FishNet scene object SyncVar sync issues
+        int currentTurn;
+        if (!IsServerInitialized && _cachedTurnObjectId >= 0)
+        {
+            // Use cached value from RPC (0 or higher is valid)
+            currentTurn = _cachedTurnObjectId;
+        }
+        else
+        {
+            currentTurn = CurrentTurnObjectId.Value;
+        }
+        
+        // Only -1 is invalid (means game not started). ObjectId 0 IS valid in FishNet!
+        if (currentTurn < 0)
+        {
+            Debug.LogWarning($"[NetworkGameManager] CurrentTurnObjectId is invalid ({currentTurn}), game might not be started yet");
+            return false;
+        }
+        
         // Simply check if the current turn ObjectId matches local player's ObjectId
-        bool isLocal = CurrentTurnObjectId.Value == localNetworkPlayer.ObjectId;
-        Debug.Log($"[NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId={CurrentTurnObjectId.Value}, localObjectId={localNetworkPlayer.ObjectId}, result={isLocal}");
+        bool isLocal = currentTurn == localNetworkPlayer.ObjectId;
+        Debug.Log($"[NetworkGameManager] IsLocalPlayerTurn: CurrentTurnObjectId={currentTurn}, localObjectId={localNetworkPlayer.ObjectId}, result={isLocal}");
         return isLocal;
     }
     
@@ -404,6 +426,9 @@ public class NetworkGameManager : NetworkBehaviour
         TurnNumber.Value++;
         CurrentTurnObjectId.Value = nextObjectId;
         
+        // Explicitly broadcast turn state via RPC to ensure clients get it
+        RpcBroadcastTurnState(CurrentTurnObjectId.Value, TurnNumber.Value, GameStarted.Value, ShuffleSeed.Value);
+        
         Debug.Log($"[Server] Turn ended. Now ObjectId {nextObjectId}'s turn. Turn #{TurnNumber.Value}");
     }
     
@@ -443,7 +468,88 @@ public class NetworkGameManager : NetworkBehaviour
         TurnNumber.Value = 1;
         GameStarted.Value = true;
         
+        // Explicitly broadcast turn state via RPC to ensure clients get it
+        RpcBroadcastTurnState(CurrentTurnObjectId.Value, TurnNumber.Value, GameStarted.Value, ShuffleSeed.Value);
+        
         Debug.Log($"[Server] Game started! PlayerId {lowestPlayerId} (ObjectId {firstObjectId}) goes first.");
+    }
+    
+    /// <summary>
+    /// ObserversRpc to explicitly send turn state to all clients.
+    /// This is a workaround for scene object SyncVar issues.
+    /// </summary>
+    [ObserversRpc(BufferLast = true)]
+    private void RpcBroadcastTurnState(int turnObjectId, int turnNumber, bool gameStarted, int shuffleSeed)
+    {
+        Debug.Log($"[Client RPC] Received turn state: TurnObjectId={turnObjectId}, TurnNumber={turnNumber}, GameStarted={gameStarted}");
+        
+        // Only process on non-server clients
+        if (IsServerInitialized) return;
+        
+        // Update local cache of turn state (these are used by IsLocalPlayerTurn)
+        _cachedTurnObjectId = turnObjectId;
+        _cachedTurnNumber = turnNumber;
+        _cachedGameStarted = gameStarted;
+        _cachedShuffleSeed = shuffleSeed;
+        
+        // If the game just started, initialize the encounter
+        if (gameStarted && !_encounterInitialized)
+        {
+            TryInitializeEncounterFromRpc();
+        }
+        
+        // Notify encounter controller about turn change
+        if (gameStarted)
+        {
+            // Try to find encounterController if not set
+            if (encounterController == null)
+            {
+                encounterController = FindObjectOfType<EncounterController>();
+                Debug.Log($"[Client RPC] Found encounterController: {encounterController != null}");
+            }
+            
+            if (encounterController != null)
+            {
+                bool isLocalTurn = IsLocalPlayerTurnFromCache();
+                Debug.Log($"[Client RPC] Calling OnNetworkTurnChanged. isLocalTurn={isLocalTurn}, turnNumber={turnNumber}");
+                encounterController.OnNetworkTurnChanged(isLocalTurn, turnNumber);
+            }
+            else
+            {
+                Debug.LogWarning("[Client RPC] encounterController is null - cannot notify turn change!");
+            }
+        }
+    }
+    
+    // Cached turn state from RPC (for clients)
+    private int _cachedTurnObjectId = -1;
+    private int _cachedTurnNumber = 0;
+    private bool _cachedGameStarted = false;
+    private int _cachedShuffleSeed = 0;
+    
+    private bool IsLocalPlayerTurnFromCache()
+    {
+        if (localNetworkPlayer == null) return false;
+        return localNetworkPlayer.ObjectId == _cachedTurnObjectId;
+    }
+    
+    private void TryInitializeEncounterFromRpc()
+    {
+        if (_encounterInitialized) return;
+        if (!_cachedGameStarted) return;
+        
+        if (encounterController == null)
+        {
+            encounterController = FindObjectOfType<EncounterController>();
+        }
+        
+        if (encounterController != null && localNetworkPlayer != null)
+        {
+            bool isLocalTurn = IsLocalPlayerTurnFromCache();
+            Debug.Log($"[NetworkGameManager] Initializing encounter from RPC with seed {_cachedShuffleSeed}");
+            encounterController.OnNetworkGameStarted(isLocalTurn, _cachedShuffleSeed);
+            _encounterInitialized = true;
+        }
     }
     
     private int GetNextPlayerObjectId()
@@ -467,20 +573,32 @@ public class NetworkGameManager : NetworkBehaviour
     /// </summary>
     private void OnTurnChanged(int oldValue, int newValue, bool asServer)
     {
-        // On host, this fires twice (server + client). Only process the client callback.
-        if (asServer && IsClientInitialized)
+        Debug.Log($"[NetworkGameManager] Turn changed: ObjectId {oldValue} -> ObjectId {newValue} (asServer={asServer})");
+        
+        // Only -1 is invalid (game not started). ObjectId 0 IS valid in FishNet!
+        if (newValue < 0)
         {
-            return; // Skip server callback on host - client callback will handle it
+            Debug.Log($"[NetworkGameManager] Ignoring invalid turn value: {newValue}");
+            return;
         }
         
-        Debug.Log($"[NetworkGameManager] Turn changed: ObjectId {oldValue} -> ObjectId {newValue}");
-        
-        // Notify the EncounterController about turn change
-        if (encounterController != null && GameStarted.Value)
+        // On the SERVER/HOST: Notify encounter controller via SyncVar callback
+        // (The RPC is for remote clients only - it skips the server)
+        if (IsServerInitialized && asServer && GameStarted.Value)
         {
-            bool isLocalTurn = IsLocalPlayerTurn();
-            encounterController.OnNetworkTurnChanged(isLocalTurn, TurnNumber.Value);
+            if (encounterController == null)
+            {
+                encounterController = FindObjectOfType<EncounterController>();
+            }
+            
+            if (encounterController != null)
+            {
+                bool isLocalTurn = IsLocalPlayerTurn();
+                Debug.Log($"[Server] SyncVar callback - notifying encounter. isLocalTurn={isLocalTurn}, turnNumber={TurnNumber.Value}");
+                encounterController.OnNetworkTurnChanged(isLocalTurn, TurnNumber.Value);
+            }
         }
+        // Remote clients are handled by RpcBroadcastTurnState
     }
     
     private void OnTurnNumberChanged(int oldValue, int newValue, bool asServer)
@@ -531,7 +649,7 @@ public class NetworkGameManager : NetworkBehaviour
     /// </summary>
     private void OnOpponentDisconnectedChanged(bool oldValue, bool newValue, bool asServer)
     {
-        Debug.Log($"[NetworkGameManager] OpponentDisconnected changed: {oldValue} -> {newValue}");
+        Debug.Log($"[NetworkGameManager] OpponentDisconnected changed: {oldValue} -> {newValue}, asServer={asServer}");
         
         if (newValue && !oldValue)
         {
@@ -539,9 +657,21 @@ public class NetworkGameManager : NetworkBehaviour
             isWaitingForReconnect = true;
             disconnectTimer = 0f;
             
+            // Try to find EncounterController if we don't have it
+            if (encounterController == null)
+            {
+                encounterController = FindObjectOfType<EncounterController>();
+                Debug.Log($"[NetworkGameManager] Found EncounterController: {encounterController != null}");
+            }
+            
             if (encounterController != null)
             {
+                Debug.Log($"[NetworkGameManager] Calling OnOpponentDisconnected with grace period {reconnectGracePeriod}");
                 encounterController.OnOpponentDisconnected(reconnectGracePeriod);
+            }
+            else
+            {
+                Debug.LogError("[NetworkGameManager] EncounterController is null! Cannot show disconnect UI.");
             }
         }
     }
@@ -552,9 +682,15 @@ public class NetworkGameManager : NetworkBehaviour
     [Server]
     public void ServerOnPlayerDisconnected(int playerId)
     {
-        if (!GameStarted.Value) return;
+        Debug.Log($"[Server] ServerOnPlayerDisconnected called for player {playerId}. GameStarted={GameStarted.Value}");
         
-        Debug.Log($"[Server] Player {playerId} disconnected during game!");
+        if (!GameStarted.Value)
+        {
+            Debug.Log($"[Server] Game not started, ignoring disconnect");
+            return;
+        }
+        
+        Debug.Log($"[Server] Player {playerId} disconnected during game! Setting OpponentDisconnected=true");
         disconnectedPlayerId = playerId;
         OpponentDisconnected.Value = true;
     }
@@ -591,6 +727,392 @@ public class NetworkGameManager : NetworkBehaviour
         
         // Load main menu (use full namespace to avoid FishNet.SceneManager conflict)
         UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+    }
+    
+    /// <summary>
+    /// Server: Restore game state from a snapshot (sent by reconnecting client).
+    /// </summary>
+    [Server]
+    public void ServerRestoreGameState(GameStateSnapshot snapshot)
+    {
+        if (snapshot == null)
+        {
+            Debug.LogError("[Server] Cannot restore null game state!");
+            return;
+        }
+        
+        Debug.Log($"[Server] Restoring game state: Turn {snapshot.turnNumber}");
+        
+        // Restore turn state
+        TurnNumber.Value = snapshot.turnNumber;
+        CurrentTurnObjectId.Value = snapshot.currentTurnObjectId;
+        ShuffleSeed.Value = snapshot.shuffleSeed;
+        
+        // Restore player health/mana via their NetworkPlayers
+        if (snapshot.localPlayer != null && localNetworkPlayer != null)
+        {
+            // The "local" from client perspective is the client (opponent from server view)
+            var opponentNP = opponentNetworkPlayer ?? localNetworkPlayer;
+            if (opponentNP != null)
+            {
+                opponentNP.CurrentHealth.Value = snapshot.localPlayer.health;
+                opponentNP.CurrentMana.Value = snapshot.localPlayer.mana;
+                opponentNP.MaxMana.Value = snapshot.localPlayer.maxMana;
+            }
+        }
+        
+        if (snapshot.opponent != null)
+        {
+            // The "opponent" from client perspective is the host (local from server view)
+            var hostNP = localNetworkPlayer;
+            if (hostNP != null)
+            {
+                hostNP.CurrentHealth.Value = snapshot.opponent.health;
+                hostNP.CurrentMana.Value = snapshot.opponent.mana;
+                hostNP.MaxMana.Value = snapshot.opponent.maxMana;
+            }
+        }
+        
+        Debug.Log("[Server] Basic game state restored, broadcasting card restoration...");
+        
+        // Broadcast card restoration to all clients
+        // The client who sent the snapshot has the "localPlayer" data which is actually from their perspective
+        // We need to tell all clients to restore board/hand state
+        string snapshotJson = snapshot.ToJson();
+        RpcRestoreFullGameState(snapshotJson);
+    }
+    
+    /// <summary>
+    /// Notify all clients to restore the full game state including cards.
+    /// </summary>
+    [ObserversRpc]
+    private void RpcRestoreFullGameState(string snapshotJson)
+    {
+        Debug.Log("[Client] Received full game state restoration RPC");
+        
+        var snapshot = GameStateSnapshot.FromJson(snapshotJson);
+        if (snapshot == null)
+        {
+            Debug.LogError("[Client] Failed to deserialize game state snapshot!");
+            return;
+        }
+        
+        // Restore cards on this client
+        RestoreCardsFromSnapshot(snapshot);
+        
+        // Notify encounter controller
+        if (encounterController != null)
+        {
+            encounterController.OnGameStateRestored();
+        }
+    }
+    
+    /// <summary>
+    /// Restore all cards (hand, board, deck) from a snapshot.
+    /// </summary>
+    private void RestoreCardsFromSnapshot(GameStateSnapshot snapshot)
+    {
+        Debug.Log("[Client] Restoring cards from snapshot...");
+        
+        // Ensure CardLibrary is initialized
+        CardLibrary.EnsureInitialized();
+        
+        if (CardLibrary.Instance == null)
+        {
+            Debug.LogError("[Client] CardLibrary not available! Cannot restore cards.");
+            return;
+        }
+        
+        // Determine which snapshot data applies to which local controller
+        // This depends on whether we're the host or client
+        bool isServer = IsServerInitialized;
+        
+        PlayerSnapshot mySnapshot;
+        PlayerSnapshot theirSnapshot;
+        PlayerController myController;
+        PlayerController theirController;
+        HandController myHand;
+        HandController theirHand;
+        string mySlotPrefix;
+        string theirSlotPrefix;
+        bool needsSlotTranslation;
+        
+        if (isServer)
+        {
+            // On server: "opponent" in snapshot is ME (host), "localPlayer" is the client
+            // The snapshot was captured from the CLIENT's perspective, so:
+            // - snapshot.localPlayer has slots like "PlayerSlot-X" (client's view of their slots)
+            // - snapshot.opponent has slots like "OpponentSlot-X" (client's view of host slots)
+            // On server:
+            // - My slots (host) are "PlayerSlot-X", so snapshot.opponent slots need translation from "OpponentSlot" -> "PlayerSlot"
+            // - Their slots (client) are "OpponentSlot-X", so snapshot.localPlayer slots need translation from "PlayerSlot" -> "OpponentSlot"
+            mySnapshot = snapshot.opponent;
+            theirSnapshot = snapshot.localPlayer;
+            myController = localPlayerController;
+            theirController = opponentPlayerController;
+            myHand = encounterController?.playerHandController;
+            theirHand = encounterController?.opponentHandController;
+            mySlotPrefix = "PlayerSlot";
+            theirSlotPrefix = "OpponentSlot";
+            needsSlotTranslation = true; // Server needs to translate client's slot names
+        }
+        else
+        {
+            // On client: "localPlayer" in snapshot is ME, "opponent" is the host
+            // The snapshot was captured from THIS client's perspective, so no translation needed
+            mySnapshot = snapshot.localPlayer;
+            theirSnapshot = snapshot.opponent;
+            myController = localPlayerController;
+            theirController = opponentPlayerController;
+            myHand = encounterController?.playerHandController;
+            theirHand = encounterController?.opponentHandController;
+            mySlotPrefix = "PlayerSlot";
+            theirSlotPrefix = "OpponentSlot";
+            needsSlotTranslation = false; // Client uses its own perspective
+        }
+        
+        // Clear current board and hands before restoring
+        ClearBoardAndHands();
+        
+        // Restore my state
+        if (mySnapshot != null && myController != null)
+        {
+            // On server: mySnapshot is from opponent's perspective, needs translation
+            RestorePlayerCards(mySnapshot, myController, myHand, mySlotPrefix, needsSlotTranslation);
+        }
+        
+        // Restore opponent state
+        if (theirSnapshot != null && theirController != null)
+        {
+            // On server: theirSnapshot is from client's own perspective, needs translation
+            RestorePlayerCards(theirSnapshot, theirController, theirHand, theirSlotPrefix, needsSlotTranslation);
+        }
+        
+        Debug.Log("[Client] Card restoration complete!");
+    }
+    
+    /// <summary>
+    /// Clear all cards from board and hands.
+    /// </summary>
+    private void ClearBoardAndHands()
+    {
+        Debug.Log("[Client] Clearing board and hands...");
+        
+        // Clear player slots
+        for (int i = 1; i <= 3; i++)
+        {
+            ClearSlot($"PlayerSlot-{i}");
+            ClearSlot($"OpponentSlot-{i}");
+        }
+        
+        // Clear player boards
+        if (localPlayerController != null)
+        {
+            localPlayerController.board.Clear();
+        }
+        if (opponentPlayerController != null)
+        {
+            opponentPlayerController.board.Clear();
+        }
+        
+        // Clear hands
+        var playerHand = encounterController?.playerHandController;
+        var oppHand = encounterController?.opponentHandController;
+        
+        if (playerHand != null)
+        {
+            var hand = playerHand.GetHand();
+            if (hand != null)
+            {
+                foreach (var card in hand.ToArray())
+                {
+                    if (card != null) Destroy(card.gameObject);
+                }
+                hand.Clear();
+            }
+        }
+        
+        if (oppHand != null)
+        {
+            var hand = oppHand.GetHand();
+            if (hand != null)
+            {
+                foreach (var card in hand.ToArray())
+                {
+                    if (card != null) Destroy(card.gameObject);
+                }
+                hand.Clear();
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Translate a slot name from one perspective to the other.
+    /// PlayerSlot-X <-> OpponentSlot-X
+    /// </summary>
+    private string TranslateSlotName(string slotName)
+    {
+        if (string.IsNullOrEmpty(slotName)) return slotName;
+        
+        if (slotName.StartsWith("PlayerSlot-"))
+        {
+            return slotName.Replace("PlayerSlot-", "OpponentSlot-");
+        }
+        else if (slotName.StartsWith("OpponentSlot-"))
+        {
+            return slotName.Replace("OpponentSlot-", "PlayerSlot-");
+        }
+        
+        return slotName;
+    }
+    
+    /// <summary>
+    /// Clear a single board slot.
+    /// </summary>
+    private void ClearSlot(string slotName)
+    {
+        var slot = GameObject.Find(slotName);
+        if (slot != null)
+        {
+            var card = slot.GetComponentInChildren<CardController>();
+            if (card != null)
+            {
+                Destroy(card.gameObject);
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Restore cards for a single player.
+    /// </summary>
+    /// <param name="snapshot">The player's state snapshot</param>
+    /// <param name="controller">The PlayerController to restore to</param>
+    /// <param name="handController">The HandController for this player</param>
+    /// <param name="slotPrefix">The slot prefix to use (e.g., "PlayerSlot" or "OpponentSlot")</param>
+    /// <param name="translateSlots">If true, translate slot names from opposite perspective</param>
+    private void RestorePlayerCards(PlayerSnapshot snapshot, PlayerController controller, HandController handController, string slotPrefix, bool translateSlots = false)
+    {
+        Debug.Log($"[Client] Restoring cards for {controller.name}: " +
+                  $"{snapshot.handCardIds.Count} hand, {snapshot.boardCards.Count} board, {snapshot.deckCardIds.Count} deck");
+        
+        // Restore board cards first
+        foreach (var boardCard in snapshot.boardCards)
+        {
+            var newCard = CardLibrary.Instance.InstantiateCard(boardCard.cardId);
+            if (newCard == null)
+            {
+                Debug.LogWarning($"[Client] Could not create card: {boardCard.cardId}");
+                continue;
+            }
+            
+            // Determine the correct slot name
+            string slotName;
+            if (!string.IsNullOrEmpty(boardCard.slotName) && translateSlots)
+            {
+                // Translate slot name from other perspective
+                // If captured as "PlayerSlot-X", it should be "OpponentSlot-X" on the other side, and vice versa
+                slotName = TranslateSlotName(boardCard.slotName);
+                Debug.Log($"[Client] Translated slot {boardCard.slotName} -> {slotName}");
+            }
+            else if (!string.IsNullOrEmpty(boardCard.slotName))
+            {
+                // Use the slot name as captured
+                slotName = boardCard.slotName;
+            }
+            else
+            {
+                // Fallback: use slot prefix with index
+                slotName = $"{slotPrefix}-{boardCard.slotIndex + 1}";
+            }
+            
+            var slot = GameObject.Find(slotName);
+            if (slot == null)
+            {
+                Debug.LogWarning($"[Client] Could not find slot: {slotName}");
+                Destroy(newCard.gameObject);
+                continue;
+            }
+            
+            // Position card in slot
+            newCard.transform.SetParent(slot.transform);
+            newCard.transform.localPosition = Vector3.zero;
+            newCard.transform.localRotation = Quaternion.identity;
+            newCard.transform.localScale = Vector3.one;
+            
+            // Restore card state
+            newCard.health = boardCard.currentHealth;
+            newCard.isTapped = boardCard.hasAttacked;
+            newCard.hasSummoningSickness = boardCard.hasSummoningSickness;
+            newCard.isInHand = false;
+            newCard.isInPlay = true;
+            newCard.owningPlayer = controller;
+            
+            // Update visuals
+            newCard.UpdateCardUI();
+            newCard.UpdateVisualEffects();
+            
+            // Add to board list
+            controller.board.Add(newCard);
+            
+            Debug.Log($"[Client] Restored board card: {boardCard.cardId} to {slotName} with HP={boardCard.currentHealth}");
+        }
+        
+        // Restore hand cards
+        if (handController != null)
+        {
+            foreach (var cardId in snapshot.handCardIds)
+            {
+                var newCard = CardLibrary.Instance.InstantiateCard(cardId);
+                if (newCard == null)
+                {
+                    Debug.LogWarning($"[Client] Could not create hand card: {cardId}");
+                    continue;
+                }
+                
+                newCard.owningPlayer = controller;
+                newCard.isInHand = true;
+                newCard.isInPlay = false;
+                
+                // Add to hand using HandController (use AddExistingCardToHand since card is already instantiated)
+                handController.AddExistingCardToHand(newCard);
+                
+                Debug.Log($"[Client] Restored hand card: {cardId}");
+            }
+        }
+        
+        // Restore deck order
+        if (controller.deck != null)
+        {
+            controller.deck.Clear();
+            foreach (var cardId in snapshot.deckCardIds)
+            {
+                var newCard = CardLibrary.Instance.InstantiateCard(cardId);
+                if (newCard != null)
+                {
+                    newCard.owningPlayer = controller;
+                    newCard.isInHand = false;
+                    newCard.isInPlay = false;
+                    // Hide deck cards
+                    newCard.gameObject.SetActive(false);
+                    controller.deck.Add(newCard);
+                }
+            }
+            Debug.Log($"[Client] Restored {controller.deck.Count} deck cards");
+        }
+    }
+    
+    /// <summary>
+    /// Notify all clients that game state has been restored after reconnection.
+    /// </summary>
+    [ObserversRpc]
+    private void RpcGameStateRestored()
+    {
+        Debug.Log("[Client] Game state restored - resuming game!");
+        
+        if (encounterController != null)
+        {
+            encounterController.OnGameStateRestored();
+        }
     }
     
     #endregion

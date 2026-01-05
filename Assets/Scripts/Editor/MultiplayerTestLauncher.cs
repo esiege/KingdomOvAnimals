@@ -97,6 +97,67 @@ public static class MultiplayerTestLauncher
         }
     }
     
+    [MenuItem("Tools/Multiplayer Test/Clean FishNet Cache (Requires Restart)")]
+    public static void CleanFishNetCache()
+    {
+        UnityEngine.Debug.Log("[MultiplayerTest] Cleaning FishNet cache to fix SyncType mismatches...");
+        UnityEngine.Debug.LogWarning("[MultiplayerTest] WARNING: You will need to restart Unity after this!");
+        
+        string projectRoot = Directory.GetCurrentDirectory();
+        int deletedCount = 0;
+        
+        // Directories to clean (these contain cached FishNet weaver output)
+        string[] cacheDirs = new string[]
+        {
+            Path.Combine(projectRoot, "Library", "Bee"),
+            Path.Combine(projectRoot, "Library", "ScriptAssemblies"),
+            Path.Combine(projectRoot, "Build") // Also clean the build folder
+        };
+        
+        foreach (string dir in cacheDirs)
+        {
+            if (Directory.Exists(dir))
+            {
+                try
+                {
+                    Directory.Delete(dir, true);
+                    UnityEngine.Debug.Log($"[MultiplayerTest] Deleted: {dir}");
+                    deletedCount++;
+                }
+                catch (System.Exception e)
+                {
+                    UnityEngine.Debug.LogWarning($"[MultiplayerTest] Could not delete {dir}: {e.Message}");
+                }
+            }
+        }
+        
+        if (deletedCount > 0)
+        {
+            UnityEngine.Debug.Log($"[MultiplayerTest] Cleaned {deletedCount} cache directories. Please restart Unity.");
+            AssetDatabase.Refresh();
+        }
+        else
+        {
+            UnityEngine.Debug.Log("[MultiplayerTest] No cache directories found to clean.");
+        }
+    }
+    
+    [MenuItem("Tools/Multiplayer Test/Rebuild SceneIds + Build + Run %&r")]
+    public static void RebuildAndRun()
+    {
+        // Rebuild FishNet SceneIds to ensure sync between editor and build
+        EditorApplication.ExecuteMenuItem("Tools/Fish-Networking/Rebuild SceneIds");
+        
+        // Save all scenes after rebuilding SceneIds
+        UnityEditor.SceneManagement.EditorSceneManager.SaveOpenScenes();
+        
+        // Wait a frame for the save to complete, then build
+        EditorApplication.delayCall += () =>
+        {
+            BuildAndRunBoth();
+        };
+    }
+    
     private static void LaunchBuild()
     {
         string fullPath = Path.Combine(Directory.GetCurrentDirectory(), BUILD_PATH);
