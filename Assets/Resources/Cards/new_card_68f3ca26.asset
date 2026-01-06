@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcb980dac48b640408a61c4e643f328a, type: 3}
+  m_Name: new_card_68f3ca26
+  m_EditorClassIdentifier: 
+  id: new_card_68f3ca26
+  displayName: Fart
+  description: 
+  health: 1
+  manaCost: 1
+  offensiveAbility: {fileID: 0}
+  defensiveAbility: {fileID: 0}
+  artwork: {fileID: 21300000, guid: aea5779950ad2eb4b8175f69750f942f, type: 3}
+  cardFrame: {fileID: 0}
+  cardType: 0
+  faction: 

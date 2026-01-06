@@ -1,8 +1,9 @@
 # Story 017: Card List & Editor UI
 
-## Status: Not Started
+## Status: In Progress
 ## Sprint: 02
 ## Dependencies: 012, 016
+## Started: 2026-01-06
 
 ---
 
