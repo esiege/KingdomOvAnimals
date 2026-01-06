@@ -1,6 +1,7 @@
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using System;
 using UnityEngine;
 
 // FishNet code regeneration trigger - do not remove
@@ -94,6 +95,9 @@ public class NetworkPlayer : NetworkBehaviour
 
     // Store the player ID to be used during OnStartServer
     private int _pendingPlayerId = -1;
+    
+    // Store pending state for reconnection (applied in OnStartServer)
+    private DisconnectedPlayerState _pendingState = null;
 
     /// <summary>
     /// Called by server to set the player ID before spawn.
@@ -103,21 +107,86 @@ public class NetworkPlayer : NetworkBehaviour
     {
         _pendingPlayerId = playerId;
     }
+    
+    /// <summary>
+    /// Set the state to be restored when the NetworkPlayer spawns.
+    /// Must be called BEFORE spawn.
+    /// </summary>
+    public void SetPendingState(DisconnectedPlayerState state)
+    {
+        _pendingState = state;
+        if (state != null)
+        {
+            _pendingPlayerId = state.playerId;
+            Debug.Log($"[NetworkPlayer] Pending state set for player {state.playerId}: HP={state.health}, Mana={state.mana}");
+        }
+    }
+    
+    /// <summary>
+    /// Restore SyncVar state from saved DisconnectedPlayerState.
+    /// Called AFTER spawn so SyncVars sync to clients properly.
+    /// Card restoration happens separately via NetworkGameManager.
+    /// </summary>
+    [Obsolete("Use SetPendingState before spawn instead")]
+    public void RestoreFromState(DisconnectedPlayerState state)
+    {
+        if (state == null)
+        {
+            Debug.LogWarning("[NetworkPlayer] RestoreFromState called with null state!");
+            return;
+        }
+        
+        Debug.Log($"[NetworkPlayer] Restoring state for player {state.playerId}: HP={state.health}/{state.maxHealth}, Mana={state.mana}/{state.maxMana}");
+        
+        // Restore all SyncVars - these will sync to clients since we're spawned
+        PlayerId.Value = state.playerId;
+        PlayerName.Value = state.playerName;
+        CurrentHealth.Value = state.health;
+        MaxHealth.Value = state.maxHealth;
+        CurrentMana.Value = state.mana;
+        MaxMana.Value = state.maxMana;
+        
+        Debug.Log($"[NetworkPlayer] State restored! PlayerId={PlayerId.Value}, HP={CurrentHealth.Value}, Mana={CurrentMana.Value}");
+    }
 
     public override void OnStartServer()
     {
         base.OnStartServer();
         
-        // Use FishNet's Owner.ClientId as the canonical player ID
-        // This ensures consistency between server and client
-        PlayerId.Value = Owner.ClientId;
-        PlayerName.Value = $"Player {Owner.ClientId}";
-        Debug.Log($"[NetworkPlayer] Server: PlayerId set to Owner.ClientId={Owner.ClientId}");
+        // Check if this is a reconnection with pending state
+        if (_pendingState != null)
+        {
+            // Reconnection - restore ALL state from pending state
+            PlayerId.Value = _pendingState.playerId;
+            PlayerName.Value = _pendingState.playerName;
+            CurrentHealth.Value = _pendingState.health;
+            MaxHealth.Value = _pendingState.maxHealth;
+            CurrentMana.Value = _pendingState.mana;
+            MaxMana.Value = _pendingState.maxMana;
+            
+            Debug.Log($"[NetworkPlayer] Server (reconnect): Restored state for player {_pendingState.playerId}: HP={_pendingState.health}/{_pendingState.maxHealth}, Mana={_pendingState.mana}/{_pendingState.maxMana}");
+            
+            // Clear pending state
+            _pendingState = null;
+            _pendingPlayerId = -1;
+        }
+        else if (_pendingPlayerId >= 0)
+        {
+            // Reconnection without full state - just use the preserved player ID
+            PlayerId.Value = _pendingPlayerId;
+            PlayerName.Value = $"Player {_pendingPlayerId}";
+            Debug.Log($"[NetworkPlayer] Server (reconnect): PlayerId set to preserved ID={_pendingPlayerId}");
+            _pendingPlayerId = -1;
+        }
+        else
+        {
+            // New player - use FishNet's Owner.ClientId as the canonical player ID
+            PlayerId.Value = Owner.ClientId;
+            PlayerName.Value = $"Player {Owner.ClientId}";
+            Debug.Log($"[NetworkPlayer] Server: PlayerId set to Owner.ClientId={Owner.ClientId}");
+        }
         
-        // Initial values (20 health, 1 mana) are set in SyncVar constructors.
-        // ForceUpdateLinkedController() handles pushing these to the UI.
-        
-        Debug.Log($"[NetworkPlayer] Spawned: {PlayerName.Value} (ID: {PlayerId.Value})");
+        Debug.Log($"[NetworkPlayer] Spawned: {PlayerName.Value} (ID: {PlayerId.Value}), HP={CurrentHealth.Value}, Mana={CurrentMana.Value}");
     }
 
     public override void OnStartClient()
@@ -505,10 +574,104 @@ public class NetworkPlayer : NetworkBehaviour
         Debug.Log($"[Client] {card.cardName} played to {slot.name}");
     }
     
+    #region Card Draw (Network Synced)
+    
+    /// <summary>
+    /// Server triggers a card draw for this player.
+    /// Called by NetworkGameManager when a turn starts.
+    /// </summary>
+    [Server]
+    public void ServerDrawCard()
+    {
+        if (LinkedPlayerController == null || LinkedPlayerController.deck == null)
+        {
+            Debug.LogWarning($"[Server] Cannot draw card - LinkedPlayerController or deck is null");
+            return;
+        }
+        
+        if (LinkedPlayerController.deck.Count == 0)
+        {
+            Debug.Log($"[Server] {PlayerName.Value} has no cards to draw");
+            return;
+        }
+        
+        // Get the card name that will be drawn (top of deck)
+        var topCard = LinkedPlayerController.deck[0];
+        string cardName = topCard.cardName;
+        
+        Debug.Log($"[Server] {PlayerName.Value} drawing card: {cardName}");
+        
+        // Broadcast to all clients
+        RpcExecuteCardDraw(cardName);
+    }
+    
+    /// <summary>
+    /// Called on all clients to execute a card draw.
+    /// NOTE: BufferLast is NOT used because reconnecting clients get their hand state
+    /// from the state restoration snapshot, not from buffered RPCs.
+    /// </summary>
+    [ObserversRpc]
+    private void RpcExecuteCardDraw(string cardName)
+    {
+        Debug.Log($"[Client] RpcExecuteCardDraw: {PlayerName.Value} draws {cardName}");
+        
+        var encounterController = FindObjectOfType<EncounterController>();
+        if (encounterController == null)
+        {
+            Debug.LogWarning("[Client] RpcExecuteCardDraw: EncounterController not found (may be in state restoration)");
+            return;
+        }
+        
+        var handController = GetHandController();
+        if (handController == null)
+        {
+            Debug.LogWarning($"[Client] RpcExecuteCardDraw: HandController not found for {PlayerName.Value} (may be in state restoration)");
+            return;
+        }
+        
+        if (LinkedPlayerController == null || LinkedPlayerController.deck == null)
+        {
+            Debug.LogWarning($"[Client] RpcExecuteCardDraw: LinkedPlayerController or deck is null (may be in state restoration)");
+            return;
+        }
+        
+        // Check if deck has cards
+        if (LinkedPlayerController.deck.Count == 0)
+        {
+            Debug.Log($"[Client] {PlayerName.Value} has no cards to draw (deck empty)");
+            return;
+        }
+        
+        // Check hand size limit
+        if (handController.GetHand().Count >= encounterController.maxHandSize)
+        {
+            Debug.Log($"[Client] {PlayerName.Value} cannot draw - hand is full");
+            return;
+        }
+        
+        // Draw the top card from deck
+        CardController drawnCard = LinkedPlayerController.deck[0];
+        LinkedPlayerController.deck.RemoveAt(0);
+        
+        // Verify it's the expected card (sanity check)
+        if (drawnCard.cardName != cardName)
+        {
+            Debug.LogWarning($"[Client] Card mismatch! Expected {cardName}, got {drawnCard.cardName}. Decks may be out of sync.");
+        }
+        
+        // Set ownership and add to hand
+        drawnCard.owningPlayer = LinkedPlayerController;
+        handController.AddCardToHand(drawnCard);
+        
+        Debug.Log($"[Client] {PlayerName.Value} drew {drawnCard.cardName}. Deck remaining: {LinkedPlayerController.deck.Count}");
+    }
+    
+    #endregion
+
     /// <summary>
     /// Gets the HandController associated with this player.
     /// </summary>
-    private HandController GetHandController()
+    public HandController GetHandController()
     {
         var encounterController = GameObject.FindObjectOfType<EncounterController>();
         if (encounterController == null)

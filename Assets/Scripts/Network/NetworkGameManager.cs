@@ -4,6 +4,7 @@ using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 using System.Collections.Generic;
 
 // FishNet code regeneration trigger - do not remove
@@ -71,6 +72,10 @@ public class NetworkGameManager : NetworkBehaviour
     
     // Reconnection flag - client sets this when it was disconnected and is reconnecting
     private bool _isReconnecting = false;
+    
+    // Track last time we tried to find local player (to avoid spam)
+    private float _lastPlayerSearchTime = 0f;
+    private const float PLAYER_SEARCH_COOLDOWN = 0.5f; // Only try every 0.5 seconds
 
     private void Awake()
     {
@@ -358,12 +363,23 @@ public class NetworkGameManager : NetworkBehaviour
     {
         if (localNetworkPlayer == null)
         {
-            Debug.LogWarning("[NetworkGameManager] IsLocalPlayerTurn called but localNetworkPlayer is NULL! Trying to find it...");
-            TryFindLocalPlayer();
-            
-            if (localNetworkPlayer == null)
+            // Only try to find the player if enough time has passed since last attempt
+            float currentTime = Time.time;
+            if (currentTime - _lastPlayerSearchTime >= PLAYER_SEARCH_COOLDOWN)
             {
-                Debug.LogError("[NetworkGameManager] Could not find localNetworkPlayer!");
+                _lastPlayerSearchTime = currentTime;
+                Debug.LogWarning("[NetworkGameManager] IsLocalPlayerTurn called but localNetworkPlayer is NULL! Trying to find it...");
+                TryFindLocalPlayer();
+                
+                if (localNetworkPlayer == null)
+                {
+                    Debug.LogWarning("[NetworkGameManager] Could not find localNetworkPlayer yet (this is normal during reconnection)");
+                    return false;
+                }
+            }
+            else
+            {
+                // Still cooling down, don't spam logs
                 return false;
             }
         }
@@ -400,15 +416,32 @@ public class NetworkGameManager : NetworkBehaviour
     private void TryFindLocalPlayer()
     {
         NetworkPlayer[] players = FindObjectsOfType<NetworkPlayer>();
+        
+        // Get our local connection ID for comparison
+        int localClientId = -1;
+        if (FishNet.InstanceFinder.ClientManager != null && FishNet.InstanceFinder.ClientManager.Connection != null)
+        {
+            localClientId = FishNet.InstanceFinder.ClientManager.Connection.ClientId;
+        }
+        
         foreach (var player in players)
         {
-            if (player.IsOwner)
+            // Check both IsOwner and ClientId match
+            bool isLocalPlayer = player.IsOwner;
+            if (!isLocalPlayer && player.Owner != null && localClientId >= 0)
+            {
+                isLocalPlayer = (player.Owner.ClientId == localClientId);
+            }
+            
+            if (isLocalPlayer)
             {
                 localNetworkPlayer = player;
                 Debug.Log($"[NetworkGameManager] Found local player: {player.PlayerName.Value} (ObjectId: {player.ObjectId})");
                 return;
             }
         }
+        
+        Debug.LogWarning($"[NetworkGameManager] TryFindLocalPlayer failed! Found {players.Length} NetworkPlayer(s), localClientId={localClientId}");
     }
     
     /// <summary>
@@ -457,6 +490,18 @@ public class NetworkGameManager : NetworkBehaviour
         int nextObjectId = GetNextPlayerObjectId();
         TurnNumber.Value++;
         CurrentTurnObjectId.Value = nextObjectId;
+        
+        // Trigger card draw for the new current player (turn 2+ draws a card)
+        if (TurnNumber.Value > 1)
+        {
+            NetworkPlayer nextPlayer = null;
+            networkPlayers.TryGetValue(nextObjectId, out nextPlayer);
+            if (nextPlayer != null)
+            {
+                Debug.Log($"[Server] Triggering card draw for {nextPlayer.PlayerName.Value}");
+                nextPlayer.ServerDrawCard();
+            }
+        }
         
         // Explicitly broadcast turn state via RPC to ensure clients get it
         RpcBroadcastTurnState(CurrentTurnObjectId.Value, TurnNumber.Value, GameStarted.Value, ShuffleSeed.Value);
@@ -565,8 +610,22 @@ public class NetworkGameManager : NetworkBehaviour
     
     private bool IsLocalPlayerTurnFromCache()
     {
-        if (localNetworkPlayer == null) return false;
-        return localNetworkPlayer.ObjectId == _cachedTurnObjectId;
+        // Try to find localNetworkPlayer if null (can happen after reconnection)
+        if (localNetworkPlayer == null)
+        {
+            Debug.LogWarning("[NetworkGameManager] IsLocalPlayerTurnFromCache: localNetworkPlayer is null, trying to find it...");
+            ReRegisterNetworkPlayers();
+        }
+        
+        if (localNetworkPlayer == null)
+        {
+            Debug.LogWarning("[NetworkGameManager] IsLocalPlayerTurnFromCache: Still null after re-registration!");
+            return false;
+        }
+        
+        bool result = localNetworkPlayer.ObjectId == _cachedTurnObjectId;
+        Debug.Log($"[NetworkGameManager] IsLocalPlayerTurnFromCache: localObjectId={localNetworkPlayer.ObjectId}, cachedTurnObjectId={_cachedTurnObjectId}, result={result}");
+        return result;
     }
     
     private void TryInitializeEncounterFromRpc()
@@ -590,17 +649,26 @@ public class NetworkGameManager : NetworkBehaviour
     
     private int GetNextPlayerObjectId()
     {
+        Debug.Log($"[Server] GetNextPlayerObjectId: Looking for player other than {CurrentTurnObjectId.Value}. networkPlayers count={networkPlayers.Count}");
+        
+        // Log all players in dictionary
+        foreach (var kvp in networkPlayers)
+        {
+            Debug.Log($"[Server] GetNextPlayerObjectId: Found player ObjectId={kvp.Key}, Name={kvp.Value?.PlayerName?.Value ?? "null"}");
+        }
+        
         // Simple 2-player toggle - find the OTHER player in the dictionary
         foreach (var kvp in networkPlayers)
         {
             if (kvp.Key != CurrentTurnObjectId.Value)
             {
+                Debug.Log($"[Server] GetNextPlayerObjectId: Returning {kvp.Key}");
                 return kvp.Key;
             }
         }
         
         // Fallback - shouldn't happen
-        Debug.LogWarning("[Server] Could not find next player ObjectId!");
+        Debug.LogWarning("[Server] Could not find next player ObjectId! Only one player in dictionary?");
         return CurrentTurnObjectId.Value;
     }
     
@@ -739,14 +807,148 @@ public class NetworkGameManager : NetworkBehaviour
     }
     
     /// <summary>
-    /// Server: Called when a player reconnects.
+    /// Server: Called when a player reconnects with the DESPAWN/RESPAWN pattern.
+    /// The fresh NetworkPlayer is already spawned; we need to link it and restore card state.
+    /// </summary>
+    [Server]
+    public void ServerOnPlayerReconnected(int playerId, NetworkConnection conn, NetworkPlayer newNetworkPlayer, DisconnectedPlayerState savedState)
+    {
+        Debug.Log($"[Server] Player {playerId} reconnected with fresh NetworkPlayer!");
+        
+        if (disconnectedPlayerId == playerId)
+        {
+            OpponentDisconnected.Value = false;
+            disconnectedPlayerId = -1;
+        }
+        
+        // Re-register the new NetworkPlayer in our tracking
+        if (newNetworkPlayer != null)
+        {
+            int newObjectId = newNetworkPlayer.ObjectId;
+            
+            // CRITICAL: Remove the OLD despawned NetworkPlayer from the dictionary first!
+            // The old ObjectId is stored in savedState.oldObjectId
+            if (savedState.oldObjectId > 0 && networkPlayers.ContainsKey(savedState.oldObjectId))
+            {
+                Debug.Log($"[Server] Removing OLD despawned NetworkPlayer {savedState.oldObjectId} from networkPlayers dictionary");
+                networkPlayers.Remove(savedState.oldObjectId);
+            }
+            
+            // Now register the fresh NetworkPlayer
+            networkPlayers[newObjectId] = newNetworkPlayer;
+            Debug.Log($"[Server] Registered fresh NetworkPlayer {newObjectId} for player {playerId}. networkPlayers.Count={networkPlayers.Count}");
+            
+            // CRITICAL: Update CurrentTurnObjectId if this player had the turn
+            // The old NetworkPlayer was despawned, so we need to point to the new one
+            if (savedState.wasTheirTurn)
+            {
+                Debug.Log($"[Server] Updating CurrentTurnObjectId from {CurrentTurnObjectId.Value} to {newObjectId} (it was player {playerId}'s turn)");
+                CurrentTurnObjectId.Value = newObjectId;
+            }
+            else
+            {
+                Debug.Log($"[Server] Not updating turn - it was NOT player {playerId}'s turn (CurrentTurnObjectId={CurrentTurnObjectId.Value})");
+            }
+            
+            // Link to the appropriate PlayerController
+            // Player 0 = encounter.player, Player 1 = encounter.opponent (from server perspective)
+            if (encounterController != null)
+            {
+                PlayerController targetController = (playerId == 0) ? encounterController.player : encounterController.opponent;
+                HandController targetHand = (playerId == 0) ? encounterController.playerHandController : encounterController.opponentHandController;
+                
+                if (targetController != null)
+                {
+                    newNetworkPlayer.LinkedPlayerController = targetController;
+                    targetController.networkPlayer = newNetworkPlayer;
+                    Debug.Log($"[Server] Linked NetworkPlayer to {targetController.gameObject.name}");
+                    
+                    // Restore cards from saved state
+                    RestorePlayerCards(targetController, targetHand, savedState);
+                }
+            }
+        }
+        
+        // Send game state to the reconnected client
+        StartCoroutine(SendGameStateToReconnectedPlayer(playerId, conn));
+    }
+    
+    /// <summary>
+    /// Server: Restore cards (hand, deck, graveyard) from saved state.
+    /// Board cards are handled separately as they persist in the scene.
+    /// </summary>
+    [Server]
+    private void RestorePlayerCards(PlayerController controller, HandController handController, DisconnectedPlayerState state)
+    {
+        if (controller == null || state == null) return;
+        
+        Debug.Log($"[Server] Restoring cards for player {state.playerId}: Hand={state.handCardIds.Count}, Deck={state.deckCardIds.Count}");
+        
+        // Clear and restore deck
+        if (controller.deck != null)
+        {
+            controller.deck.Clear();
+            foreach (var cardId in state.deckCardIds)
+            {
+                var card = CardLibrary.Instance?.InstantiateCard(cardId);
+                if (card != null)
+                {
+                    card.owningPlayer = controller;
+                    card.isInHand = false;
+                    card.isInPlay = false;
+                    card.gameObject.SetActive(false);
+                    controller.deck.Add(card);
+                }
+            }
+        }
+        
+        // Clear and restore hand
+        if (handController != null)
+        {
+            handController.ClearHand();
+            foreach (var cardId in state.handCardIds)
+            {
+                var card = CardLibrary.Instance?.InstantiateCard(cardId);
+                if (card != null)
+                {
+                    card.owningPlayer = controller;
+                    card.isInHand = true;
+                    handController.AddExistingCardToHand(card);
+                }
+            }
+        }
+        
+        // Restore graveyard
+        if (controller.graveyard != null)
+        {
+            controller.graveyard.Clear();
+            foreach (var cardId in state.graveyardCardIds)
+            {
+                var card = CardLibrary.Instance?.InstantiateCard(cardId);
+                if (card != null)
+                {
+                    card.owningPlayer = controller;
+                    card.isInHand = false;
+                    card.isInPlay = false;
+                    card.gameObject.SetActive(false);
+                    controller.graveyard.Add(card);
+                }
+            }
+        }
+        
+        Debug.Log($"[Server] Cards restored: Hand={handController?.GetHand()?.Count ?? 0}, Deck={controller.deck?.Count ?? 0}");
+    }
+    
+    /// <summary>
+    /// Legacy overload for backward compatibility (shouldn't be needed with new pattern).
     /// </summary>
     [Server]
     public void ServerOnPlayerReconnected(int playerId, NetworkConnection conn = null)
     {
+        Debug.LogWarning($"[Server] Legacy ServerOnPlayerReconnected called for player {playerId}. Using new DESPAWN/RESPAWN pattern is preferred.");
+        
         if (disconnectedPlayerId == playerId)
         {
-            Debug.Log($"[Server] Player {playerId} reconnected!");
             OpponentDisconnected.Value = false;
             disconnectedPlayerId = -1;
             
@@ -829,11 +1031,28 @@ public class NetworkGameManager : NetworkBehaviour
     {
         if (controller == null) return null;
         
+        // Prefer NetworkPlayer values if available (authoritative), fall back to local PlayerController
+        int capturedHealth = controller.currentHealth;
+        int capturedMana = controller.currentMana;
+        int capturedMaxMana = controller.maxMana;
+        
+        if (controller.networkPlayer != null && controller.networkPlayer.IsSpawned)
+        {
+            capturedHealth = controller.networkPlayer.CurrentHealth.Value;
+            capturedMana = controller.networkPlayer.CurrentMana.Value;
+            capturedMaxMana = controller.networkPlayer.MaxMana.Value;
+            Debug.Log($"[Server] CapturePlayerSnapshot using NetworkPlayer: {controller.networkPlayer.PlayerName.Value}, Mana={capturedMana}/{capturedMaxMana}, HP={capturedHealth}");
+        }
+        else
+        {
+            Debug.LogWarning($"[Server] CapturePlayerSnapshot: NetworkPlayer unavailable for controller, using local values: Mana={capturedMana}/{capturedMaxMana}, HP={capturedHealth}");
+        }
+        
         var snapshot = new PlayerSnapshot
         {
-            health = controller.currentHealth,
-            mana = controller.currentMana,
-            maxMana = controller.maxMana,
+            health = capturedHealth,
+            mana = capturedMana,
+            maxMana = capturedMaxMana,
             handCardIds = new System.Collections.Generic.List<string>(),
             boardCards = new System.Collections.Generic.List<BoardCardSnapshot>(),
             deckCardIds = new System.Collections.Generic.List<string>()
@@ -922,6 +1141,8 @@ public class NetworkGameManager : NetworkBehaviour
     
     /// <summary>
     /// Server: Restore game state from a snapshot (sent by reconnecting client).
+    /// This is called when the HOST reconnects and client sends saved state.
+    /// Only overwrites server state if the server has LOST its state.
     /// </summary>
     [Server]
     public void ServerRestoreGameState(GameStateSnapshot snapshot)
@@ -932,12 +1153,27 @@ public class NetworkGameManager : NetworkBehaviour
             return;
         }
         
-        Debug.Log($"[Server] Restoring game state: Turn {snapshot.turnNumber}");
+        Debug.Log($"[Server] ServerRestoreGameState called: Client sent Turn={snapshot.turnNumber}, TurnObjectId={snapshot.currentTurnObjectId}");
+        Debug.Log($"[Server] Current server state: Turn={TurnNumber.Value}, TurnObjectId={CurrentTurnObjectId.Value}");
         
-        // Restore turn state
-        TurnNumber.Value = snapshot.turnNumber;
-        CurrentTurnObjectId.Value = snapshot.currentTurnObjectId;
-        ShuffleSeed.Value = snapshot.shuffleSeed;
+        // CRITICAL: Only restore turn state if the server has invalid/lost state.
+        // If the server has valid turn state (>= 0), it means the server didn't lose state
+        // and a client is incorrectly trying to overwrite it (e.g., client reconnected
+        // thinking it was host reconnection).
+        bool serverHasValidTurnState = CurrentTurnObjectId.Value >= 0;
+        
+        if (serverHasValidTurnState)
+        {
+            Debug.LogWarning($"[Server] SKIPPING turn state restoration - server already has valid state (TurnObjectId={CurrentTurnObjectId.Value}). Client snapshot may be stale.");
+            // Don't overwrite TurnNumber, CurrentTurnObjectId, or ShuffleSeed
+        }
+        else
+        {
+            Debug.Log($"[Server] Restoring turn state from client snapshot (server had no valid state)");
+            TurnNumber.Value = snapshot.turnNumber;
+            CurrentTurnObjectId.Value = snapshot.currentTurnObjectId;
+            ShuffleSeed.Value = snapshot.shuffleSeed;
+        }
         
         // Restore player health/mana via their NetworkPlayers
         if (snapshot.localPlayer != null && localNetworkPlayer != null)
@@ -1020,10 +1256,21 @@ public class NetworkGameManager : NetworkBehaviour
         // Mark encounter as initialized for reconnecting clients
         _encounterInitialized = true;
         
-        // CRITICAL: Re-register and re-link NetworkPlayers after reconnection
-        // This ensures RPCs like RpcExecuteCardPlay can find the correct HandController
+        // DESPAWN/RESPAWN PATTERN: The client should have received a fresh NetworkPlayer spawn
+        // that they already own. Just re-register to find it.
         Debug.Log("[Client] Re-registering NetworkPlayers after reconnection...");
         ReRegisterNetworkPlayers();
+        
+        // If we still don't have localNetworkPlayer, try the retry coroutine as fallback
+        if (localNetworkPlayer == null)
+        {
+            Debug.LogWarning("[Client] localNetworkPlayer still null after re-registration. Starting retry coroutine...");
+            StartCoroutine(ReRegisterNetworkPlayersWithRetry());
+        }
+        else
+        {
+            Debug.Log($"[Client] Found localNetworkPlayer: {localNetworkPlayer.PlayerName.Value}");
+        }
         
         // Ensure CardLibrary is populated before restoring cards
         if (CardLibrary.Instance != null)
@@ -1043,17 +1290,24 @@ public class NetworkGameManager : NetworkBehaviour
             Debug.Log($"[Client] CardLibrary now has {CardLibrary.Instance.GetAllCards()?.Count ?? 0} cards");
         }
         
-        // Restore cards on this client
-        RestoreCardsFromSnapshot(snapshot);
-        
-        // Restore and broadcast turn state after cards are restored
+        // CRITICAL: Set networkInitialized BEFORE restoring cards to prevent 
+        // OnNetworkGameStarted from being called (which would draw extra cards)
         if (encounterController != null)
         {
-            // Determine whose turn it is
             bool isLocalTurn = IsLocalPlayerTurn();
+            // This sets networkInitialized = true, blocking any calls to OnNetworkGameStarted
             encounterController.RestoreTurnState(isLocalTurn, snapshot.turnNumber);
+            Debug.Log($"[Client] Turn state restored first (to block OnNetworkGameStarted). Turn={snapshot.turnNumber}, IsLocalTurn={isLocalTurn}");
+        }
+        
+        // Now restore cards on this client (safe since networkInitialized is already set)
+        RestoreCardsFromSnapshot(snapshot);
+        
+        // Finalize turn state restoration
+        if (encounterController != null)
+        {
             encounterController.OnGameStateRestored();
-            Debug.Log($"[Client] Game state restoration complete! Turn={snapshot.turnNumber}, IsLocalTurn={isLocalTurn}");
+            Debug.Log($"[Client] Game state restoration complete! Turn={snapshot.turnNumber}");
         }
         else
         {
@@ -1061,6 +1315,43 @@ public class NetworkGameManager : NetworkBehaviour
         }
     }
     
+    /// <summary>
+    /// Coroutine that retries finding both NetworkPlayers after reconnection.
+    /// Waits for ownership transfer to propagate from server before proceeding.
+    /// </summary>
+    private IEnumerator ReRegisterNetworkPlayersWithRetry()
+    {
+        const int maxAttempts = 30; // 3 seconds worth of attempts
+        const float delayBetweenAttempts = 0.1f; // Check every 100ms
+        
+        for (int attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            Debug.Log($"[Client] Re-registration attempt {attempt}/{maxAttempts}...");
+            
+            // Try to register players
+            ReRegisterNetworkPlayers();
+            
+            // Check if we found both players
+            if (localNetworkPlayer != null && opponentNetworkPlayer != null)
+            {
+                Debug.Log($"[Client] Successfully found both NetworkPlayers after {attempt} attempt(s)!");
+                yield break; // Success!
+            }
+            
+            // Log what we're missing
+            string missing = "";
+            if (localNetworkPlayer == null) missing += "localNetworkPlayer ";
+            if (opponentNetworkPlayer == null) missing += "opponentNetworkPlayer ";
+            Debug.Log($"[Client] Missing: {missing}. Retrying in {delayBetweenAttempts}s...");
+            
+            yield return new WaitForSeconds(delayBetweenAttempts);
+        }
+        
+        // Failed to find both players
+        Debug.LogWarning($"[Client] Failed to find both NetworkPlayers after {maxAttempts} attempts!");
+        Debug.LogWarning($"[Client] localNetworkPlayer={(localNetworkPlayer != null ? localNetworkPlayer.PlayerName.Value : "null")}, opponentNetworkPlayer={(opponentNetworkPlayer != null ? opponentNetworkPlayer.PlayerName.Value : "null")}");
+    }
+
     /// <summary>
     /// Re-register and re-link all NetworkPlayers. Called after reconnection to ensure
     /// RPCs can correctly find the HandController for each player.
@@ -1103,9 +1394,43 @@ public class NetworkGameManager : NetworkBehaviour
         NetworkPlayer[] players = FindObjectsOfType<NetworkPlayer>();
         Debug.Log($"[Client] Found {players.Length} NetworkPlayer(s) to re-register");
         
+        // Get our local connection ID for identifying our NetworkPlayer
+        int localClientId = -1;
+        if (FishNet.InstanceFinder.ClientManager != null && FishNet.InstanceFinder.ClientManager.Connection != null)
+        {
+            localClientId = FishNet.InstanceFinder.ClientManager.Connection.ClientId;
+            Debug.Log($"[Client] Local ClientId: {localClientId}");
+        }
+        
         foreach (var player in players)
         {
-            RegisterNetworkPlayer(player);
+            // Register in dictionary
+            int objectId = player.ObjectId;
+            if (!networkPlayers.ContainsKey(objectId))
+            {
+                networkPlayers[objectId] = player;
+            }
+            
+            // Determine if this is our local player
+            // Check IsOwner first, but also check if the player's Owner connection matches our ClientId
+            bool isLocalPlayer = player.IsOwner;
+            if (!isLocalPlayer && player.Owner != null && localClientId >= 0)
+            {
+                isLocalPlayer = (player.Owner.ClientId == localClientId);
+            }
+            
+            Debug.Log($"[Client] NetworkPlayer {player.PlayerName.Value}: ObjectId={objectId}, IsOwner={player.IsOwner}, Owner={(player.Owner != null ? player.Owner.ClientId.ToString() : "null")}, isLocalPlayer={isLocalPlayer}");
+            
+            if (isLocalPlayer)
+            {
+                localNetworkPlayer = player;
+                Debug.Log($"[Client] Local player identified: {player.PlayerName.Value}");
+            }
+            else
+            {
+                opponentNetworkPlayer = player;
+                Debug.Log($"[Client] Opponent identified: {player.PlayerName.Value}");
+            }
         }
         
         // Force re-link to controllers
@@ -1258,12 +1583,28 @@ public class NetworkGameManager : NetworkBehaviour
         // Restore my state
         if (mySnapshot != null && myController != null)
         {
+            // CRITICAL: Restore health/mana to PlayerController (SyncVars may not have synced yet)
+            myController.currentHealth = mySnapshot.health;
+            myController.maxHealth = mySnapshot.maxHealth > 0 ? mySnapshot.maxHealth : 20;
+            myController.currentMana = mySnapshot.mana;
+            myController.maxMana = mySnapshot.maxMana > 0 ? mySnapshot.maxMana : 1;
+            myController.UpdatePlayerUI();
+            Debug.Log($"[Client] Restored my health/mana: HP={mySnapshot.health}/{mySnapshot.maxHealth}, Mana={mySnapshot.mana}/{mySnapshot.maxMana}");
+            
             RestorePlayerCards(mySnapshot, myController, myHand, mySlotPrefix, needsSlotTranslation);
         }
         
         // Restore opponent state
         if (theirSnapshot != null && theirController != null)
         {
+            // CRITICAL: Restore health/mana to opponent PlayerController too
+            theirController.currentHealth = theirSnapshot.health;
+            theirController.maxHealth = theirSnapshot.maxHealth > 0 ? theirSnapshot.maxHealth : 20;
+            theirController.currentMana = theirSnapshot.mana;
+            theirController.maxMana = theirSnapshot.maxMana > 0 ? theirSnapshot.maxMana : 1;
+            theirController.UpdatePlayerUI();
+            Debug.Log($"[Client] Restored opponent health/mana: HP={theirSnapshot.health}/{theirSnapshot.maxHealth}, Mana={theirSnapshot.mana}/{theirSnapshot.maxMana}");
+            
             // On server: theirSnapshot is from client's own perspective, needs translation
             RestorePlayerCards(theirSnapshot, theirController, theirHand, theirSlotPrefix, needsSlotTranslation);
         }

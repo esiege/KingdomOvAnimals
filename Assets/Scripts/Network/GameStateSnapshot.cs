@@ -111,6 +111,7 @@ public class PlayerSnapshot
 {
     public int playerId;
     public int health;
+    public int maxHealth;
     public int mana;
     public int maxMana;
     
@@ -139,6 +140,7 @@ public class PlayerSnapshot
         
         // Try to get values from NetworkPlayer first, fall back to local PlayerController values
         int capturedHealth = controller.currentHealth;
+        int capturedMaxHealth = controller.maxHealth;
         int capturedMana = controller.currentMana;
         int capturedMaxMana = controller.maxMana;
         int capturedPlayerId = 0;
@@ -147,19 +149,21 @@ public class PlayerSnapshot
         if (controller.networkPlayer != null && controller.networkPlayer.IsSpawned)
         {
             capturedHealth = controller.networkPlayer.CurrentHealth.Value;
+            capturedMaxHealth = controller.networkPlayer.MaxHealth.Value;
             capturedMana = controller.networkPlayer.CurrentMana.Value;
             capturedMaxMana = controller.networkPlayer.MaxMana.Value;
             capturedPlayerId = controller.networkPlayer.PlayerId.Value;
-            Debug.Log($"[PlayerSnapshot] Using NetworkPlayer values: HP={capturedHealth}, Mana={capturedMana}");
+            Debug.Log($"[PlayerSnapshot] Using NetworkPlayer values: HP={capturedHealth}/{capturedMaxHealth}, Mana={capturedMana}/{capturedMaxMana}");
         }
         else
         {
-            Debug.Log($"[PlayerSnapshot] NetworkPlayer unavailable, using local values: HP={capturedHealth}, Mana={capturedMana}");
+            Debug.Log($"[PlayerSnapshot] NetworkPlayer unavailable, using local values: HP={capturedHealth}/{capturedMaxHealth}, Mana={capturedMana}/{capturedMaxMana}");
         }
         
         var snapshot = new PlayerSnapshot
         {
             health = capturedHealth,
+            maxHealth = capturedMaxHealth,
             mana = capturedMana,
             maxMana = capturedMaxMana,
             playerId = capturedPlayerId

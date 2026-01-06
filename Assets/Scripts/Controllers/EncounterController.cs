@@ -84,6 +84,13 @@ public class EncounterController : MonoBehaviour
     /// </summary>
     public void OnNetworkGameStarted(bool isLocalPlayerFirst, int shuffleSeed)
     {
+        // Guard against duplicate calls (can happen with buffered RPCs after reconnection)
+        if (networkInitialized)
+        {
+            Debug.LogWarning($"[EncounterController] OnNetworkGameStarted called but already initialized! Ignoring duplicate call.");
+            return;
+        }
+        
         Debug.Log($"[EncounterController] Network game started! Local player goes first: {isLocalPlayerFirst}, Seed: {shuffleSeed}");
         
         // Shuffle decks with synchronized seeds
@@ -307,15 +314,16 @@ public class EncounterController : MonoBehaviour
     
     /// <summary>
     /// Start turn logic for network mode.
-    /// Both clients execute draw for current player (decks are synced via seed).
+    /// Server triggers card draws via RPC now.
     /// </summary>
     private void StartTurnNetwork()
     {
         Debug.Log($"[EncounterController] StartTurnNetwork called! isCurrentPlayerTurn: {isCurrentPlayerTurn}, turnNumber: {turnNumber}");
         Debug.Log($"[EncounterController] player.deck.Count={player?.deck?.Count ?? -1}, opponent.deck.Count={opponent?.deck?.Count ?? -1}");
         
-        // BOTH clients draw for the current player (decks are in same order due to seed)
-        // This keeps hands in sync on both sides
+        // Card draws are now handled by server via RpcExecuteCardDraw
+        // This ensures all clients stay in sync even after reconnection
+        
         if (isCurrentPlayerTurn)
         {
             // It's local player's turn
@@ -335,7 +343,7 @@ public class EncounterController : MonoBehaviour
             }
             
             player.ResetBoard();
-            DrawCard(player);  // Local player draws for themselves
+            // Card draw is handled by server RPC (ServerDrawCard -> RpcExecuteCardDraw)
 
             // Show playable cards
             playerHandController.HideBoardTargets();
@@ -348,15 +356,14 @@ public class EncounterController : MonoBehaviour
         }
         else
         {
-            // It's opponent's turn - draw for opponent (keeps decks in sync)
+            // It's opponent's turn
             currentPlayer = opponent;
             
             // Reset opponent's board (clear summoning sickness, untap) so server state matches
             // This is important for server-side validation of abilities
             opponent.ResetBoard();
             
-            // Draw for opponent so their hand stays in sync
-            DrawCard(opponent);
+            // Card draw is handled by server RPC (ServerDrawCard -> RpcExecuteCardDraw)
 
             // Hide all playable indicators - can't play during opponent's turn
             playerHandController.HideBoardTargets();
@@ -608,6 +615,28 @@ public class EncounterController : MonoBehaviour
             Debug.Log($"[EncounterController] player == ngm.localPlayerController: {player == ngm.localPlayerController}");
             Debug.Log($"[EncounterController] opponent == ngm.opponentPlayerController: {opponent == ngm.opponentPlayerController}");
             Debug.Log($"[EncounterController] ngm.localPlayerController.deck.Count={ngm.localPlayerController?.deck?.Count ?? -1}");
+            
+            // CRITICAL: Ensure EncounterController.player has networkPlayer linked
+            // This is needed because HandController.owningPlayer references encounterController.player
+            if (player != null && ngm.localPlayerController != null && ngm.localPlayerController.networkPlayer != null)
+            {
+                if (player.networkPlayer == null)
+                {
+                    Debug.Log("[EncounterController] Linking networkPlayer to encounterController.player");
+                    player.networkPlayer = ngm.localPlayerController.networkPlayer;
+                }
+                Debug.Log($"[EncounterController] player.networkPlayer={(player.networkPlayer != null ? player.networkPlayer.PlayerName.Value : "null")}");
+            }
+            
+            // Also link opponent
+            if (opponent != null && ngm.opponentPlayerController != null && ngm.opponentPlayerController.networkPlayer != null)
+            {
+                if (opponent.networkPlayer == null)
+                {
+                    Debug.Log("[EncounterController] Linking networkPlayer to encounterController.opponent");
+                    opponent.networkPlayer = ngm.opponentPlayerController.networkPlayer;
+                }
+            }
         }
         
         isGamePaused = false;

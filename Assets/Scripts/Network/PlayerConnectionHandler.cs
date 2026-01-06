@@ -30,9 +30,10 @@ public class PlayerConnectionHandler : MonoBehaviour
     public Dictionary<int, NetworkPlayer> ConnectedPlayers { get; private set; } = new Dictionary<int, NetworkPlayer>();
     
     /// <summary>
-    /// Disconnected players awaiting reconnection, keyed by their PlayerId.
+    /// Saved state of disconnected players awaiting reconnection, keyed by their PlayerId.
+    /// We save state and DESPAWN (not preserve) so reconnection spawns fresh.
     /// </summary>
-    private Dictionary<int, NetworkPlayer> _disconnectedPlayers = new Dictionary<int, NetworkPlayer>();
+    private Dictionary<int, DisconnectedPlayerState> _disconnectedPlayerStates = new Dictionary<int, DisconnectedPlayerState>();
 
     /// <summary>
     /// Number of currently connected players.
@@ -47,6 +48,10 @@ public class PlayerConnectionHandler : MonoBehaviour
     private float _hostReconnectGracePeriod = 120f; // 2 minutes
     private float _reconnectAttemptInterval = 3f; // Try every 3 seconds
     private float _nextReconnectAttempt = 0f;
+    
+    // Flag to track intentional disconnects vs unexpected disconnects
+    // When true, we should NOT enter reconnect-wait mode
+    private bool _isIntentionalDisconnect = false;
     private GameStateSnapshot _savedGameState;
     private string _lastServerAddress;
     private ushort _lastServerPort;
@@ -173,25 +178,53 @@ public class PlayerConnectionHandler : MonoBehaviour
             {
                 Debug.Log("[PlayerConnectionHandler] Connection started (normal connect, not reconnect)");
                 LogReconnect("Connection started (normal connect, not reconnect)");
+                
+                // Clear intentional disconnect flag on successful connection
+                _isIntentionalDisconnect = false;
+                
+                // Clear any stale reconnection state - this is a fresh connect, not a reconnect
+                _savedGameState = null;
+                ReconnectionManager.ClearSavedState();
             }
         }
         else if (args.ConnectionState == LocalConnectionState.Stopped)
         {
-            // We lost connection to the server (host disconnected)
-            Debug.Log("[PlayerConnectionHandler] Lost connection to host!");
-            LogReconnect($"Lost connection to host! IsServerStarted={_networkManager.IsServerStarted}, _isWaitingForHostReconnect={_isWaitingForHostReconnect}");
+            // We lost connection to the server
+            Debug.Log("[PlayerConnectionHandler] Lost connection!");
+            LogReconnect($"Lost connection! IsServerStarted={_networkManager.IsServerStarted}, _isWaitingForHostReconnect={_isWaitingForHostReconnect}, _isIntentionalDisconnect={_isIntentionalDisconnect}");
             
             // If we're not the server (i.e., we're the client that lost connection)
             // and we're not already in a reconnection wait
-            if (!_networkManager.IsServerStarted && !isWaiting)
+            // and this wasn't an intentional disconnect (client chose to leave)
+            if (!_networkManager.IsServerStarted && !isWaiting && !_isIntentionalDisconnect)
             {
                 OnHostDisconnected();
             }
             else
             {
-                LogReconnect($"Skipping OnHostDisconnected because IsServerStarted={_networkManager.IsServerStarted} or already waiting");
+                if (_isIntentionalDisconnect)
+                {
+                    LogReconnect("Skipping OnHostDisconnected because this was an intentional disconnect (client chose to leave)");
+                    // Reset the flag
+                    _isIntentionalDisconnect = false;
+                }
+                else
+                {
+                    LogReconnect($"Skipping OnHostDisconnected because IsServerStarted={_networkManager.IsServerStarted} or already waiting");
+                }
             }
         }
+    }
+    
+    /// <summary>
+    /// Call this before disconnecting intentionally (e.g., returning to main menu).
+    /// This prevents the client from entering reconnect-wait mode.
+    /// </summary>
+    public void SetIntentionalDisconnect()
+    {
+        _isIntentionalDisconnect = true;
+        Debug.Log("[PlayerConnectionHandler] Intentional disconnect flagged");
+        LogReconnect("SetIntentionalDisconnect called - will not enter reconnect mode on disconnect");
     }
 
     /// <summary>
@@ -346,24 +379,31 @@ public class PlayerConnectionHandler : MonoBehaviour
     
     /// <summary>
     /// Restore game state locally and send to host for sync.
+    /// This should only be used for TRUE host reconnection scenarios (host disconnected and came back).
     /// </summary>
     private IEnumerator RestoreAndSendGameState(EncounterController encounterController, GameStateSnapshot savedState)
     {
         // Wait for NetworkPlayer to be ready
         yield return new WaitForSeconds(0.5f);
         
-        // Restore locally first - client needs to see the game state
+        // CRITICAL CHECK: Only send state to host if this is a true host reconnection scenario.
+        // If the server already has valid game state (encounterController.turnNumber > 0 or similar),
+        // then the host didn't actually lose state and we should NOT overwrite it.
+        
+        // Restore locally first - client needs to see the game state (this is always safe)
         if (savedState != null && NetworkGameManager.Instance != null)
         {
             Debug.Log("[PlayerConnectionHandler] Restoring game state locally after host reconnect...");
             NetworkGameManager.Instance.RestoreGameStateLocally(savedState);
         }
         
-        // Also send to host so it can sync (in case host lost state)
+        // Send to host ONLY if we believe the host truly lost state
+        // The host will also validate and skip overwriting if it has valid state
         var localPlayer = NetworkGameManager.Instance?.GetLocalPlayer();
         if (localPlayer != null && savedState != null)
         {
-            Debug.Log("[PlayerConnectionHandler] Sending saved game state to host...");
+            Debug.Log($"[PlayerConnectionHandler] Sending saved game state to host (TurnObjectId={savedState.currentTurnObjectId})...");
+            Debug.Log("[PlayerConnectionHandler] Note: Host will validate and skip if it has valid state already.");
             string stateJson = savedState.ToJson();
             localPlayer.ServerRestoreGameState(stateJson);
         }
@@ -406,12 +446,12 @@ public class PlayerConnectionHandler : MonoBehaviour
 
         // Check if this is a reconnecting player
         // For now, we use a simple approach: if there's a disconnected player waiting, reconnect them
-        NetworkPlayer reconnectingPlayer = TryGetReconnectingPlayer();
+        int reconnectingPlayerId = TryGetReconnectingPlayerId();
         
-        if (reconnectingPlayer != null)
+        if (reconnectingPlayerId >= 0 && _disconnectedPlayerStates.TryGetValue(reconnectingPlayerId, out var savedState))
         {
-            // Reconnection!
-            HandleReconnection(conn, reconnectingPlayer);
+            // Reconnection! Spawn fresh and restore state
+            HandleReconnection(conn, reconnectingPlayerId, savedState);
             return;
         }
 
@@ -442,46 +482,69 @@ public class PlayerConnectionHandler : MonoBehaviour
     }
     
     /// <summary>
-    /// Try to find a disconnected player waiting for reconnection.
+    /// Try to find saved state for a disconnected player waiting for reconnection.
+    /// Returns the playerId if found, -1 otherwise.
     /// </summary>
-    private NetworkPlayer TryGetReconnectingPlayer()
+    private int TryGetReconnectingPlayerId()
     {
-        // Return the first disconnected player (simple 1v1 game)
-        foreach (var kvp in _disconnectedPlayers)
+        // Return the first disconnected player's ID (simple 1v1 game)
+        foreach (var kvp in _disconnectedPlayerStates)
         {
-            return kvp.Value;
+            return kvp.Key;
         }
-        return null;
+        return -1;
     }
     
     /// <summary>
     /// Handle a player reconnecting to their existing session.
+    /// DESPAWN/RESPAWN PATTERN: Spawn a FRESH NetworkPlayer and restore saved state.
     /// </summary>
-    private void HandleReconnection(NetworkConnection conn, NetworkPlayer player)
+    private void HandleReconnection(NetworkConnection conn, int playerId, DisconnectedPlayerState savedState)
     {
-        int playerId = player.PlayerId.Value;
         Debug.Log($"[PlayerConnectionHandler] Player {playerId} reconnecting with Connection ID {conn.ClientId}");
         
-        // Remove from disconnected list
-        _disconnectedPlayers.Remove(playerId);
+        // Remove from disconnected states
+        _disconnectedPlayerStates.Remove(playerId);
         
-        // Add to connected players with new connection ID
-        ConnectedPlayers[conn.ClientId] = player;
-        
-        // Transfer ownership back to the reconnecting client
-        player.GiveOwnership(conn);
-        
-        Debug.Log($"[PlayerConnectionHandler] Player {playerId} reconnected! Ownership transferred.");
-        
-        // Notify NetworkGameManager with the connection for targeted RPC
-        if (NetworkGameManager.Instance != null)
+        // Spawn a FRESH NetworkPlayer for the reconnecting client
+        if (playerPrefab != null)
         {
-            NetworkGameManager.Instance.ServerOnPlayerReconnected(playerId, conn);
+            NetworkObject nob = _networkManager.GetPooledInstantiated(playerPrefab, true);
+            NetworkPlayer newPlayer = nob.GetComponent<NetworkPlayer>();
+            
+            if (newPlayer != null)
+            {
+                // Set pending state BEFORE spawn - OnStartServer will apply it
+                newPlayer.SetPendingState(savedState);
+                
+                // Track in connected players
+                ConnectedPlayers[conn.ClientId] = newPlayer;
+                
+                // Spawn with correct ownership - OnStartServer will restore state
+                _networkManager.ServerManager.Spawn(nob, conn);
+                
+                Debug.Log($"[PlayerConnectionHandler] Player {playerId} reconnected! Fresh NetworkPlayer spawned with connection {conn.ClientId}.");
+                
+                // Notify NetworkGameManager with the new player and saved state
+                if (NetworkGameManager.Instance != null)
+                {
+                    NetworkGameManager.Instance.ServerOnPlayerReconnected(playerId, conn, newPlayer, savedState);
+                }
+            }
+            else
+            {
+                Debug.LogError("[PlayerConnectionHandler] Failed to get NetworkPlayer component from prefab!");
+            }
+        }
+        else
+        {
+            Debug.LogError("[PlayerConnectionHandler] Cannot respawn - playerPrefab is null!");
         }
     }
 
     /// <summary>
     /// Called when a player disconnects from the server.
+    /// Uses DESPAWN/RESPAWN pattern: Save state, despawn, respawn fresh on reconnect.
     /// </summary>
     private void OnPlayerDisconnected(NetworkConnection conn)
     {
@@ -496,13 +559,21 @@ public class PlayerConnectionHandler : MonoBehaviour
         {
             disconnectedPlayerId = disconnectedPlayer.PlayerId.Value;
             
-            // Transfer ownership to server to prevent despawn
-            disconnectedPlayer.RemoveOwnership();
+            // DESPAWN/RESPAWN PATTERN: Save state BEFORE despawning
+            var savedState = DisconnectedPlayerState.Capture(disconnectedPlayer);
+            if (savedState != null)
+            {
+                _disconnectedPlayerStates[disconnectedPlayerId] = savedState;
+                Debug.Log($"[PlayerConnectionHandler] Player {disconnectedPlayerId} state saved for reconnection");
+            }
             
-            // Move to disconnected players for potential reconnection
-            _disconnectedPlayers[disconnectedPlayerId] = disconnectedPlayer;
-            
-            Debug.Log($"[PlayerConnectionHandler] Player {disconnectedPlayerId} preserved for reconnection");
+            // DESPAWN the NetworkPlayer - we'll spawn fresh on reconnect
+            // This is cleaner than trying to transfer ownership
+            if (disconnectedPlayer.IsSpawned)
+            {
+                Debug.Log($"[PlayerConnectionHandler] Despawning NetworkPlayer for player {disconnectedPlayerId}");
+                _networkManager.ServerManager.Despawn(disconnectedPlayer.NetworkObject);
+            }
         }
 
         // Remove from active connections
@@ -512,7 +583,7 @@ public class PlayerConnectionHandler : MonoBehaviour
         }
 
         if (logConnections)
-            Debug.Log($"[PlayerConnectionHandler] Remaining connected players: {PlayerCount}, Disconnected awaiting reconnect: {_disconnectedPlayers.Count}");
+            Debug.Log($"[PlayerConnectionHandler] Remaining connected players: {PlayerCount}, Disconnected awaiting reconnect: {_disconnectedPlayerStates.Count}");
 
         // Notify NetworkGameManager about the disconnect (server-side)
         if (disconnectedPlayerId >= 0 && NetworkGameManager.Instance != null)
@@ -526,16 +597,11 @@ public class PlayerConnectionHandler : MonoBehaviour
     /// </summary>
     public void ForfeitDisconnectedPlayer(int playerId)
     {
-        if (_disconnectedPlayers.TryGetValue(playerId, out NetworkPlayer player))
+        if (_disconnectedPlayerStates.ContainsKey(playerId))
         {
             Debug.Log($"[PlayerConnectionHandler] Removing forfeited player {playerId}");
-            _disconnectedPlayers.Remove(playerId);
-            
-            // Now despawn since they forfeited
-            if (player != null && player.IsSpawned)
-            {
-                _networkManager.ServerManager.Despawn(player.NetworkObject);
-            }
+            _disconnectedPlayerStates.Remove(playerId);
+            // NetworkPlayer was already despawned on disconnect, nothing else to do
         }
     }
     
@@ -544,7 +610,7 @@ public class PlayerConnectionHandler : MonoBehaviour
     /// </summary>
     public bool IsPlayerDisconnected(int playerId)
     {
-        return _disconnectedPlayers.ContainsKey(playerId);
+        return _disconnectedPlayerStates.ContainsKey(playerId);
     }
 
     /// <summary>

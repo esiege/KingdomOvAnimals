@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
 
     public List<CardController> deck = new List<CardController>();
     public List<CardController> board = new List<CardController>();
+    public List<CardController> graveyard = new List<CardController>();
 
     // Network Reference (optional - for multiplayer mode)
     [Header("Network")]

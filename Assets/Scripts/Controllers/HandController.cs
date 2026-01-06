@@ -162,6 +162,23 @@ public class HandController : MonoBehaviour
             Debug.LogWarning($"Attempted to remove a card with ID {cardId} that is not in the hand.");
         }
     }
+    
+    /// <summary>
+    /// Clear all cards from the hand. Used during reconnection state restoration.
+    /// </summary>
+    public void ClearHand()
+    {
+        // Destroy all card GameObjects
+        foreach (var card in playerHand)
+        {
+            if (card != null && card.gameObject != null)
+            {
+                Destroy(card.gameObject);
+            }
+        }
+        playerHand.Clear();
+        Debug.Log($"[HandController] Hand cleared");
+    }
 
 
     // Method to arrange the cards in hand and update their positions
