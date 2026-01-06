@@ -14,13 +14,23 @@
 
 ---
 
+## Description
+
+- AbilityData assets for all existing abilities
+- CardData assets for each existing card (Lion, Elephant, etc.)
+- Stats match current hardcoded values
+- Abilities properly linked to cards
+- Game runs correctly with new data system
+
+---
+
 ## Acceptance Criteria
 
-- [ ] AbilityData assets for all existing abilities
-- [ ] CardData assets for each existing card (Lion, Elephant, etc.)
-- [ ] Stats match current hardcoded values
-- [ ] Abilities properly linked to cards
-- [ ] Game runs correctly with new data system
+- [ ] All existing cards appear in the Card Management card list
+- [ ] All existing abilities appear in the Card Management ability list
+- [ ] Starting a game from MainMenu still works
+- [ ] Cards display correct health values
+- [ ] Using abilities deals correct damage/healing
 
 ---
 

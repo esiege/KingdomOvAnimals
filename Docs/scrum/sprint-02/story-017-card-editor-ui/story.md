@@ -14,15 +14,27 @@
 
 ---
 
+## Description
+
+- Left panel: scrollable list of all CardData assets
+- Search/filter by name
+- Right panel: selected card's editable fields
+- Dropdown to assign offensive/defensive abilities
+- Save button persists changes to disk (#if UNITY_EDITOR)
+- New Card button creates new CardData asset
+- Delete button with confirmation
+
+---
+
 ## Acceptance Criteria
 
-- [ ] Left panel: scrollable list of all CardData assets
-- [ ] Search/filter by name
-- [ ] Right panel: selected card's editable fields
-- [ ] Dropdown to assign offensive/defensive abilities
-- [ ] Save button persists changes to disk (#if UNITY_EDITOR)
-- [ ] New Card button creates new CardData asset
-- [ ] Delete button with confirmation
+- [ ] I see a list of all cards on the left side
+- [ ] Typing in search box filters the card list
+- [ ] Clicking a card shows its details on the right
+- [ ] I can edit name, health, and abilities in the form
+- [ ] Clicking Save updates the card (persists after exiting play mode)
+- [ ] Clicking New Card adds a new card to the list
+- [ ] Clicking Delete removes the card after confirmation
 
 ---
 

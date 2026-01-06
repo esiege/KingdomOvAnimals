@@ -14,12 +14,23 @@
 
 ---
 
+## Description
+
+- CardController has a CardData reference field
+- Initialize() reads from CardData instead of hardcoded values
+- Abilities execute using AbilityData values
+- Existing functionality preserved
+
+---
+
 ## Acceptance Criteria
 
-- [ ] CardController has a CardData reference field
-- [ ] Initialize() reads from CardData instead of hardcoded values
-- [ ] Abilities execute using AbilityData values
-- [ ] Existing functionality preserved
+- [ ] Card prefabs have a CardData field visible in Inspector
+- [ ] Assigning a CardData to a card shows its stats correctly
+- [ ] Playing the game, cards display health from CardData
+- [ ] Using offensive ability deals damage from AbilityData
+- [ ] Using defensive ability works as defined in AbilityData
+- [ ] No gameplay regressions from before migration
 
 ---
 

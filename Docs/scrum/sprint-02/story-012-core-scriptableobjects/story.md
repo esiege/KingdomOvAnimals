@@ -14,14 +14,25 @@
 
 ---
 
+## Description
+
+- CardData SO with: id, displayName, health, offensiveAbility, defensiveAbility, artwork
+- AbilityData SO with: id, displayName, description, manaCost, damage, healAmount, duration, targetType, effectPrefab, animationType, vfxPrefab
+- TargetType enum (Self, SingleEnemy, AllEnemies, SingleAlly, AllAllies)
+- AnimationType enum (Melee, Projectile, AOE, Buff, etc.)
+- [CreateAssetMenu] attributes for manual creation if needed
+- Proper serialization (shows in inspector)
+
+---
+
 ## Acceptance Criteria
 
-- [ ] CardData SO with: id, displayName, health, offensiveAbility, defensiveAbility, artwork
-- [ ] AbilityData SO with: id, displayName, description, manaCost, damage, healAmount, duration, targetType, effectPrefab, animationType, vfxPrefab
-- [ ] TargetType enum (Self, SingleEnemy, AllEnemies, SingleAlly, AllAllies)
-- [ ] AnimationType enum (Melee, Projectile, AOE, Buff, etc.)
-- [ ] [CreateAssetMenu] attributes for manual creation if needed
-- [ ] Proper serialization (shows in inspector)
+- [ ] Right-click in Project > Create > KOA shows "Card Data" option
+- [ ] Right-click in Project > Create > KOA shows "Ability Data" option
+- [ ] Creating a CardData asset shows all fields in the Inspector
+- [ ] Creating an AbilityData asset shows all fields in the Inspector
+- [ ] Target Type dropdown shows: Self, SingleEnemy, AllEnemies, SingleAlly, AllAllies
+- [ ] Animation Type dropdown shows: Melee, Projectile, AOE, Buff, etc.
 
 ---
 

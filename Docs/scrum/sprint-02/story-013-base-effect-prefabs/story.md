@@ -14,13 +14,23 @@
 
 ---
 
+## Description
+
+- AbilityEffect base class with Execute(AbilityData, CardController target)
+- GenericDamageEffect - deals data.damage to target
+- GenericHealEffect - heals data.healAmount to target
+- Effect prefabs in Resources/Effects/ folder
+- Effects can be assigned to AbilityData.effectPrefab
+
+---
+
 ## Acceptance Criteria
 
-- [ ] AbilityEffect base class with Execute(AbilityData, CardController target)
-- [ ] GenericDamageEffect - deals data.damage to target
-- [ ] GenericHealEffect - heals data.healAmount to target
-- [ ] Effect prefabs in Resources/Effects/ folder
-- [ ] Effects can be assigned to AbilityData.effectPrefab
+- [ ] Resources/Effects folder contains GenericDamageEffect prefab
+- [ ] Resources/Effects folder contains GenericHealEffect prefab
+- [ ] AbilityData's effectPrefab field accepts the effect prefabs
+- [ ] Playing a card with GenericDamageEffect deals damage to target
+- [ ] Playing a card with GenericHealEffect heals the target
 
 ---
 

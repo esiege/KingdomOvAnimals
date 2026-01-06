@@ -14,14 +14,27 @@
 
 ---
 
+## Description
+
+- DeckData SO with list of CardData references and deck name
+- UI to list existing decks, create new decks
+- Available cards list on left, deck contents on right
+- Add/remove cards from deck (click or drag)
+- Show deck stats (card count, avg mana cost)
+- Save deck to disk
+
+---
+
 ## Acceptance Criteria
 
-- [ ] DeckData SO with list of CardData references and deck name
-- [ ] UI to list existing decks, create new decks
-- [ ] Available cards list on left, deck contents on right
-- [ ] Add/remove cards from deck (click or drag)
-- [ ] Show deck stats (card count, avg mana cost)
-- [ ] Save deck to disk
+- [ ] I can select a deck from a dropdown
+- [ ] I see available cards on the left and deck contents on the right
+- [ ] Clicking + on a card adds it to the deck
+- [ ] Clicking - on a deck card removes it
+- [ ] I see card count and average stats displayed
+- [ ] Clicking New Deck creates an empty deck
+- [ ] Clicking Save Deck persists changes (survives exiting play mode)
+- [ ] Clicking Delete removes the deck after confirmation
 
 ---
 

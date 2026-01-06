@@ -14,13 +14,23 @@
 
 ---
 
+## Description
+
+- CardLibrary singleton loads all CardData from Resources
+- GetCardById(string id) returns CardData
+- GetAllCards() returns list for deck building
+- GetAbilityById(string id) returns AbilityData
+- Works in builds (not editor-only)
+
+---
+
 ## Acceptance Criteria
 
-- [ ] CardLibrary singleton loads all CardData from Resources
-- [ ] GetCardById(string id) returns CardData
-- [ ] GetAllCards() returns list for deck building
-- [ ] GetAbilityById(string id) returns AbilityData
-- [ ] Works in builds (not editor-only)
+- [ ] CardLibrary GameObject exists in NetworkManager scene
+- [ ] Playing the game, all cards load correctly from Resources
+- [ ] Console shows no "card not found" or loading errors
+- [ ] Building the game succeeds without errors
+- [ ] Running the build, cards still load and work correctly
 
 ---
 

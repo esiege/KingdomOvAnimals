@@ -14,13 +14,23 @@
 
 ---
 
+## Description
+
+- New scene "CardManagement" in Scenes folder
+- Main menu with buttons: Edit Cards, Edit Abilities, Edit Decks
+- Panel navigation system (show/hide panels)
+- Back button to return to main menu
+- Scene NOT added to build settings
+
+---
+
 ## Acceptance Criteria
 
-- [ ] New scene "CardManagement" in Scenes folder
-- [ ] Main menu with buttons: Edit Cards, Edit Abilities, Edit Decks
-- [ ] Panel navigation system (show/hide panels)
-- [ ] Back button to return to main menu
-- [ ] Scene NOT added to build settings
+- [ ] I see "Card Management" title and three buttons on scene start
+- [ ] Clicking "Edit Cards" shows the card editor panel
+- [ ] Clicking "Edit Abilities" shows the ability editor panel
+- [ ] Clicking "Edit Decks" shows the deck editor panel
+- [ ] Back button returns to main menu from any panel
 
 ---
 

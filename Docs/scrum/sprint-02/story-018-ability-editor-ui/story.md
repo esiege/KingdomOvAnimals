@@ -14,15 +14,28 @@
 
 ---
 
+## Description
+
+- List of all AbilityData assets
+- Edit: name, description, mana cost
+- Edit: damage, healAmount, duration values
+- Dropdown for targetType, animationType
+- Dropdown for effectPrefab (shows available effect prefabs)
+- Save persists to disk
+- New/Delete ability buttons
+
+---
+
 ## Acceptance Criteria
 
-- [ ] List of all AbilityData assets
-- [ ] Edit: name, description, mana cost
-- [ ] Edit: damage, healAmount, duration values
-- [ ] Dropdown for targetType, animationType
-- [ ] Dropdown for effectPrefab (shows available effect prefabs)
-- [ ] Save persists to disk
-- [ ] New/Delete ability buttons
+- [ ] I see a list of all abilities on the left side
+- [ ] Clicking an ability shows its details on the right
+- [ ] I can edit name, description, mana cost, damage, heal, duration
+- [ ] I can select target type from a dropdown
+- [ ] I can select effect prefab from a dropdown
+- [ ] Clicking Save updates the ability (persists after exiting play mode)
+- [ ] Clicking New Ability adds a new ability to the list
+- [ ] Clicking Delete removes the ability after confirmation
 
 ---
 
