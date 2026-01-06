@@ -17,7 +17,7 @@ MonoBehaviour:
   description: 
   health: 1
   manaCost: 0
-  offensiveAbility: {fileID: 0}
+  offensiveAbility: {fileID: 11400000, guid: cdda09e6a2570e94f9f6532360d70b49, type: 2}
   defensiveAbility: {fileID: 0}
   artwork: {fileID: 0}
   cardFrame: {fileID: 0}

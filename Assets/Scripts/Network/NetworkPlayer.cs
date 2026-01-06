@@ -3,6 +3,7 @@ using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using System;
 using UnityEngine;
+using KOA.Data;
 
 // FishNet code regeneration trigger - do not remove
 // Last regenerated: 2026-01-04
@@ -795,21 +796,42 @@ public class NetworkPlayer : NetworkBehaviour
         int targetOwnerId = target.owningPlayer?.networkPlayer?.PlayerId.Value ?? -1;
         int targetSlotIndex = GetSlotIndex(serverTargetSlot);
         
-        // Get the ability and damage amount
-        GameObject abilityObj = isOffensive ? attacker.offensiveAbility : attacker.supportAbility;
-        if (abilityObj == null)
-        {
-            Debug.LogWarning($"[Server] {attacker.cardName} has no {(isOffensive ? "offensive" : "support")} ability!");
-            return;
-        }
-        
-        DamageAbility damageAbility = abilityObj.GetComponentInChildren<DamageAbility>();
-        int damageAmount = damageAbility != null ? damageAbility.damageAmount : 0;
+        // Get damage amount from CardData (new system) or legacy DamageAbility
+        int damageAmount = GetAbilityDamage(attacker, isOffensive);
         
         Debug.Log($"[Server] {attacker.cardName} uses ability on {target.cardName} for {damageAmount} damage");
         
         // Broadcast ability use to all clients with owner IDs for correct perspective
         RpcExecuteAbilityOnCard(attackerOwnerId, attackerSlotIndex, targetOwnerId, targetSlotIndex, isOffensive, damageAmount);
+    }
+    
+    /// <summary>
+    /// Get the damage amount from a card's ability, supporting both new CardData and legacy systems.
+    /// </summary>
+    private int GetAbilityDamage(CardController card, bool isOffensive)
+    {
+        // NEW SYSTEM: Check CardData first
+        if (card.cardData != null)
+        {
+            AbilityData abilityData = isOffensive ? card.cardData.offensiveAbility : card.cardData.defensiveAbility;
+            if (abilityData != null)
+            {
+                return abilityData.damage;
+            }
+        }
+        
+        // LEGACY SYSTEM: Fall back to GameObject-based abilities
+        GameObject abilityObj = isOffensive ? card.offensiveAbility : card.supportAbility;
+        if (abilityObj != null)
+        {
+            DamageAbility damageAbility = abilityObj.GetComponentInChildren<DamageAbility>();
+            if (damageAbility != null)
+            {
+                return damageAbility.damageAmount;
+            }
+        }
+        
+        return 0;
     }
     
     /// <summary>
@@ -876,16 +898,8 @@ public class NetworkPlayer : NetworkBehaviour
         int targetOwnerId = target.owningPlayer?.networkPlayer?.PlayerId.Value ?? -1;
         int targetSlotIndex = GetSlotIndex(serverTargetSlot);
         
-        // Get the ability and damage amount
-        GameObject abilityObj = isOffensive ? attacker.offensiveAbility : attacker.supportAbility;
-        if (abilityObj == null)
-        {
-            Debug.LogWarning($"[Server] {attacker.cardName} has no {(isOffensive ? "offensive" : "support")} ability!");
-            return;
-        }
-        
-        DamageAbility damageAbility = abilityObj.GetComponentInChildren<DamageAbility>();
-        int damageAmount = damageAbility != null ? damageAbility.damageAmount : 0;
+        // Get damage amount from CardData (new system) or legacy DamageAbility
+        int damageAmount = GetAbilityDamage(attacker, isOffensive);
         
         // Deduct mana
         CurrentMana.Value -= attacker.manaCost;
@@ -941,16 +955,8 @@ public class NetworkPlayer : NetworkBehaviour
             return;
         }
         
-        // Get the ability and damage amount
-        GameObject abilityObj = isOffensive ? attacker.offensiveAbility : attacker.supportAbility;
-        if (abilityObj == null)
-        {
-            Debug.LogWarning($"[Server] {attacker.cardName} has no {(isOffensive ? "offensive" : "support")} ability!");
-            return;
-        }
-        
-        DamageAbility damageAbility = abilityObj.GetComponentInChildren<DamageAbility>();
-        int damageAmount = damageAbility != null ? damageAbility.damageAmount : 0;
+        // Get damage amount from CardData (new system) or legacy DamageAbility
+        int damageAmount = GetAbilityDamage(attacker, isOffensive);
         
         // Deduct mana
         CurrentMana.Value -= attacker.manaCost;
@@ -1014,16 +1020,8 @@ public class NetworkPlayer : NetworkBehaviour
             return;
         }
         
-        // Get the ability and damage amount
-        GameObject abilityObj = isOffensive ? attacker.offensiveAbility : attacker.supportAbility;
-        if (abilityObj == null)
-        {
-            Debug.LogWarning($"[Server] {attacker.cardName} has no {(isOffensive ? "offensive" : "support")} ability!");
-            return;
-        }
-        
-        DamageAbility damageAbility = abilityObj.GetComponentInChildren<DamageAbility>();
-        int damageAmount = damageAbility != null ? damageAbility.damageAmount : 0;
+        // Get damage amount from CardData (new system) or legacy DamageAbility
+        int damageAmount = GetAbilityDamage(attacker, isOffensive);
         
         Debug.Log($"[Server] {attacker.cardName} uses ability on Player {targetPlayerId} for {damageAmount} damage");
         

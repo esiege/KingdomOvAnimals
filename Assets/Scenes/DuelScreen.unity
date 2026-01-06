@@ -106687,6 +106687,10 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1631415180478802473, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
+      propertyPath: cardData
+      value: 
+      objectReference: {fileID: 11400000, guid: 05ede30d5af1e974ea4e12203bb8ff39, type: 2}
+    - target: {fileID: 1631415180478802473, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
       propertyPath: manaCost
       value: 1
       objectReference: {fileID: 0}

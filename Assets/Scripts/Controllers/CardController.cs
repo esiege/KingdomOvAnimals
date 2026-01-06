@@ -2,13 +2,22 @@ using UnityEngine;
 using TMPro;
 using System.Collections.Generic; 
 using System;
+using KOA.Data;
+using KOA.Effects;
 
 public class CardController : MonoBehaviour
 {
-    // Card Properties
+    // === DATA SOURCE ===
+    [Header("Card Data (New System)")]
+    [Tooltip("Optional: If set, card initializes from this data asset")]
+    public CardData cardData;
+
+    // Card Properties (runtime values - can be modified during gameplay)
+    [Header("Runtime Properties")]
     public string cardName;
     public int manaCost;
     public int health;
+    private int maxHealth;
 
     // Owner reference
     public PlayerController owningPlayer;
@@ -30,7 +39,8 @@ public class CardController : MonoBehaviour
     public bool isBuried;
     public bool isDefending;
 
-    // Ability GameObjects
+    // Ability GameObjects (Legacy system - still works)
+    [Header("Abilities (Legacy GameObject System)")]
     public GameObject offensiveAbility;
     public GameObject supportAbility; 
 
@@ -51,9 +61,37 @@ public class CardController : MonoBehaviour
     // Initialization method
     public void Start()
     {
+        // If CardData is assigned, initialize from it
+        if (cardData != null)
+        {
+            InitializeFromData(cardData);
+        }
+        else
+        {
+            // Legacy: use inspector values
+            maxHealth = health;
+        }
+        
         id = Guid.NewGuid().ToString();
         UpdateCardUI();
         UpdateVisualEffects(); // Update visuals on load
+    }
+
+    /// <summary>
+    /// Initialize this card from a CardData asset.
+    /// </summary>
+    public void InitializeFromData(CardData data)
+    {
+        cardData = data;
+        cardName = data.displayName;
+        manaCost = data.manaCost;
+        health = data.health;
+        maxHealth = data.health;
+        
+        // Note: artwork and other visuals can be set here too
+        // if (data.artwork != null) { /* set sprite */ }
+        
+        UpdateCardUI();
     }
 
     // Method to update the card's UI elements
@@ -252,6 +290,14 @@ public class CardController : MonoBehaviour
     // Methods to activate abilities on a CardController target
     public void ActivateOffensiveAbility(CardController target)
     {
+        // NEW SYSTEM: Use CardData + AbilityEffect
+        if (cardData != null && cardData.offensiveAbility != null)
+        {
+            ExecuteAbilityEffect(cardData.offensiveAbility, target);
+            return;
+        }
+        
+        // LEGACY SYSTEM: Use GameObject with AbilityController
         if (offensiveAbility != null)
         {
             AbilityController abilityController = offensiveAbility.GetComponentInChildren<AbilityController>();
@@ -272,6 +318,14 @@ public class CardController : MonoBehaviour
 
     public void ActivateDefensiveAbility(CardController target)
     {
+        // NEW SYSTEM: Use CardData + AbilityEffect
+        if (cardData != null && cardData.defensiveAbility != null)
+        {
+            ExecuteAbilityEffect(cardData.defensiveAbility, target);
+            return;
+        }
+        
+        // LEGACY SYSTEM: Use GameObject with AbilityController
         if (supportAbility != null)
         {
             AbilityController abilityController = supportAbility.GetComponentInChildren<AbilityController>();
@@ -293,6 +347,14 @@ public class CardController : MonoBehaviour
     // Methods to activate abilities on a PlayerController target
     public void ActivateOffensiveAbility(PlayerController target)
     {
+        // NEW SYSTEM: Use CardData + AbilityEffect
+        if (cardData != null && cardData.offensiveAbility != null)
+        {
+            ExecuteAbilityEffectOnPlayer(cardData.offensiveAbility, target);
+            return;
+        }
+        
+        // LEGACY SYSTEM: Use GameObject with AbilityController
         if (offensiveAbility != null)
         {
             AbilityController abilityController = offensiveAbility.GetComponentInChildren<AbilityController>();
@@ -313,6 +375,14 @@ public class CardController : MonoBehaviour
 
     public void ActivateDefensiveAbility(PlayerController target)
     {
+        // NEW SYSTEM: Use CardData + AbilityEffect
+        if (cardData != null && cardData.defensiveAbility != null)
+        {
+            ExecuteAbilityEffectOnPlayer(cardData.defensiveAbility, target);
+            return;
+        }
+        
+        // LEGACY SYSTEM: Use GameObject with AbilityController
         if (supportAbility != null)
         {
             AbilityController abilityController = supportAbility.GetComponentInChildren<AbilityController>();
@@ -328,6 +398,50 @@ public class CardController : MonoBehaviour
         else
         {
             Debug.LogError("Support ability is not set.");
+        }
+    }
+
+    /// <summary>
+    /// Execute an ability effect from the new data system.
+    /// </summary>
+    private void ExecuteAbilityEffect(AbilityData abilityData, CardController target)
+    {
+        if (abilityData.effectPrefab == null)
+        {
+            Debug.LogWarning($"Ability {abilityData.displayName} has no effect prefab assigned.");
+            return;
+        }
+
+        AbilityEffect effect = abilityData.effectPrefab.GetComponent<AbilityEffect>();
+        if (effect != null)
+        {
+            effect.Execute(abilityData, this, target);
+        }
+        else
+        {
+            Debug.LogError($"Effect prefab for {abilityData.displayName} does not have an AbilityEffect component.");
+        }
+    }
+
+    /// <summary>
+    /// Execute an ability effect targeting a player.
+    /// </summary>
+    private void ExecuteAbilityEffectOnPlayer(AbilityData abilityData, PlayerController target)
+    {
+        if (abilityData.effectPrefab == null)
+        {
+            Debug.LogWarning($"Ability {abilityData.displayName} has no effect prefab assigned.");
+            return;
+        }
+
+        AbilityEffect effect = abilityData.effectPrefab.GetComponent<AbilityEffect>();
+        if (effect != null)
+        {
+            effect.Execute(abilityData, this, target);
+        }
+        else
+        {
+            Debug.LogError($"Effect prefab for {abilityData.displayName} does not have an AbilityEffect component.");
         }
     }
 }

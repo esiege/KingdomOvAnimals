@@ -1,9 +1,10 @@
 # Story 012: Create Core Data ScriptableObjects
 
-## Status: In Progress
+## Status: Complete ✓
 ## Sprint: 02
 ## Dependencies: None
 ## Started: 2026-01-06
+## Completed: 2026-01-06
 
 ---
 

@@ -1,8 +1,10 @@
 # Story 013: Create Base Effect Prefabs
 
-## Status: Not Started
+## Status: Complete ✓
 ## Sprint: 02
 ## Dependencies: 012
+## Started: 2026-01-06
+## Completed: 2026-01-06
 
 ---
 
