@@ -28,6 +28,11 @@ public class EncounterController : MonoBehaviour
     [Header("Turn Indicator")]
     public TextMeshProUGUI turnIndicatorText;
     
+    [Header("Connection Status UI")]
+    public GameObject opponentConnectionIndicator;
+    public Image opponentConnectionIcon;
+    public TextMeshProUGUI opponentConnectionText;
+    
     [Header("Disconnect UI")]
     public GameObject disconnectPanel;
     public TextMeshProUGUI disconnectStatusText;
@@ -37,6 +42,7 @@ public class EncounterController : MonoBehaviour
     private bool networkInitialized = false;
     private NetworkGameManager networkGameManager;
     private bool isGamePaused = false;
+    private bool isRestoringState = false;  // Flag to prevent mana changes during state restoration
 
     // Initialization method
     void Start()
@@ -92,6 +98,9 @@ public class EncounterController : MonoBehaviour
         }
         
         Debug.Log($"[EncounterController] Network game started! Local player goes first: {isLocalPlayerFirst}, Seed: {shuffleSeed}");
+        
+        // Set initial opponent connection status to connected
+        UpdateOpponentConnectionStatus(true, "Connected");
         
         // Shuffle decks with synchronized seeds
         // IMPORTANT: First player (host) always uses seed, second player always uses seed+1
@@ -193,6 +202,9 @@ public class EncounterController : MonoBehaviour
     public void RestoreTurnState(bool isLocalPlayerTurn, int networkTurnNumber)
     {
         Debug.Log($"[EncounterController] Restoring turn state: Local turn: {isLocalPlayerTurn}, Turn #: {networkTurnNumber}");
+        
+        // Set flag to prevent mana changes during state restoration
+        isRestoringState = true;
         
         // Set turn state without triggering new turn effects
         isCurrentPlayerTurn = isLocalPlayerTurn;
@@ -318,8 +330,27 @@ public class EncounterController : MonoBehaviour
     /// </summary>
     private void StartTurnNetwork()
     {
-        Debug.Log($"[EncounterController] StartTurnNetwork called! isCurrentPlayerTurn: {isCurrentPlayerTurn}, turnNumber: {turnNumber}");
+        Debug.Log($"[EncounterController] StartTurnNetwork called! isCurrentPlayerTurn: {isCurrentPlayerTurn}, turnNumber: {turnNumber}, isRestoringState: {isRestoringState}");
         Debug.Log($"[EncounterController] player.deck.Count={player?.deck?.Count ?? -1}, opponent.deck.Count={opponent?.deck?.Count ?? -1}");
+        
+        // CRITICAL: Skip mana changes if we're restoring state after reconnection
+        // The mana values were already restored from the snapshot
+        if (isRestoringState)
+        {
+            Debug.Log("[EncounterController] Skipping mana changes - restoring state from snapshot");
+            // Still need to update UI
+            if (isCurrentPlayerTurn)
+            {
+                playerHandController.VisualizePlayableHand();
+                playerHandController.VisualizePlayableBoard();
+            }
+            else
+            {
+                playerHandController.HidePlayableHand();
+                playerHandController.HidePlayableBoard();
+            }
+            return;
+        }
         
         // Card draws are now handled by server via RpcExecuteCardDraw
         // This ensures all clients stay in sync even after reconnection
@@ -449,6 +480,63 @@ public class EncounterController : MonoBehaviour
         }
     }
     
+    #region Connection Status
+    
+    /// <summary>
+    /// Updates the opponent connection status indicator.
+    /// </summary>
+    /// <param name="isConnected">True if opponent is connected</param>
+    /// <param name="statusText">Optional status text (ignored if no text component)</param>
+    public void UpdateOpponentConnectionStatus(bool isConnected, string statusText = null)
+    {
+        Debug.Log($"[EncounterController] UpdateOpponentConnectionStatus: isConnected={isConnected}");
+        
+        if (opponentConnectionIcon != null)
+        {
+            opponentConnectionIcon.color = isConnected ? Color.green : Color.red;
+        }
+        
+        // Text is optional - only update if component exists
+        if (opponentConnectionText != null)
+        {
+            if (statusText != null)
+            {
+                opponentConnectionText.text = statusText;
+            }
+            else
+            {
+                opponentConnectionText.text = isConnected ? "Connected" : "Disconnected";
+            }
+            opponentConnectionText.color = isConnected ? Color.green : Color.red;
+        }
+        
+        // Show/hide the indicator if needed
+        if (opponentConnectionIndicator != null)
+        {
+            opponentConnectionIndicator.SetActive(true);
+        }
+    }
+    
+    /// <summary>
+    /// Sets opponent connection status to "Reconnecting..." state.
+    /// </summary>
+    public void SetOpponentReconnecting()
+    {
+        if (opponentConnectionIcon != null)
+        {
+            opponentConnectionIcon.color = Color.yellow;
+        }
+        
+        // Text is optional
+        if (opponentConnectionText != null)
+        {
+            opponentConnectionText.text = "Reconnecting...";
+            opponentConnectionText.color = Color.yellow;
+        }
+    }
+    
+    #endregion
+    
     #region Disconnect Handling
     
     /// <summary>
@@ -459,6 +547,9 @@ public class EncounterController : MonoBehaviour
         Debug.Log($"[EncounterController] OnOpponentDisconnected called! Waiting {gracePeriod}s for reconnect...");
         Debug.Log($"[EncounterController] disconnectPanel is null: {disconnectPanel == null}, disconnectStatusText is null: {disconnectStatusText == null}");
         isGamePaused = true;
+        
+        // Update connection status indicator
+        SetOpponentReconnecting();
         
         // Show disconnect UI
         if (disconnectPanel != null)
@@ -500,6 +591,9 @@ public class EncounterController : MonoBehaviour
     {
         Debug.Log("[EncounterController] Opponent reconnected! Resuming game...");
         isGamePaused = false;
+        
+        // Update connection status indicator
+        UpdateOpponentConnectionStatus(true, "Connected");
         
         // Hide disconnect UI
         if (disconnectPanel != null)
@@ -607,6 +701,9 @@ public class EncounterController : MonoBehaviour
     {
         Debug.Log("[EncounterController] Game state restored!");
         Debug.Log($"[EncounterController] player.deck.Count={player?.deck?.Count ?? -1}, opponent.deck.Count={opponent?.deck?.Count ?? -1}");
+        
+        // Clear the state restoration flag - mana changes are now allowed
+        isRestoringState = false;
         
         // Verify player references match NetworkGameManager
         var ngm = NetworkGameManager.Instance;

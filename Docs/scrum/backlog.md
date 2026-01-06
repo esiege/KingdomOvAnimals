@@ -15,8 +15,9 @@ Stories in priority order. We commit to **1 story at a time per sprint**.
 7. [x] **Story 007**: Implement matchmaking queue *(Sprint 01 - Complete)*
 8. [x] **Story 008**: Network-authorize turn switching *(Sprint 01 - Complete)*
 9. [x] **Story 009**: Handle player disconnect *(Sprint 01 - Complete)*
-10. [ ] **Story 010**: Add reconnection support
-11. [ ] **Story 011**: Show opponent connection status
+10. [x] **Story 010**: Add reconnection support *(Sprint 01 - Complete)*
+11. [x] **Story 011**: Show opponent connection status *(Sprint 01 - Complete)*
+12. [ ] **Story 012**: ScriptableObject card data system
 
 ---
 
@@ -33,3 +34,5 @@ Stories in priority order. We commit to **1 story at a time per sprint**.
 | 007 - Implement matchmaking queue | Sprint 01 | 2026-01-04 |
 | 008 - Network-authorize turn switching | Sprint 01 | 2026-01-04 |
 | 009 - Handle player disconnect | Sprint 01 | 2026-01-04 |
+| 010 - Add reconnection support | Sprint 01 | 2026-01-06 |
+| 011 - Show opponent connection status | Sprint 01 | 2026-01-06 |

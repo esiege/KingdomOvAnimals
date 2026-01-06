@@ -25,15 +25,29 @@ public class DuelScreenSetup : EditorWindow
             "This will add disconnect handling UI to the current scene:\n" +
             "• Disconnect Panel (overlay)\n" +
             "• Status text with timer\n" +
+            "• Connection status indicator\n" +
             "• Wire up to EncounterController\n\n" +
             "Make sure you have the DuelScreen scene open!",
             MessageType.Info);
 
         GUILayout.Space(10);
 
-        if (GUILayout.Button("Add Disconnect UI", GUILayout.Height(40)))
+        if (GUILayout.Button("Add All UI", GUILayout.Height(40)))
         {
             AddDisconnectUI();
+            AddConnectionStatusUI();
+        }
+        
+        GUILayout.Space(5);
+        
+        if (GUILayout.Button("Add Disconnect Panel Only", GUILayout.Height(30)))
+        {
+            AddDisconnectUI();
+        }
+        
+        if (GUILayout.Button("Add Connection Status Only", GUILayout.Height(30)))
+        {
+            AddConnectionStatusUI();
         }
         
         GUILayout.Space(10);
@@ -96,13 +110,59 @@ public class DuelScreenSetup : EditorWindow
         disconnectPanel.SetActive(false);
         
         // Wire up to EncounterController
-        WireUpToEncounterController(disconnectPanel, statusText);
+        WireUpDisconnectPanel(disconnectPanel, statusText);
         
         // Mark scene dirty
         UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
             UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene());
         
         Debug.Log("[DuelScreenSetup] Disconnect UI added successfully!");
+    }
+
+    private static void AddConnectionStatusUI()
+    {
+        Canvas canvas = FindMainUICanvas();
+        if (canvas == null)
+        {
+            Debug.LogError("[DuelScreenSetup] No Canvas found under 'UI' object! Please ensure UI hierarchy exists.");
+            return;
+        }
+
+        // Check if connection status already exists
+        Transform existingIndicator = canvas.transform.Find("OpponentConnectionStatus");
+        if (existingIndicator != null)
+        {
+            Debug.LogWarning("[DuelScreenSetup] OpponentConnectionStatus already exists. Use 'Wire Up Existing UI' to reconnect.");
+            return;
+        }
+
+        // Create Connection Status Indicator - just a circle in the far top-right corner
+        GameObject connectionIndicator = new GameObject("OpponentConnectionStatus");
+        connectionIndicator.transform.SetParent(canvas.transform, false);
+        
+        RectTransform indicatorRect = connectionIndicator.AddComponent<RectTransform>();
+        indicatorRect.anchorMin = new Vector2(1, 1); // Top-right corner
+        indicatorRect.anchorMax = new Vector2(1, 1);
+        indicatorRect.pivot = new Vector2(1, 1);
+        indicatorRect.sizeDelta = new Vector2(20, 20);
+        indicatorRect.anchoredPosition = new Vector2(-5, -5); // 5px padding from corner
+        
+        // Add circle image
+        Image iconImage = connectionIndicator.AddComponent<Image>();
+        iconImage.color = Color.green; // Default: connected
+        
+        // Make it a circle using Unity's built-in Knob sprite (circular)
+        iconImage.sprite = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
+        iconImage.type = Image.Type.Simple;
+        
+        // Wire up to EncounterController
+        WireUpConnectionStatus(connectionIndicator, iconImage);
+        
+        // Mark scene dirty
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
+            UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene());
+        
+        Debug.Log("[DuelScreenSetup] Connection Status UI added successfully!");
     }
 
     private static void WireUpExistingUI()
@@ -114,28 +174,44 @@ public class DuelScreenSetup : EditorWindow
             return;
         }
 
+        // Wire up disconnect panel
         Transform panelTransform = canvas.transform.Find("DisconnectPanel");
-        if (panelTransform == null)
+        if (panelTransform != null)
         {
-            Debug.LogError("[DuelScreenSetup] DisconnectPanel not found! Use 'Add Disconnect UI' first.");
-            return;
+            GameObject disconnectPanel = panelTransform.gameObject;
+            TextMeshProUGUI statusText = disconnectPanel.GetComponentInChildren<TextMeshProUGUI>();
+            
+            if (statusText != null)
+            {
+                WireUpDisconnectPanel(disconnectPanel, statusText);
+                Debug.Log("[DuelScreenSetup] Disconnect panel wired up!");
+            }
         }
-
-        GameObject disconnectPanel = panelTransform.gameObject;
-        TextMeshProUGUI statusText = disconnectPanel.GetComponentInChildren<TextMeshProUGUI>();
         
-        if (statusText == null)
+        // Wire up connection status
+        Transform connectionTransform = canvas.transform.Find("OpponentConnectionStatus");
+        if (connectionTransform != null)
         {
-            Debug.LogError("[DuelScreenSetup] No TextMeshProUGUI found in DisconnectPanel!");
-            return;
+            // New style: icon is on the indicator itself
+            Image icon = connectionTransform.GetComponent<Image>();
+            // Old style: icon is a child
+            if (icon == null)
+            {
+                icon = connectionTransform.Find("ConnectionIcon")?.GetComponent<Image>();
+            }
+            TextMeshProUGUI text = connectionTransform.Find("ConnectionText")?.GetComponent<TextMeshProUGUI>();
+            
+            if (icon != null)
+            {
+                WireUpConnectionStatus(connectionTransform.gameObject, icon, text);
+                Debug.Log("[DuelScreenSetup] Connection status wired up!");
+            }
         }
-
-        WireUpToEncounterController(disconnectPanel, statusText);
         
-        Debug.Log("[DuelScreenSetup] Disconnect UI wired up successfully!");
+        Debug.Log("[DuelScreenSetup] UI wiring complete!");
     }
 
-    private static void WireUpToEncounterController(GameObject disconnectPanel, TextMeshProUGUI statusText)
+    private static void WireUpDisconnectPanel(GameObject disconnectPanel, TextMeshProUGUI statusText)
     {
         EncounterController encounterController = FindObjectOfType<EncounterController>();
         if (encounterController == null)
@@ -150,6 +226,27 @@ public class DuelScreenSetup : EditorWindow
         so.ApplyModifiedProperties();
         
         Debug.Log("[DuelScreenSetup] Wired DisconnectPanel to EncounterController");
+    }
+    
+    private static void WireUpConnectionStatus(GameObject indicator, Image icon, TextMeshProUGUI text = null)
+    {
+        EncounterController encounterController = FindObjectOfType<EncounterController>();
+        if (encounterController == null)
+        {
+            Debug.LogWarning("[DuelScreenSetup] No EncounterController found in scene! You'll need to wire up manually.");
+            return;
+        }
+
+        SerializedObject so = new SerializedObject(encounterController);
+        so.FindProperty("opponentConnectionIndicator").objectReferenceValue = indicator;
+        so.FindProperty("opponentConnectionIcon").objectReferenceValue = icon;
+        if (text != null)
+        {
+            so.FindProperty("opponentConnectionText").objectReferenceValue = text;
+        }
+        so.ApplyModifiedProperties();
+        
+        Debug.Log("[DuelScreenSetup] Wired Connection Status to EncounterController");
     }
 
     /// <summary>

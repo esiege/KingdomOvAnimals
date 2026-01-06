@@ -63,12 +63,15 @@ Abilities are modular and support various targeting types:
 
 ## Documentation Index
 
+### Game Design
+- [Game Design Overview](./game-design/README.md)
+- [Game Flow](./game-design/game-flow.md)
+- [Card System](./game-design/cards.md)
+- [Ability System](./game-design/abilities.md)
+- [Targeting System](./game-design/targeting.md)
+
 ### Core Systems
 - [Architecture Overview](./architecture.md)
-- [Game Flow](./game-flow.md)
-- [Card System](./cards.md)
-- [Ability System](./abilities.md)
-- [Targeting System](./targeting.md)
 - [Utilities](./utilities.md)
 
 ### Networking

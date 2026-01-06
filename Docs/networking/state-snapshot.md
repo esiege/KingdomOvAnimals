@@ -6,7 +6,7 @@ Serializable representation of complete game state for persistence and reconnect
 
 - Capture game state when disconnection occurs
 - Serialize to JSON for network transfer
-- Restore state after reconnection
+- Restore state after reconnection (including health, mana, cards, turn state)
 - Enable game state persistence (future feature)
 
 ## Structure
@@ -21,6 +21,7 @@ GameStateSnapshot
 ├── localPlayer: PlayerSnapshot
 │   ├── playerId: int
 │   ├── health: int
+│   ├── maxHealth: int          ← Added to support proper HP restoration
 │   ├── mana: int
 │   ├── maxMana: int
 │   ├── handCardIds: List<string>
@@ -56,17 +57,35 @@ Captures individual card state on the board:
 3. Captures PlayerSnapshot for opponent
 4. Records timestamp for validation
 
-PlayerSnapshot capture:
-- Prefers NetworkPlayer SyncVar values if available
-- Falls back to PlayerController local values
-- Collects hand cards from HandController
-- Collects board cards with positions
+### PlayerSnapshot Capture Priority
+
+Values are captured with this priority:
+1. **NetworkPlayer SyncVars** (if spawned and valid)
+2. **PlayerController local values** (fallback)
+
+This ensures accurate values even if NetworkPlayer is being despawned.
+
+```csharp
+// Capture priority example
+if (controller.networkPlayer != null && controller.networkPlayer.IsSpawned)
+{
+    capturedHealth = controller.networkPlayer.CurrentHealth.Value;
+    capturedMaxHealth = controller.networkPlayer.MaxHealth.Value;
+    // ...
+}
+else
+{
+    capturedHealth = controller.currentHealth;
+    capturedMaxHealth = controller.maxHealth;
+    // ...
+}
+```
 
 ## Serialization
 
 Uses Unity's `JsonUtility`:
 
-```
+```csharp
 snapshot.ToJson() → JSON string
 GameStateSnapshot.FromJson(json) → GameStateSnapshot
 ```
@@ -81,16 +100,57 @@ Used during restoration to correctly map players.
 
 ## Restoration
 
-Snapshot can restore:
-- Health and mana values
-- Cards in hand (instantiated from CardLibrary)
-- Cards on board with correct positions
-- Card status flags (tapped, summoning sickness)
+### What Gets Restored
 
-Cannot restore:
-- Exact card GameObject references
+| Data | Restored To | Notes |
+|------|-------------|-------|
+| `health` | PlayerController.currentHealth | Also updates UI |
+| `maxHealth` | PlayerController.maxHealth | Needed for HP bar |
+| `mana` | PlayerController.currentMana | Also updates UI |
+| `maxMana` | PlayerController.maxMana | Needed for mana display |
+| `handCardIds` | Hand via CardLibrary lookup | Instantiated fresh |
+| `boardCards` | Board slots | With full card state |
+| `deckCardIds` | PlayerController.deck | Order preserved |
+| `graveyardCardIds` | PlayerController.graveyard | Order preserved |
+
+### Restoration Code Path
+
+```
+TargetReceiveGameState (RPC)
+  └── RestoreTurnState()        ← Sets isRestoringState = true
+  └── RestoreCardsFromSnapshot()
+        ├── Restore HP/mana to PlayerController
+        ├── Restore hand cards
+        ├── Restore board cards
+        └── Restore deck/graveyard
+  └── OnGameStateRestored()     ← Sets isRestoringState = false
+```
+
+### Critical: Mana Restoration
+
+The `isRestoringState` flag in `EncounterController` prevents duplicate mana increases:
+
+```csharp
+// In StartTurnNetwork()
+if (isRestoringState)
+{
+    Debug.Log("Skipping mana changes - restoring state from snapshot");
+    return; // Don't add +1 mana during restoration
+}
+```
+
+## Cannot Restore
+
+- Exact card GameObject references (new instances created)
 - Visual animation states
 - Pending actions/timers
+- Transient UI states
+
+## Related Files
+
+- [GameStateSnapshot.cs](../../Assets/Scripts/Network/GameStateSnapshot.cs)
+- [NetworkGameManager.cs](../../Assets/Scripts/Network/NetworkGameManager.cs) - `RestoreCardsFromSnapshot()`
+- [EncounterController.cs](../../Assets/Scripts/Controllers/EncounterController.cs) - `RestoreTurnState()`, `OnGameStateRestored()`
 
 ---
 *Parent: [Networking System](./README.md)*
