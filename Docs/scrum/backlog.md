@@ -21,8 +21,8 @@ A data-driven card system with a dedicated Unity scene for managing cards, abili
 | 012 | Create Core Data ScriptableObjects | Complete ✓ | None |
 | 013 | Create Base Effect Prefabs | Complete ✓ | 012 |
 | 014 | Migrate CardController to CardData | Complete ✓ | 012 |
-| 015 | Create CardLibrary System | Not Started | 012, 014 |
-| 016 | Create Card Management Scene Shell | Not Started | None |
+| 015 | Create CardLibrary System | Complete ✓ | 012, 014 |
+| 016 | Create Card Management Scene Shell | Complete ✓ | None |
 | 017 | Card List & Editor UI | Not Started | 012, 016 |
 | 018 | Ability List & Editor UI | Not Started | 012, 016 |
 | 019 | Create Initial Card/Ability Data Assets | Not Started | 017, 018 |

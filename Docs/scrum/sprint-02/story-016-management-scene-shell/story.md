@@ -1,8 +1,10 @@
 # Story 016: Create Card Management Scene Shell
 
-## Status: Not Started
+## Status: Complete ✓
 ## Sprint: 02
 ## Dependencies: None
+## Started: 2026-01-06
+## Completed: 2026-01-06
 
 ---
 
