@@ -1,8 +1,9 @@
 # Story 015: Create CardLibrary System
 
-## Status: Not Started
+## Status: In Progress
 ## Sprint: 02
 ## Dependencies: 012, 014
+## Started: 2026-01-06
 
 ---
 
