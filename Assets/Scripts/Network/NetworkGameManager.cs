@@ -563,6 +563,31 @@ public class NetworkGameManager : NetworkBehaviour
         // Only process on non-server clients
         if (IsServerInitialized) return;
         
+        // CRITICAL: Ignore RPCs with older turn numbers - buffered RPCs can arrive with stale data
+        if (turnNumber < _cachedTurnNumber)
+        {
+            Debug.Log($"[Client RPC] IGNORING stale RPC - received turnNumber {turnNumber} but cached is {_cachedTurnNumber}");
+            return;
+        }
+        
+        // CRITICAL: For same turn number, only update if the new ObjectId matches our local player
+        // This handles the case where we reconnect and the server sends us a fresh RPC with our new ObjectId
+        if (turnNumber == _cachedTurnNumber && turnObjectId != _cachedTurnObjectId)
+        {
+            // Check if the new ObjectId is our local player - if so, prefer it!
+            if (localNetworkPlayer != null && turnObjectId == localNetworkPlayer.ObjectId)
+            {
+                Debug.Log($"[Client RPC] Same turn but NEW ObjectId {turnObjectId} matches our local player - updating!");
+            }
+            else if (localNetworkPlayer != null && _cachedTurnObjectId == localNetworkPlayer.ObjectId)
+            {
+                // Our cache already has our ObjectId - ignore this RPC with different ObjectId
+                Debug.Log($"[Client RPC] IGNORING RPC - same turn but cached ObjectId {_cachedTurnObjectId} already matches our local player");
+                return;
+            }
+            // Otherwise, update to the new ObjectId (it's for the other player)
+        }
+        
         // Check if this is a duplicate/same turn (important for buffered RPCs after reconnection)
         bool isNewTurn = turnNumber != _cachedTurnNumber;
         Debug.Log($"[Client RPC] isNewTurn={isNewTurn}, localNetworkPlayer={(localNetworkPlayer != null ? localNetworkPlayer.PlayerName.Value : "null")}");
@@ -844,6 +869,11 @@ public class NetworkGameManager : NetworkBehaviour
             {
                 Debug.Log($"[Server] Updating CurrentTurnObjectId from {CurrentTurnObjectId.Value} to {newObjectId} (it was player {playerId}'s turn)");
                 CurrentTurnObjectId.Value = newObjectId;
+                
+                // CRITICAL: Broadcast fresh turn state to update the buffered RPC!
+                // The old buffered RPC has the despawned ObjectId, which will overwrite client state
+                Debug.Log($"[Server] Broadcasting fresh turn state to update buffered RPC with new ObjectId {newObjectId}");
+                RpcBroadcastTurnState(CurrentTurnObjectId.Value, TurnNumber.Value, GameStarted.Value, ShuffleSeed.Value);
             }
             else
             {
