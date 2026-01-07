@@ -33,8 +33,8 @@ namespace KOA.Editor
             GameObject cardsPanel = CreateCardEditorPanel(canvasObj.transform);
             cardsPanel.SetActive(false);
             
-            // Create Abilities Panel (hidden by default)
-            GameObject abilitiesPanel = CreateEditorPanel(canvasObj.transform, "AbilitiesPanel", "Ability Editor");
+            // Create Abilities Panel with full editor UI
+            GameObject abilitiesPanel = CreateAbilityEditorPanel(canvasObj.transform);
             abilitiesPanel.SetActive(false);
             
             // Create Decks Panel (hidden by default)
@@ -74,6 +74,9 @@ namespace KOA.Editor
             
             // Create CardListItem prefab if it doesn't exist
             CreateCardListItemPrefab();
+            
+            // Create AbilityListItem prefab if it doesn't exist
+            CreateAbilityListItemPrefab();
             
             // Save the scene
             string scenePath = "Assets/Scenes/CardManagement.unity";
@@ -428,6 +431,36 @@ namespace KOA.Editor
             y -= spacing;
         }
 
+        private static void CreateConditionalFormField(Transform parent, string containerName, string fieldName, string label, ref float y, float height, float spacing)
+        {
+            // Container for visibility toggling
+            GameObject container = new GameObject(containerName);
+            container.transform.SetParent(parent, false);
+            RectTransform containerRect = container.AddComponent<RectTransform>();
+            containerRect.anchorMin = new Vector2(0f, y - height);
+            containerRect.anchorMax = new Vector2(1f, y);
+            containerRect.offsetMin = Vector2.zero;
+            containerRect.offsetMax = Vector2.zero;
+            
+            // Label
+            GameObject labelObj = CreateTMPText(container.transform, fieldName + "Label", label, 20, TextAlignmentOptions.MidlineRight);
+            RectTransform labelRect = labelObj.GetComponent<RectTransform>();
+            labelRect.anchorMin = new Vector2(0.02f, 0f);
+            labelRect.anchorMax = new Vector2(0.25f, 1f);
+            labelRect.offsetMin = Vector2.zero;
+            labelRect.offsetMax = Vector2.zero;
+            
+            // Input field
+            GameObject field = CreateTMPInputField(container.transform, fieldName, "");
+            RectTransform fieldRect = field.GetComponent<RectTransform>();
+            fieldRect.anchorMin = new Vector2(0.27f, 0f);
+            fieldRect.anchorMax = new Vector2(0.95f, 1f);
+            fieldRect.offsetMin = Vector2.zero;
+            fieldRect.offsetMax = Vector2.zero;
+            
+            y -= spacing;
+        }
+
         private static void CreateFormDropdown(Transform parent, string name, string label, ref float y, float height, float spacing)
         {
             // Label
@@ -719,26 +752,34 @@ namespace KOA.Editor
             Image arrowImg = arrowObj.AddComponent<Image>();
             arrowImg.color = Color.white;
             
-            // Template (dropdown list)
+            // Template (dropdown list) - opens UPWARD
             GameObject template = new GameObject("Template");
             template.transform.SetParent(dropObj.transform, false);
             RectTransform tempRect = template.AddComponent<RectTransform>();
-            tempRect.anchorMin = new Vector2(0, 0);
-            tempRect.anchorMax = new Vector2(1, 0);
-            tempRect.pivot = new Vector2(0.5f, 1);
-            tempRect.sizeDelta = new Vector2(0, 150);
+            tempRect.anchorMin = new Vector2(0, 1);
+            tempRect.anchorMax = new Vector2(1, 1);
+            tempRect.pivot = new Vector2(0.5f, 0);
+            tempRect.sizeDelta = new Vector2(0, 250); // Taller dropdown list
+            tempRect.anchoredPosition = Vector2.zero;
             Image tempBg = template.AddComponent<Image>();
             tempBg.color = new Color(0.2f, 0.2f, 0.25f, 1f);
+            
+            // Add Canvas to template so it renders on top of everything
+            Canvas templateCanvas = template.AddComponent<Canvas>();
+            templateCanvas.overrideSorting = true;
+            templateCanvas.sortingOrder = 30000; // Very high sorting order
+            template.AddComponent<GraphicRaycaster>();
+            
             ScrollRect scroll = template.AddComponent<ScrollRect>();
             
-            // Viewport
+            // Viewport with padding
             GameObject viewport = new GameObject("Viewport");
             viewport.transform.SetParent(template.transform, false);
             RectTransform vpRect = viewport.AddComponent<RectTransform>();
             vpRect.anchorMin = Vector2.zero;
             vpRect.anchorMax = Vector2.one;
-            vpRect.offsetMin = Vector2.zero;
-            vpRect.offsetMax = Vector2.zero;
+            vpRect.offsetMin = new Vector2(0, 5);
+            vpRect.offsetMax = new Vector2(0, -5);
             viewport.AddComponent<Mask>().showMaskGraphic = false;
             viewport.AddComponent<Image>();
             
@@ -864,6 +905,251 @@ namespace KOA.Editor
             Object.DestroyImmediate(itemObj);
             
             Debug.Log($"[CardManagement] Created CardListItem prefab at: {prefabPath}");
+        }
+
+        #endregion
+
+        #region Ability Editor Panel
+
+        private static GameObject CreateAbilityEditorPanel(Transform parent)
+        {
+            GameObject panel = CreatePanel(parent, "AbilitiesPanel");
+            
+            // Add AbilityEditorUI component
+            var abilityEditor = panel.AddComponent<AbilityEditorUI>();
+            
+            // Title
+            GameObject titleObj = CreateText(panel.transform, "Title", "Ability Editor", 36);
+            RectTransform titleRect = titleObj.GetComponent<RectTransform>();
+            titleRect.anchorMin = new Vector2(0.5f, 0.92f);
+            titleRect.anchorMax = new Vector2(0.5f, 0.98f);
+            titleRect.sizeDelta = new Vector2(400, 50);
+            titleRect.anchoredPosition = Vector2.zero;
+            
+            // Back button
+            GameObject backBtn = CreateButton(panel.transform, "BackButton", "← Back", 40);
+            RectTransform backRect = backBtn.GetComponent<RectTransform>();
+            backRect.anchorMin = new Vector2(0.02f, 0.92f);
+            backRect.anchorMax = new Vector2(0.12f, 0.98f);
+            backRect.offsetMin = Vector2.zero;
+            backRect.offsetMax = Vector2.zero;
+            
+            // Left Panel - Ability List
+            GameObject leftPanel = CreateAbilityListPanel(panel.transform);
+            
+            // Right Panel - Ability Editor Form
+            GameObject rightPanel = CreateAbilityFormPanel(panel.transform);
+            
+            // Confirmation Dialog
+            GameObject confirmDialog = CreateConfirmDialog(panel.transform);
+            confirmDialog.name = "AbilityConfirmDialog";
+            
+            // Wire up AbilityEditorUI
+            SerializedObject so = new SerializedObject(abilityEditor);
+            
+            // List panel references
+            so.FindProperty("abilityListContent").objectReferenceValue = leftPanel.transform.Find("ScrollView/Viewport/Content");
+            so.FindProperty("searchField").objectReferenceValue = leftPanel.transform.Find("SearchField")?.GetComponent<TMP_InputField>();
+            so.FindProperty("newAbilityButton").objectReferenceValue = leftPanel.transform.Find("NewAbilityButton")?.GetComponent<Button>();
+            
+            // Load prefab reference
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/UI/AbilityListItem.prefab");
+            so.FindProperty("abilityListItemPrefab").objectReferenceValue = prefab;
+            
+            // Editor panel references
+            so.FindProperty("editorPanel").objectReferenceValue = rightPanel;
+            so.FindProperty("idField").objectReferenceValue = rightPanel.transform.Find("IdField")?.GetComponent<TMP_InputField>();
+            so.FindProperty("nameField").objectReferenceValue = rightPanel.transform.Find("NameField")?.GetComponent<TMP_InputField>();
+            so.FindProperty("descriptionField").objectReferenceValue = rightPanel.transform.Find("DescriptionField")?.GetComponent<TMP_InputField>();
+            so.FindProperty("behaviorDropdown").objectReferenceValue = rightPanel.transform.Find("BehaviorDropdown")?.GetComponent<TMP_Dropdown>();
+            
+            // Conditional field containers and fields
+            so.FindProperty("damageFieldContainer").objectReferenceValue = rightPanel.transform.Find("DamageFieldContainer")?.gameObject;
+            so.FindProperty("damageField").objectReferenceValue = rightPanel.transform.Find("DamageFieldContainer/DamageField")?.GetComponent<TMP_InputField>();
+            so.FindProperty("healAmountFieldContainer").objectReferenceValue = rightPanel.transform.Find("HealAmountFieldContainer")?.gameObject;
+            so.FindProperty("healAmountField").objectReferenceValue = rightPanel.transform.Find("HealAmountFieldContainer/HealAmountField")?.GetComponent<TMP_InputField>();
+            so.FindProperty("durationFieldContainer").objectReferenceValue = rightPanel.transform.Find("DurationFieldContainer")?.gameObject;
+            so.FindProperty("durationField").objectReferenceValue = rightPanel.transform.Find("DurationFieldContainer/DurationField")?.GetComponent<TMP_InputField>();
+            
+            // Other dropdowns
+            so.FindProperty("targetTypeDropdown").objectReferenceValue = rightPanel.transform.Find("TargetTypeDropdown")?.GetComponent<TMP_Dropdown>();
+            so.FindProperty("animationTypeDropdown").objectReferenceValue = rightPanel.transform.Find("AnimationTypeDropdown")?.GetComponent<TMP_Dropdown>();
+            so.FindProperty("effectPrefabDropdown").objectReferenceValue = rightPanel.transform.Find("EffectPrefabDropdown")?.GetComponent<TMP_Dropdown>();
+            so.FindProperty("saveButton").objectReferenceValue = rightPanel.transform.Find("SaveButton")?.GetComponent<Button>();
+            so.FindProperty("deleteButton").objectReferenceValue = rightPanel.transform.Find("DeleteButton")?.GetComponent<Button>();
+            
+            // Confirm dialog references
+            so.FindProperty("confirmDialog").objectReferenceValue = confirmDialog;
+            so.FindProperty("confirmText").objectReferenceValue = confirmDialog.transform.Find("DialogBox/Text")?.GetComponent<TMP_Text>();
+            so.FindProperty("confirmYesButton").objectReferenceValue = confirmDialog.transform.Find("DialogBox/YesButton")?.GetComponent<Button>();
+            so.FindProperty("confirmNoButton").objectReferenceValue = confirmDialog.transform.Find("DialogBox/NoButton")?.GetComponent<Button>();
+            
+            so.ApplyModifiedProperties();
+            
+            return panel;
+        }
+
+        private static GameObject CreateAbilityListPanel(Transform parent)
+        {
+            GameObject listPanel = new GameObject("ListPanel");
+            listPanel.transform.SetParent(parent, false);
+            
+            RectTransform rect = listPanel.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.02f, 0.05f);
+            rect.anchorMax = new Vector2(0.3f, 0.9f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            
+            Image bg = listPanel.AddComponent<Image>();
+            bg.color = new Color(0.2f, 0.2f, 0.25f, 1f);
+            
+            // Search field
+            GameObject searchField = CreateTMPInputField(listPanel.transform, "SearchField", "Search...");
+            RectTransform searchRect = searchField.GetComponent<RectTransform>();
+            searchRect.anchorMin = new Vector2(0.05f, 0.92f);
+            searchRect.anchorMax = new Vector2(0.95f, 0.98f);
+            searchRect.offsetMin = Vector2.zero;
+            searchRect.offsetMax = Vector2.zero;
+            
+            // Scroll view for ability list
+            GameObject scrollView = CreateScrollView(listPanel.transform, "ScrollView");
+            RectTransform scrollRect = scrollView.GetComponent<RectTransform>();
+            scrollRect.anchorMin = new Vector2(0.05f, 0.1f);
+            scrollRect.anchorMax = new Vector2(0.95f, 0.9f);
+            scrollRect.offsetMin = Vector2.zero;
+            scrollRect.offsetMax = Vector2.zero;
+            
+            // New Ability button
+            GameObject newBtn = CreateTMPButton(listPanel.transform, "NewAbilityButton", "+ New Ability", 40);
+            RectTransform newRect = newBtn.GetComponent<RectTransform>();
+            newRect.anchorMin = new Vector2(0.1f, 0.02f);
+            newRect.anchorMax = new Vector2(0.9f, 0.08f);
+            newRect.offsetMin = Vector2.zero;
+            newRect.offsetMax = Vector2.zero;
+            
+            return listPanel;
+        }
+
+        private static GameObject CreateAbilityFormPanel(Transform parent)
+        {
+            GameObject formPanel = new GameObject("FormPanel");
+            formPanel.transform.SetParent(parent, false);
+            
+            RectTransform rect = formPanel.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.32f, 0.05f);
+            rect.anchorMax = new Vector2(0.98f, 0.9f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            
+            Image bg = formPanel.AddComponent<Image>();
+            bg.color = new Color(0.2f, 0.2f, 0.25f, 1f);
+            
+            // Form fields with labels
+            float y = 0.95f;
+            float fieldHeight = 0.06f;
+            float spacing = 0.07f;
+            
+            CreateFormField(formPanel.transform, "IdField", "ID:", ref y, fieldHeight, spacing);
+            CreateFormField(formPanel.transform, "NameField", "Name:", ref y, fieldHeight, spacing);
+            CreateFormField(formPanel.transform, "DescriptionField", "Description:", ref y, fieldHeight, spacing);
+            
+            // Behavior dropdown (determines which conditional fields to show)
+            CreateFormDropdown(formPanel.transform, "BehaviorDropdown", "Behavior:", ref y, fieldHeight, spacing);
+            
+            // Section header for conditional effect values
+            y -= 0.02f;
+            
+            // Conditional fields - wrapped in containers for visibility toggling
+            CreateConditionalFormField(formPanel.transform, "DamageFieldContainer", "DamageField", "Damage:", ref y, fieldHeight, spacing);
+            CreateConditionalFormField(formPanel.transform, "HealAmountFieldContainer", "HealAmountField", "Heal Amount:", ref y, fieldHeight, spacing);
+            CreateConditionalFormField(formPanel.transform, "DurationFieldContainer", "DurationField", "Duration:", ref y, fieldHeight, spacing);
+            
+            // Section header for targeting
+            y -= 0.02f;
+            
+            CreateFormDropdown(formPanel.transform, "TargetTypeDropdown", "Target Type:", ref y, fieldHeight, spacing);
+            CreateFormDropdown(formPanel.transform, "AnimationTypeDropdown", "Animation:", ref y, fieldHeight, spacing);
+            CreateFormDropdown(formPanel.transform, "EffectPrefabDropdown", "Effect Prefab:", ref y, fieldHeight, spacing);
+            
+            // Save and Delete buttons
+            GameObject saveBtn = CreateTMPButton(formPanel.transform, "SaveButton", "Save", 45);
+            RectTransform saveRect = saveBtn.GetComponent<RectTransform>();
+            saveRect.anchorMin = new Vector2(0.55f, 0.02f);
+            saveRect.anchorMax = new Vector2(0.72f, 0.08f);
+            saveRect.offsetMin = Vector2.zero;
+            saveRect.offsetMax = Vector2.zero;
+            
+            GameObject deleteBtn = CreateTMPButton(formPanel.transform, "DeleteButton", "Delete", 45);
+            RectTransform deleteRect = deleteBtn.GetComponent<RectTransform>();
+            deleteRect.anchorMin = new Vector2(0.75f, 0.02f);
+            deleteRect.anchorMax = new Vector2(0.92f, 0.08f);
+            deleteRect.offsetMin = Vector2.zero;
+            deleteRect.offsetMax = Vector2.zero;
+            // Make delete button red-ish
+            deleteBtn.GetComponent<Image>().color = new Color(0.5f, 0.25f, 0.25f, 1f);
+            
+            return formPanel;
+        }
+
+        private static void CreateAbilityListItemPrefab()
+        {
+            string prefabPath = "Assets/Resources/UI/AbilityListItem.prefab";
+            
+            // Check if prefab already exists
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath) != null)
+            {
+                Debug.Log("[CardManagement] AbilityListItem prefab already exists");
+                return;
+            }
+            
+            // Ensure directory exists
+            if (!System.IO.Directory.Exists("Assets/Resources/UI"))
+            {
+                System.IO.Directory.CreateDirectory("Assets/Resources/UI");
+            }
+            
+            // Create prefab
+            GameObject itemObj = new GameObject("AbilityListItem");
+            
+            RectTransform rect = itemObj.AddComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(0, 40);
+            
+            Image bg = itemObj.AddComponent<Image>();
+            bg.color = new Color(0.3f, 0.3f, 0.4f, 1f);
+            
+            Button btn = itemObj.AddComponent<Button>();
+            ColorBlock colors = btn.colors;
+            colors.highlightedColor = new Color(0.4f, 0.4f, 0.5f, 1f);
+            colors.pressedColor = new Color(0.2f, 0.2f, 0.3f, 1f);
+            btn.colors = colors;
+            
+            // Add AbilityListItem component
+            itemObj.AddComponent<AbilityListItem>();
+            
+            // Layout element for scroll view
+            var layout = itemObj.AddComponent<LayoutElement>();
+            layout.minHeight = 40;
+            layout.preferredHeight = 40;
+            
+            // Name text
+            GameObject textObj = new GameObject("NameText");
+            textObj.transform.SetParent(itemObj.transform, false);
+            RectTransform textRect = textObj.AddComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = new Vector2(10, 0);
+            textRect.offsetMax = new Vector2(-10, 0);
+            
+            TextMeshProUGUI tmp = textObj.AddComponent<TextMeshProUGUI>();
+            tmp.fontSize = 18;
+            tmp.color = Color.white;
+            tmp.alignment = TextAlignmentOptions.MidlineLeft;
+            
+            // Save as prefab
+            PrefabUtility.SaveAsPrefabAsset(itemObj, prefabPath);
+            Object.DestroyImmediate(itemObj);
+            
+            Debug.Log($"[CardManagement] Created AbilityListItem prefab at: {prefabPath}");
         }
 
         #endregion
