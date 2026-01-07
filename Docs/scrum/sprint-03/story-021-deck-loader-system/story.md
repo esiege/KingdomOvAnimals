@@ -28,11 +28,11 @@
 
 ## Acceptance Criteria
 
-- [ ] I can load a deck and see it shuffled
-- [ ] I can draw cards one at a time from the deck
-- [ ] I can see how many cards remain in the deck
-- [ ] Drawing from an empty deck returns nothing (no crash)
-- [ ] I can reset the deck to draw again
+- [x] I can load a deck and see it shuffled
+- [x] I can draw cards one at a time from the deck
+- [x] I can see how many cards remain in the deck
+- [x] Drawing from an empty deck returns nothing (no crash)
+- [x] I can reset the deck to draw again
 
 ---
 

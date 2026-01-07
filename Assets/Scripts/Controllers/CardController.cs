@@ -50,6 +50,10 @@ public class CardController : MonoBehaviour
     public TextMeshProUGUI healthText;
 
     // Card Visuals
+    [Header("Card Artwork")]
+    [Tooltip("SpriteRenderer for the card artwork (assigned in Inspector)")]
+    public SpriteRenderer artworkRenderer;
+    
     public GameObject summoningSicknessIcon;
     public GameObject tappedIcon;
     public GameObject flippedIcon;
@@ -88,8 +92,11 @@ public class CardController : MonoBehaviour
         health = data.health;
         maxHealth = data.health;
         
-        // Note: artwork and other visuals can be set here too
-        // if (data.artwork != null) { /* set sprite */ }
+        // Set artwork if available
+        if (data.artwork != null && artworkRenderer != null)
+        {
+            artworkRenderer.sprite = data.artwork;
+        }
         
         UpdateCardUI();
     }
@@ -97,6 +104,9 @@ public class CardController : MonoBehaviour
     // Method to update the card's UI elements
     public void UpdateCardUI()
     {
+        Debug.Log($"[CardController] UpdateCardUI called for '{cardName}' - Health: {health}, Mana: {manaCost}");
+        Debug.Log($"[CardController] Text refs - Name: {(cardNameText != null ? "OK" : "NULL")}, Mana: {(manaCostText != null ? "OK" : "NULL")}, Health: {(healthText != null ? "OK" : "NULL")}");
+        
         if (cardNameText != null) cardNameText.text = cardName;
         if (manaCostText != null) manaCostText.text = manaCost.ToString();
         if (healthText != null) healthText.text = health.ToString();
@@ -196,6 +206,7 @@ public class CardController : MonoBehaviour
         Debug.Log($"{cardName} takes {damage} damage. Current health: {health} -> {health - damage}");
 
         health -= damage;
+        
         if (health <= 0)
         {
             owningPlayer.RemoveCardFromBoard(this);

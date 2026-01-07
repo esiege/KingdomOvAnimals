@@ -1,9 +1,9 @@
 # Story 022: CardController Uses CardData
 
-## Status: Not Started
+## Status: In Progress
 ## Sprint: 03
 ## Dependencies: 012, 021
-## Started: 
+## Started: 2025-01-08
 
 ---
 
@@ -27,13 +27,29 @@
 
 ## Acceptance Criteria
 
-- [ ] I can assign a CardData asset to a CardController in Inspector
-- [ ] Card displays the name from CardData
-- [ ] Card displays the health from CardData
-- [ ] Card displays the artwork from CardData
-- [ ] Using offensive ability triggers the CardData's offensive ability
-- [ ] Using defensive ability triggers the CardData's defensive ability
+- [x] I can assign a CardData asset to a CardController in Inspector
+- [x] Card displays the name from CardData
+- [x] Card displays the health from CardData
+- [x] Card displays the artwork from CardData
+- [x] Using offensive ability triggers the CardData's offensive ability
+- [x] Using defensive ability triggers the CardData's defensive ability
 - [ ] In multiplayer, both players see the same card stats
+
+---
+
+## Testing Instructions
+
+1. Open any scene with a card prefab (or create an empty scene)
+2. Add a CardController to a GameObject
+3. Assign a CardData asset (from Resources/Cards) to the CardController's `cardData` field
+4. Alternatively, add the `CardControllerDataTest` script and assign test cards
+5. Enter Play mode - the test script will output results to Console
+
+**For Multiplayer Test:**
+1. Build a standalone client
+2. Run as Host in editor
+3. Run client as separate instance
+4. Summon a card with CardData - both instances should show the same name/health
 
 ---
 

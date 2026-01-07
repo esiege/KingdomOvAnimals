@@ -35692,6 +35692,10 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1631415180478802473, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
+      propertyPath: cardData
+      value: 
+      objectReference: {fileID: 11400000, guid: 79eadd66dd24c8740a0a00670bbc14ae, type: 2}
+    - target: {fileID: 1631415180478802473, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
       propertyPath: cardName
       value: Chip 'N Wail
       objectReference: {fileID: 0}
@@ -106689,7 +106693,7 @@ PrefabInstance:
     - target: {fileID: 1631415180478802473, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
       propertyPath: cardData
       value: 
-      objectReference: {fileID: 11400000, guid: 05ede30d5af1e974ea4e12203bb8ff39, type: 2}
+      objectReference: {fileID: 11400000, guid: d956c3499bab74b438dedd0db4a7553b, type: 2}
     - target: {fileID: 1631415180478802473, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
       propertyPath: manaCost
       value: 1
@@ -111731,6 +111735,10 @@ PrefabInstance:
       propertyPath: health
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 1631415180478802473, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
+      propertyPath: cardData
+      value: 
+      objectReference: {fileID: 11400000, guid: cb34609a1ff70cd45815f0b19f383ba8, type: 2}
     - target: {fileID: 1631415180478802473, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
       propertyPath: cardName
       value: Flying Fox
@@ -172983,6 +172991,10 @@ PrefabInstance:
       value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 1631415180478802473, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
+      propertyPath: cardData
+      value: 
+      objectReference: {fileID: 11400000, guid: 3933165d6747a304c9b236b2c1895b32, type: 2}
+    - target: {fileID: 1631415180478802473, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
       propertyPath: cardName
       value: Owl
       objectReference: {fileID: 0}
@@ -209256,6 +209268,10 @@ PrefabInstance:
       propertyPath: health
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 1631415180478802473, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
+      propertyPath: cardData
+      value: 
+      objectReference: {fileID: 11400000, guid: 53571ad064b497d4eaab4eb7c9586bea, type: 2}
     - target: {fileID: 1631415180478802473, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
       propertyPath: manaCost
       value: 3
