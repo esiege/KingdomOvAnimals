@@ -27,14 +27,12 @@
 
 ## Acceptance Criteria
 
-- [ ] Deck selection UI before entering matchmaking queue
-- [ ] Dropdown/list shows available decks from Resources/Decks
-- [ ] Selected deck ID sent to server on match start
-- [ ] Server validates deck (exists, legal card count, etc.)
-- [ ] Both players load their chosen decks
-- [ ] Initial hands drawn (default 5 cards each)
-- [ ] Match UI shows "Deck: [name]" or deck icon
-- [ ] Invalid deck shows error and prevents match start
+- [ ] I can select a deck before entering matchmaking
+- [ ] I see all available decks in the selection list
+- [ ] Match starts with my selected deck loaded
+- [ ] I see my initial hand (5 cards) from my deck
+- [ ] Opponent has their initial hand from their deck
+- [ ] Invalid decks are rejected with an error message
 
 ---
 

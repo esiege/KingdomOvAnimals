@@ -27,16 +27,14 @@
 
 ## Acceptance Criteria
 
-- [ ] AbilityExecutor.Execute(AbilityData, caster, target) runs ability
-- [ ] Routes to correct behavior based on behaviorType
-- [ ] DamageAbility deals damage to target
-- [ ] HealAbility heals target
-- [ ] PoisonAbility applies damage-over-time
-- [ ] StunAbility disables card for N turns
-- [ ] BuffAttackAbility increases attack stat
-- [ ] ReturnToHandAbility returns card to hand
-- [ ] DrawCardAbility draws card from deck
-- [ ] Network synced (all clients see effect)
+- [ ] DamageAbility reduces target's health by the correct amount
+- [ ] HealAbility increases target's health by the correct amount
+- [ ] PoisonAbility applies damage over multiple turns
+- [ ] StunAbility prevents target from acting
+- [ ] BuffAttackAbility increases target's attack stat
+- [ ] ReturnToHandAbility sends card back to hand
+- [ ] DrawCardAbility adds a card to hand from deck
+- [ ] In multiplayer, both players see ability effects
 
 ---
 

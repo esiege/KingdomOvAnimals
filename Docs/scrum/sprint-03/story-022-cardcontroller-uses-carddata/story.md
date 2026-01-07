@@ -27,13 +27,13 @@
 
 ## Acceptance Criteria
 
-- [ ] CardController has public CardData cardData field
-- [ ] Initialize(CardData) sets displayName, health, abilities
-- [ ] UseOffensiveAbility() executes cardData.offensiveAbility
-- [ ] UseDefensiveAbility() executes cardData.defensiveAbility
-- [ ] Card artwork loaded from cardData.artwork
-- [ ] All existing functionality preserved (health sync, damage, etc.)
-- [ ] Network sync still works (replicate CardData ID, not entire object)
+- [ ] I can assign a CardData asset to a CardController in Inspector
+- [ ] Card displays the name from CardData
+- [ ] Card displays the health from CardData
+- [ ] Card displays the artwork from CardData
+- [ ] Using offensive ability triggers the CardData's offensive ability
+- [ ] Using defensive ability triggers the CardData's defensive ability
+- [ ] In multiplayer, both players see the same card stats
 
 ---
 

@@ -27,14 +27,12 @@
 
 ## Acceptance Criteria
 
-- [ ] "Draw Card" button appears during player turn
-- [ ] Clicking draws next card from deck
-- [ ] Card appears in hand with animation
-- [ ] Opponent sees "Player drew a card" (not which card)
-- [ ] Full hand prevents drawing (or auto-discards)
-- [ ] Deck count UI shows "X cards remaining"
-- [ ] Empty deck handled (button disabled or message shown)
-- [ ] Network synced (server authority, clients update UI)
+- [ ] I can click Draw Card during my turn
+- [ ] A new card appears in my hand
+- [ ] I see the deck count decrease
+- [ ] Opponent sees that I drew (but not which card)
+- [ ] Full hand prevents drawing more cards
+- [ ] Empty deck shows appropriate message
 
 ---
 

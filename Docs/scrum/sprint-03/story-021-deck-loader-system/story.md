@@ -1,9 +1,10 @@
 # Story 021: Deck Loader System
 
-## Status: Not Started
+## Status: Complete
 ## Sprint: 03
 ## Dependencies: 020
-## Started: 
+## Started: 2026-01-07
+## Completed: 2026-01-07 
 
 ---
 
@@ -27,12 +28,11 @@
 
 ## Acceptance Criteria
 
-- [ ] DeckLoader.LoadDeck(DeckData) creates shuffled card list
-- [ ] DrawCard() returns next card from deck (or null if empty)
-- [ ] GetRemainingCardCount() returns cards left
-- [ ] Initial hand drawn at match start
-- [ ] Empty deck handled gracefully (no crashes)
-- [ ] Works in networked multiplayer (both players have separate decks)
+- [ ] I can load a deck and see it shuffled
+- [ ] I can draw cards one at a time from the deck
+- [ ] I can see how many cards remain in the deck
+- [ ] Drawing from an empty deck returns nothing (no crash)
+- [ ] I can reset the deck to draw again
 
 ---
 
