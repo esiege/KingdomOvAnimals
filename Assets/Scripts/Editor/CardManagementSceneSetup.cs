@@ -16,6 +16,13 @@ namespace KOA.Editor
         [MenuItem("Tools/KingdomOvAnimals/Create Card Management Scene")]
         public static void CreateCardManagementScene()
         {
+            // Prevent running in play mode
+            if (Application.isPlaying)
+            {
+                Debug.LogError("[CardManagement] Cannot create scene while in Play mode. Please exit Play mode first.");
+                return;
+            }
+            
             // Create a new scene
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             
@@ -37,8 +44,8 @@ namespace KOA.Editor
             GameObject abilitiesPanel = CreateAbilityEditorPanel(canvasObj.transform);
             abilitiesPanel.SetActive(false);
             
-            // Create Decks Panel (hidden by default)
-            GameObject decksPanel = CreateEditorPanel(canvasObj.transform, "DecksPanel", "Deck Editor");
+            // Create Decks Panel with full editor UI
+            GameObject decksPanel = CreateDeckEditorPanel(canvasObj.transform);
             decksPanel.SetActive(false);
             
             // Wire up the controller using SerializedObject
@@ -308,11 +315,11 @@ namespace KOA.Editor
             so.FindProperty("saveButton").objectReferenceValue = rightPanel.transform.Find("SaveButton")?.GetComponent<Button>();
             so.FindProperty("deleteButton").objectReferenceValue = rightPanel.transform.Find("DeleteButton")?.GetComponent<Button>();
             
-            // Confirm dialog references
+            // Confirm dialog references (children are inside DialogBox)
             so.FindProperty("confirmDialog").objectReferenceValue = confirmDialog;
-            so.FindProperty("confirmText").objectReferenceValue = confirmDialog.transform.Find("Text")?.GetComponent<TMP_Text>();
-            so.FindProperty("confirmYesButton").objectReferenceValue = confirmDialog.transform.Find("YesButton")?.GetComponent<Button>();
-            so.FindProperty("confirmNoButton").objectReferenceValue = confirmDialog.transform.Find("NoButton")?.GetComponent<Button>();
+            so.FindProperty("confirmText").objectReferenceValue = confirmDialog.transform.Find("DialogBox/Text")?.GetComponent<TMP_Text>();
+            so.FindProperty("confirmYesButton").objectReferenceValue = confirmDialog.transform.Find("DialogBox/YesButton")?.GetComponent<Button>();
+            so.FindProperty("confirmNoButton").objectReferenceValue = confirmDialog.transform.Find("DialogBox/NoButton")?.GetComponent<Button>();
             
             so.ApplyModifiedProperties();
             
@@ -1153,5 +1160,343 @@ namespace KOA.Editor
         }
 
         #endregion
+
+        #region Deck Editor Panel
+
+        private static GameObject CreateDeckEditorPanel(Transform parent)
+        {
+            GameObject panel = CreatePanel(parent, "DecksPanel");
+            
+            // Add DeckEditorUI component
+            var deckEditor = panel.AddComponent<DeckEditorUI>();
+            
+            // Title
+            GameObject titleObj = CreateText(panel.transform, "Title", "Deck Editor", 36);
+            RectTransform titleRect = titleObj.GetComponent<RectTransform>();
+            titleRect.anchorMin = new Vector2(0.5f, 0.92f);
+            titleRect.anchorMax = new Vector2(0.5f, 0.98f);
+            titleRect.sizeDelta = new Vector2(400, 50);
+            titleRect.anchoredPosition = Vector2.zero;
+            
+            // Back button
+            GameObject backBtn = CreateButton(panel.transform, "BackButton", "← Back", 40);
+            RectTransform backRect = backBtn.GetComponent<RectTransform>();
+            backRect.anchorMin = new Vector2(0.02f, 0.92f);
+            backRect.anchorMax = new Vector2(0.12f, 0.98f);
+            backRect.offsetMin = Vector2.zero;
+            backRect.offsetMax = Vector2.zero;
+            
+            // Deck selection row
+            GameObject deckSelectionRow = CreateDeckSelectionRow(panel.transform);
+            
+            // Left Panel - Available Cards
+            GameObject leftPanel = CreateAvailableCardsPanel(panel.transform);
+            
+            // Right Panel - Deck Contents
+            GameObject rightPanel = CreateDeckContentsPanel(panel.transform);
+            
+            // Stats row at bottom
+            GameObject statsRow = CreateDeckStatsRow(panel.transform);
+            
+            // Confirmation Dialog
+            GameObject confirmDialog = CreateConfirmDialog(panel.transform);
+            confirmDialog.name = "DeckConfirmDialog";
+            
+            // Create prefabs
+            CreateDeckCardItemPrefab();
+            
+            // Wire up DeckEditorUI
+            SerializedObject so = new SerializedObject(deckEditor);
+            
+            // Deck selection
+            so.FindProperty("deckDropdown").objectReferenceValue = deckSelectionRow.transform.Find("DeckDropdown")?.GetComponent<TMP_Dropdown>();
+            so.FindProperty("newDeckButton").objectReferenceValue = deckSelectionRow.transform.Find("NewDeckButton")?.GetComponent<Button>();
+            so.FindProperty("deleteDeckButton").objectReferenceValue = deckSelectionRow.transform.Find("DeleteDeckButton")?.GetComponent<Button>();
+            
+            // Available cards
+            so.FindProperty("availableCardsContent").objectReferenceValue = leftPanel.transform.Find("ScrollView/Viewport/Content");
+            var availablePrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/UI/AvailableCardItem.prefab");
+            so.FindProperty("availableCardItemPrefab").objectReferenceValue = availablePrefab;
+            
+            // Deck contents
+            so.FindProperty("deckContentsContent").objectReferenceValue = rightPanel.transform.Find("ScrollView/Viewport/Content");
+            so.FindProperty("deckTitleText").objectReferenceValue = rightPanel.transform.Find("Title")?.GetComponent<TMP_Text>();
+            var deckPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/UI/DeckCardItem.prefab");
+            so.FindProperty("deckCardItemPrefab").objectReferenceValue = deckPrefab;
+            
+            // Stats
+            so.FindProperty("statsText").objectReferenceValue = statsRow.transform.Find("StatsText")?.GetComponent<TMP_Text>();
+            so.FindProperty("saveButton").objectReferenceValue = statsRow.transform.Find("SaveButton")?.GetComponent<Button>();
+            
+            // Confirm dialog
+            so.FindProperty("confirmDialog").objectReferenceValue = confirmDialog;
+            so.FindProperty("confirmText").objectReferenceValue = confirmDialog.transform.Find("DialogBox/Text")?.GetComponent<TMP_Text>();
+            so.FindProperty("confirmYesButton").objectReferenceValue = confirmDialog.transform.Find("DialogBox/YesButton")?.GetComponent<Button>();
+            so.FindProperty("confirmNoButton").objectReferenceValue = confirmDialog.transform.Find("DialogBox/NoButton")?.GetComponent<Button>();
+            
+            so.ApplyModifiedProperties();
+            
+            return panel;
+        }
+
+        private static GameObject CreateDeckSelectionRow(Transform parent)
+        {
+            GameObject row = new GameObject("DeckSelectionRow");
+            row.transform.SetParent(parent, false);
+            
+            RectTransform rect = row.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.02f, 0.85f);
+            rect.anchorMax = new Vector2(0.98f, 0.9f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            
+            Image bg = row.AddComponent<Image>();
+            bg.color = new Color(0.2f, 0.2f, 0.25f, 1f);
+            
+            // Deck label
+            GameObject labelObj = CreateTMPText(row.transform, "DeckLabel", "Deck:", 20, TextAlignmentOptions.MidlineRight);
+            RectTransform labelRect = labelObj.GetComponent<RectTransform>();
+            labelRect.anchorMin = new Vector2(0.02f, 0.1f);
+            labelRect.anchorMax = new Vector2(0.1f, 0.9f);
+            labelRect.offsetMin = Vector2.zero;
+            labelRect.offsetMax = Vector2.zero;
+            
+            // Deck dropdown
+            GameObject dropdown = CreateTMPDropdown(row.transform, "DeckDropdown");
+            RectTransform dropRect = dropdown.GetComponent<RectTransform>();
+            dropRect.anchorMin = new Vector2(0.11f, 0.1f);
+            dropRect.anchorMax = new Vector2(0.5f, 0.9f);
+            dropRect.offsetMin = Vector2.zero;
+            dropRect.offsetMax = Vector2.zero;
+            
+            // New Deck button
+            GameObject newBtn = CreateTMPButton(row.transform, "NewDeckButton", "+ New Deck", 30);
+            RectTransform newRect = newBtn.GetComponent<RectTransform>();
+            newRect.anchorMin = new Vector2(0.52f, 0.1f);
+            newRect.anchorMax = new Vector2(0.7f, 0.9f);
+            newRect.offsetMin = Vector2.zero;
+            newRect.offsetMax = Vector2.zero;
+            
+            // Delete button
+            GameObject delBtn = CreateTMPButton(row.transform, "DeleteDeckButton", "Delete", 30);
+            RectTransform delRect = delBtn.GetComponent<RectTransform>();
+            delRect.anchorMin = new Vector2(0.72f, 0.1f);
+            delRect.anchorMax = new Vector2(0.85f, 0.9f);
+            delRect.offsetMin = Vector2.zero;
+            delRect.offsetMax = Vector2.zero;
+            delBtn.GetComponent<Image>().color = new Color(0.5f, 0.25f, 0.25f, 1f);
+            
+            return row;
+        }
+
+        private static GameObject CreateAvailableCardsPanel(Transform parent)
+        {
+            GameObject leftPanel = new GameObject("AvailableCardsPanel");
+            leftPanel.transform.SetParent(parent, false);
+            
+            RectTransform rect = leftPanel.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.02f, 0.1f);
+            rect.anchorMax = new Vector2(0.48f, 0.83f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            
+            Image bg = leftPanel.AddComponent<Image>();
+            bg.color = new Color(0.2f, 0.2f, 0.25f, 1f);
+            
+            // Title
+            GameObject titleObj = CreateTMPText(leftPanel.transform, "Title", "Available Cards", 22, TextAlignmentOptions.Center);
+            RectTransform titleRect = titleObj.GetComponent<RectTransform>();
+            titleRect.anchorMin = new Vector2(0.05f, 0.92f);
+            titleRect.anchorMax = new Vector2(0.95f, 0.98f);
+            titleRect.offsetMin = Vector2.zero;
+            titleRect.offsetMax = Vector2.zero;
+            
+            // Scroll view for cards
+            GameObject scrollView = CreateScrollView(leftPanel.transform, "ScrollView");
+            RectTransform scrollRect = scrollView.GetComponent<RectTransform>();
+            scrollRect.anchorMin = new Vector2(0.02f, 0.02f);
+            scrollRect.anchorMax = new Vector2(0.98f, 0.9f);
+            scrollRect.offsetMin = Vector2.zero;
+            scrollRect.offsetMax = Vector2.zero;
+            
+            return leftPanel;
+        }
+
+        private static GameObject CreateDeckContentsPanel(Transform parent)
+        {
+            GameObject rightPanel = new GameObject("DeckContentsPanel");
+            rightPanel.transform.SetParent(parent, false);
+            
+            RectTransform rect = rightPanel.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.52f, 0.1f);
+            rect.anchorMax = new Vector2(0.98f, 0.83f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            
+            Image bg = rightPanel.AddComponent<Image>();
+            bg.color = new Color(0.2f, 0.2f, 0.25f, 1f);
+            
+            // Title
+            GameObject titleObj = CreateTMPText(rightPanel.transform, "Title", "Deck Contents (0/30)", 22, TextAlignmentOptions.Center);
+            RectTransform titleRect = titleObj.GetComponent<RectTransform>();
+            titleRect.anchorMin = new Vector2(0.05f, 0.92f);
+            titleRect.anchorMax = new Vector2(0.95f, 0.98f);
+            titleRect.offsetMin = Vector2.zero;
+            titleRect.offsetMax = Vector2.zero;
+            
+            // Scroll view for deck cards
+            GameObject scrollView = CreateScrollView(rightPanel.transform, "ScrollView");
+            RectTransform scrollRect = scrollView.GetComponent<RectTransform>();
+            scrollRect.anchorMin = new Vector2(0.02f, 0.02f);
+            scrollRect.anchorMax = new Vector2(0.98f, 0.9f);
+            scrollRect.offsetMin = Vector2.zero;
+            scrollRect.offsetMax = Vector2.zero;
+            
+            return rightPanel;
+        }
+
+        private static GameObject CreateDeckStatsRow(Transform parent)
+        {
+            GameObject row = new GameObject("StatsRow");
+            row.transform.SetParent(parent, false);
+            
+            RectTransform rect = row.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.02f, 0.02f);
+            rect.anchorMax = new Vector2(0.98f, 0.08f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            
+            Image bg = row.AddComponent<Image>();
+            bg.color = new Color(0.2f, 0.2f, 0.25f, 1f);
+            
+            // Stats text
+            GameObject statsObj = CreateTMPText(row.transform, "StatsText", "0 cards │ Avg Mana: - │ Avg HP: -", 18, TextAlignmentOptions.MidlineLeft);
+            RectTransform statsRect = statsObj.GetComponent<RectTransform>();
+            statsRect.anchorMin = new Vector2(0.02f, 0.1f);
+            statsRect.anchorMax = new Vector2(0.7f, 0.9f);
+            statsRect.offsetMin = Vector2.zero;
+            statsRect.offsetMax = Vector2.zero;
+            
+            // Save button
+            GameObject saveBtn = CreateTMPButton(row.transform, "SaveButton", "Save Deck", 35);
+            RectTransform saveRect = saveBtn.GetComponent<RectTransform>();
+            saveRect.anchorMin = new Vector2(0.75f, 0.1f);
+            saveRect.anchorMax = new Vector2(0.95f, 0.9f);
+            saveRect.offsetMin = Vector2.zero;
+            saveRect.offsetMax = Vector2.zero;
+            
+            return row;
+        }
+
+        private static void CreateDeckCardItemPrefab()
+        {
+            // Create Available Card Item prefab
+            CreateCardItemPrefab("Assets/Resources/UI/AvailableCardItem.prefab", "AddButton", "+");
+            
+            // Create Deck Card Item prefab
+            CreateCardItemPrefab("Assets/Resources/UI/DeckCardItem.prefab", "RemoveButton", "-");
+        }
+
+        private static void CreateCardItemPrefab(string prefabPath, string buttonName, string buttonText)
+        {
+            // Check if prefab already exists
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath) != null)
+            {
+                Debug.Log($"[CardManagement] Prefab already exists: {prefabPath}");
+                return;
+            }
+            
+            // Ensure directory exists
+            string dir = System.IO.Path.GetDirectoryName(prefabPath);
+            if (!System.IO.Directory.Exists(dir))
+            {
+                System.IO.Directory.CreateDirectory(dir);
+            }
+            
+            // Create prefab
+            GameObject itemObj = new GameObject(System.IO.Path.GetFileNameWithoutExtension(prefabPath));
+            
+            RectTransform rect = itemObj.AddComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(0, 50);
+            
+            Image bg = itemObj.AddComponent<Image>();
+            bg.color = new Color(0.3f, 0.3f, 0.4f, 1f);
+            
+            // Layout element for scroll view
+            var layout = itemObj.AddComponent<LayoutElement>();
+            layout.minHeight = 50;
+            layout.preferredHeight = 50;
+            
+            // Name text
+            GameObject nameObj = new GameObject("NameText");
+            nameObj.transform.SetParent(itemObj.transform, false);
+            RectTransform nameRect = nameObj.AddComponent<RectTransform>();
+            nameRect.anchorMin = new Vector2(0.02f, 0.5f);
+            nameRect.anchorMax = new Vector2(0.5f, 0.95f);
+            nameRect.offsetMin = Vector2.zero;
+            nameRect.offsetMax = Vector2.zero;
+            
+            TextMeshProUGUI nameTmp = nameObj.AddComponent<TextMeshProUGUI>();
+            nameTmp.fontSize = 18;
+            nameTmp.color = Color.white;
+            nameTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            nameTmp.text = "Card Name";
+            
+            // Stats text
+            GameObject statsObj = new GameObject("StatsText");
+            statsObj.transform.SetParent(itemObj.transform, false);
+            RectTransform statsRect = statsObj.AddComponent<RectTransform>();
+            statsRect.anchorMin = new Vector2(0.02f, 0.05f);
+            statsRect.anchorMax = new Vector2(0.5f, 0.5f);
+            statsRect.offsetMin = Vector2.zero;
+            statsRect.offsetMax = Vector2.zero;
+            
+            TextMeshProUGUI statsTmp = statsObj.AddComponent<TextMeshProUGUI>();
+            statsTmp.fontSize = 14;
+            statsTmp.color = new Color(0.7f, 0.7f, 0.7f, 1f);
+            statsTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            statsTmp.text = "2⬡ 3♥";
+            
+            // Action button (+/-)
+            GameObject btnObj = new GameObject(buttonName);
+            btnObj.transform.SetParent(itemObj.transform, false);
+            RectTransform btnRect = btnObj.AddComponent<RectTransform>();
+            btnRect.anchorMin = new Vector2(0.85f, 0.15f);
+            btnRect.anchorMax = new Vector2(0.98f, 0.85f);
+            btnRect.offsetMin = Vector2.zero;
+            btnRect.offsetMax = Vector2.zero;
+            
+            Image btnBg = btnObj.AddComponent<Image>();
+            btnBg.color = buttonText == "+" ? new Color(0.2f, 0.5f, 0.2f, 1f) : new Color(0.5f, 0.2f, 0.2f, 1f);
+            
+            Button btn = btnObj.AddComponent<Button>();
+            ColorBlock colors = btn.colors;
+            colors.highlightedColor = buttonText == "+" ? new Color(0.3f, 0.6f, 0.3f, 1f) : new Color(0.6f, 0.3f, 0.3f, 1f);
+            btn.colors = colors;
+            
+            // Button text
+            GameObject btnTextObj = new GameObject("Text");
+            btnTextObj.transform.SetParent(btnObj.transform, false);
+            RectTransform btnTextRect = btnTextObj.AddComponent<RectTransform>();
+            btnTextRect.anchorMin = Vector2.zero;
+            btnTextRect.anchorMax = Vector2.one;
+            btnTextRect.offsetMin = Vector2.zero;
+            btnTextRect.offsetMax = Vector2.zero;
+            
+            TextMeshProUGUI btnTmp = btnTextObj.AddComponent<TextMeshProUGUI>();
+            btnTmp.fontSize = 24;
+            btnTmp.color = Color.white;
+            btnTmp.alignment = TextAlignmentOptions.Center;
+            btnTmp.text = buttonText;
+            
+            // Save as prefab
+            PrefabUtility.SaveAsPrefabAsset(itemObj, prefabPath);
+            Object.DestroyImmediate(itemObj);
+            
+            Debug.Log($"[CardManagement] Created prefab: {prefabPath}");
+        }
+
+        #endregion
     }
 }
+

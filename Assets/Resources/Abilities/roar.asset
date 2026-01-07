@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa37c54c60b8c7845b5b988bdf87b1a2, type: 3}
+  m_Name: roar
+  m_EditorClassIdentifier: 
+  id: roar
+  displayName: Roar
+  description: Buff attack by {damage} for {duration} turns
+  behaviorType: BuffAttackAbility
+  damage: 1
+  healAmount: 0
+  duration: 2
+  targetType: 2
+  effectPrefab: {fileID: 0}
+  animationType: 0
+  vfxPrefab: {fileID: 0}
+  icon: {fileID: 0}

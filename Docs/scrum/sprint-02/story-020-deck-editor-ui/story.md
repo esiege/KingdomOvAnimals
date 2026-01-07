@@ -1,8 +1,9 @@
 # Story 020: Deck Editor UI
 
-## Status: Not Started
+## Status: In Progress
 ## Sprint: 02
 ## Dependencies: 015, 016
+## Started: 2026-01-06
 
 ---
 

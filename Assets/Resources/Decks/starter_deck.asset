@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87651227c11cca44399a6e72372e008c, type: 3}
+  m_Name: starter_deck
+  m_EditorClassIdentifier: 
+  id: starter_deck
+  deckName: Starter Deck
+  description: A balanced deck for new players
+  cards:
+  - {fileID: 11400000, guid: cb34609a1ff70cd45815f0b19f383ba8, type: 2}
+  - {fileID: 11400000, guid: cb34609a1ff70cd45815f0b19f383ba8, type: 2}
+  - {fileID: 11400000, guid: d956c3499bab74b438dedd0db4a7553b, type: 2}
+  - {fileID: 11400000, guid: d956c3499bab74b438dedd0db4a7553b, type: 2}
+  - {fileID: 11400000, guid: 79eadd66dd24c8740a0a00670bbc14ae, type: 2}
+  - {fileID: 11400000, guid: 79eadd66dd24c8740a0a00670bbc14ae, type: 2}
+  - {fileID: 11400000, guid: 3933165d6747a304c9b236b2c1895b32, type: 2}
+  - {fileID: 11400000, guid: 3933165d6747a304c9b236b2c1895b32, type: 2}
+  - {fileID: 11400000, guid: 53571ad064b497d4eaab4eb7c9586bea, type: 2}
+  - {fileID: 11400000, guid: 53571ad064b497d4eaab4eb7c9586bea, type: 2}
+  minCards: 10
+  maxCards: 30
+  maxCopiesPerCard: 4

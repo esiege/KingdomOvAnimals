@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dcb980dac48b640408a61c4e643f328a, type: 3}
-  m_Name: NewCard
+  m_Name: snake
   m_EditorClassIdentifier: 
-  id: 
-  displayName: 
-  description: 
-  health: 1
-  manaCost: 0
-  offensiveAbility: {fileID: 11400000, guid: cdda09e6a2570e94f9f6532360d70b49, type: 2}
-  defensiveAbility: {fileID: 0}
+  id: snake
+  displayName: Snake
+  description: Venomous and sneaky
+  health: 2
+  manaCost: 1
+  offensiveAbility: {fileID: 11400000, guid: 78e94115950709240a9de3aec41e3704, type: 2}
+  defensiveAbility: {fileID: 11400000, guid: 3acaf9bcad605e04f9ae89c440e6ec91, type: 2}
   artwork: {fileID: 0}
   cardFrame: {fileID: 0}
   cardType: 0
-  faction: 
+  faction: Beast

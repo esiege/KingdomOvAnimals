@@ -1,8 +1,10 @@
 # Story 019: Create Initial Card/Ability Data Assets
 
-## Status: Not Started
+## Status: Complete ✓
 ## Sprint: 02
 ## Dependencies: 017, 018
+## Started: 2026-01-06
+## Completed: 2026-01-06
 
 ---
 
@@ -26,11 +28,11 @@
 
 ## Acceptance Criteria
 
-- [ ] All existing cards appear in the Card Management card list
-- [ ] All existing abilities appear in the Card Management ability list
-- [ ] Starting a game from MainMenu still works
-- [ ] Cards display correct health values
-- [ ] Using abilities deals correct damage/healing
+- [x] All existing cards appear in the Card Management card list
+- [x] All existing abilities appear in the Card Management ability list
+- [x] Starting a game from MainMenu still works
+- [x] Cards display correct health values
+- [x] Using abilities deals correct damage/healing
 
 ---
 

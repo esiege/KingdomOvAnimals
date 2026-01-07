@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dcb980dac48b640408a61c4e643f328a, type: 3}
-  m_Name: new_card_68f3ca26
+  m_Name: bear
   m_EditorClassIdentifier: 
-  id: new_card_68f3ca26
-  displayName: Fart
-  description: 
-  health: 1
-  manaCost: 1
-  offensiveAbility: {fileID: 0}
-  defensiveAbility: {fileID: 0}
-  artwork: {fileID: 21300000, guid: aea5779950ad2eb4b8175f69750f942f, type: 3}
+  id: bear
+  displayName: Bear
+  description: Powerful forest dweller
+  health: 4
+  manaCost: 3
+  offensiveAbility: {fileID: 11400000, guid: cca88e01fcbd6594fb13e47db0761944, type: 2}
+  defensiveAbility: {fileID: 11400000, guid: 3d883f158ef066f4a8a71e2c0db32e1c, type: 2}
+  artwork: {fileID: 0}
   cardFrame: {fileID: 0}
   cardType: 0
-  faction: 
+  faction: Beast

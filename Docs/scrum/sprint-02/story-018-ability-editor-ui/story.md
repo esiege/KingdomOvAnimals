@@ -1,9 +1,10 @@
 # Story 018: Ability List & Editor UI
 
-## Status: In Progress
+## Status: Complete ✓
 ## Sprint: 02
 ## Dependencies: 012, 016
 ## Started: 2026-01-06
+## Completed: 2026-01-06
 
 ---
 
@@ -18,8 +19,9 @@
 ## Description
 
 - List of all AbilityData assets
-- Edit: name, description, mana cost
-- Edit: damage, healAmount, duration values
+- Edit: name, description
+- Behavior dropdown - selects the AbilityBehavior class that executes the ability
+- Conditional fields (damage, healAmount, duration) shown based on behavior's RequiredFields
 - Dropdown for targetType, animationType
 - Dropdown for effectPrefab (shows available effect prefabs)
 - Save persists to disk
@@ -29,14 +31,15 @@
 
 ## Acceptance Criteria
 
-- [ ] I see a list of all abilities on the left side
-- [ ] Clicking an ability shows its details on the right
-- [ ] I can edit name, description, mana cost, damage, heal, duration
-- [ ] I can select target type from a dropdown
-- [ ] I can select effect prefab from a dropdown
-- [ ] Clicking Save updates the ability (persists after exiting play mode)
-- [ ] Clicking New Ability adds a new ability to the list
-- [ ] Clicking Delete removes the ability after confirmation
+- [x] I see a list of all abilities on the left side
+- [x] Clicking an ability shows its details on the right
+- [x] I can edit name, description, and conditional fields based on behavior
+- [x] I can select behavior from a dropdown (Damage, Heal, Poison, Stun, etc.)
+- [x] I can select target type from a dropdown
+- [x] I can select effect prefab from a dropdown
+- [x] Clicking Save updates the ability (persists after exiting play mode)
+- [x] Clicking New Ability adds a new ability to the list
+- [x] Clicking Delete removes the ability after confirmation
 
 ---
 
