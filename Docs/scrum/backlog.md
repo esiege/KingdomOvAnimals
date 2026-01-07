@@ -10,7 +10,7 @@ All 11 stories completed. See [Completed Stories](#completed-stories) below.
 
 ---
 
-## Sprint 02 - Card Management System
+## Sprint 02 - Card Management System ✓ COMPLETE
 
 ### Epic: Card Management Screen
 
@@ -24,9 +24,25 @@ A data-driven card system with a dedicated Unity scene for managing cards, abili
 | 015 | Create CardLibrary System | Complete ✓ | 012, 014 |
 | 016 | Create Card Management Scene Shell | Complete ✓ | None |
 | 017 | Card List & Editor UI | Complete ✓ | 012, 016 |
-| 018 | Ability List & Editor UI | Not Started | 012, 016 |
-| 019 | Create Initial Card/Ability Data Assets | Not Started | 017, 018 |
-| 020 | Deck Editor UI | Not Started | 015, 016 |
+| 018 | Ability List & Editor UI | Complete ✓ | 012, 016 |
+| 019 | Create Initial Card/Ability Data Assets | Complete ✓ | 017, 018 |
+| 020 | Deck Editor UI | Complete ✓ | 015, 016 |
+
+---
+
+## Sprint 03 - Runtime Integration
+
+### Epic: Connect Data System to Gameplay
+
+Integrate the card management system into the actual duel/match gameplay.
+
+| Story | Title | Status | Dependencies |
+|-------|-------|--------|--------------|
+| 021 | Deck Loader System | Not Started | 020 |
+| 022 | CardController Uses CardData | Not Started | 012, 021 |
+| 023 | Ability Execution System | Not Started | 018, 022 |
+| 024 | Match Setup with Decks | Not Started | 021, 022 |
+| 025 | Card Drawing System | Not Started | 021, 024 |
 
 ---
 
@@ -164,6 +180,90 @@ Acceptance Criteria:
 - [ ] Save deck to disk
 ```
 
+#### 021 - Deck Loader System
+```
+As a player
+I want my deck to be loaded at match start
+So that I can draw cards during the game
+
+Acceptance Criteria:
+- [ ] DeckLoader.LoadDeck(DeckData) creates shuffled card list
+- [ ] DrawCard() returns next card from deck (or null if empty)
+- [ ] GetRemainingCardCount() returns cards left
+- [ ] Initial hand drawn at match start
+- [ ] Empty deck handled gracefully (no crashes)
+- [ ] Works in networked multiplayer (both players have separate decks)
+```
+
+#### 022 - CardController Uses CardData
+```
+As a developer
+I want CardController to initialize from CardData
+So that all card stats come from data assets
+
+Acceptance Criteria:
+- [ ] CardController has public CardData cardData field
+- [ ] Initialize(CardData) sets displayName, health, abilities
+- [ ] UseOffensiveAbility() executes cardData.offensiveAbility
+- [ ] UseDefensiveAbility() executes cardData.defensiveAbility
+- [ ] Card artwork loaded from cardData.artwork
+- [ ] All existing functionality preserved (health sync, damage, etc.)
+- [ ] Network sync still works (replicate CardData ID, not entire object)
+```
+
+#### 023 - Ability Execution System
+```
+As a player
+I want abilities to execute with correct effects
+So that combat works as designed
+
+Acceptance Criteria:
+- [ ] AbilityExecutor.Execute(AbilityData, caster, target) runs ability
+- [ ] Routes to correct behavior based on behaviorType
+- [ ] DamageAbility deals damage to target
+- [ ] HealAbility heals target
+- [ ] PoisonAbility applies damage-over-time
+- [ ] StunAbility disables card for N turns
+- [ ] BuffAttackAbility increases attack stat
+- [ ] ReturnToHandAbility returns card to hand
+- [ ] DrawCardAbility draws card from deck
+- [ ] Network synced (all clients see effect)
+```
+
+#### 024 - Match Setup with Decks
+```
+As a player
+I want to select my deck before a match
+So that I can play with my chosen strategy
+
+Acceptance Criteria:
+- [ ] Deck selection UI before entering matchmaking queue
+- [ ] Dropdown/list shows available decks from Resources/Decks
+- [ ] Selected deck ID sent to server on match start
+- [ ] Server validates deck (exists, legal card count, etc.)
+- [ ] Both players load their chosen decks
+- [ ] Initial hands drawn (default 5 cards each)
+- [ ] Match UI shows "Deck: [name]" or deck icon
+- [ ] Invalid deck shows error and prevents match start
+```
+
+#### 025 - Card Drawing System
+```
+As a player
+I want to draw cards from my deck during my turn
+So that I can play more cards
+
+Acceptance Criteria:
+- [ ] "Draw Card" button appears during player turn
+- [ ] Clicking draws next card from deck
+- [ ] Card appears in hand with animation
+- [ ] Opponent sees "Player drew a card" (not which card)
+- [ ] Full hand prevents drawing (or auto-discards)
+- [ ] Deck count UI shows "X cards remaining"
+- [ ] Empty deck handled (button disabled or message shown)
+- [ ] Network synced (server authority, clients update UI)
+```
+
 ---
 
 ## Future Backlog
@@ -187,3 +287,12 @@ Acceptance Criteria:
 | 009 - Handle player disconnect | Sprint 01 | 2026-01-04 |
 | 010 - Add reconnection support | Sprint 01 | 2026-01-06 |
 | 011 - Show opponent connection status | Sprint 01 | 2026-01-06 |
+| 012 - Create Core Data ScriptableObjects | Sprint 02 | 2026-01-06 |
+| 013 - Create Base Effect Prefabs | Sprint 02 | 2026-01-06 |
+| 014 - Migrate CardController to CardData | Sprint 02 | 2026-01-06 |
+| 015 - Create CardLibrary System | Sprint 02 | 2026-01-06 |
+| 016 - Create Card Management Scene Shell | Sprint 02 | 2026-01-06 |
+| 017 - Card List & Editor UI | Sprint 02 | 2026-01-06 |
+| 018 - Ability List & Editor UI | Sprint 02 | 2026-01-06 |
+| 019 - Create Initial Card/Ability Data Assets | Sprint 02 | 2026-01-06 |
+| 020 - Deck Editor UI | Sprint 02 | 2026-01-07 |

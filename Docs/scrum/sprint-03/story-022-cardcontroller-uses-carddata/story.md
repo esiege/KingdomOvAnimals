@@ -1,0 +1,92 @@
+# Story 022: CardController Uses CardData
+
+## Status: Not Started
+## Sprint: 03
+## Dependencies: 012, 021
+## Started: 
+
+---
+
+## User Story
+
+**As a** developer  
+**I want** CardController to initialize from CardData  
+**So that** all card stats come from data assets
+
+---
+
+## Description
+
+- Refactor CardController to use CardData
+- Remove hardcoded stats
+- Initialize() reads from CardData reference
+- Link to AbilityData for offensive/defensive abilities
+- Maintain existing network sync
+
+---
+
+## Acceptance Criteria
+
+- [ ] CardController has public CardData cardData field
+- [ ] Initialize(CardData) sets displayName, health, abilities
+- [ ] UseOffensiveAbility() executes cardData.offensiveAbility
+- [ ] UseDefensiveAbility() executes cardData.defensiveAbility
+- [ ] Card artwork loaded from cardData.artwork
+- [ ] All existing functionality preserved (health sync, damage, etc.)
+- [ ] Network sync still works (replicate CardData ID, not entire object)
+
+---
+
+## Technical Notes
+
+### CardController.cs Changes
+```csharp
+public class CardController : NetworkBehaviour
+{
+    public CardData cardData;
+    
+    [SyncVar] private int currentHealth;
+    [SyncVar] private string cardDataId; // For network sync
+    
+    public void Initialize(CardData data)
+    {
+        cardData = data;
+        cardDataId = data.id;
+        currentHealth = data.health;
+        UpdateDisplay();
+    }
+    
+    [Server]
+    public void UseOffensiveAbility(CardController target)
+    {
+        if (cardData.offensiveAbility != null)
+        {
+            AbilityExecutor.Execute(cardData.offensiveAbility, this, target);
+        }
+    }
+}
+```
+
+### Network Sync Strategy
+- SyncVar: cardDataId (string)
+- On client: Look up CardData from CardLibrary using ID
+- Don't sync entire CardData (too large)
+
+---
+
+## Definition of Done
+
+- [ ] Code complete
+- [ ] Unit tests pass (if applicable)
+- [ ] Acceptance criteria met
+- [ ] Code reviewed
+- [ ] Merged to main branch
+- [ ] Story closed in backlog
+
+---
+
+## Notes
+
+- Story 014 started this, but needs completion
+- Ensure CardLibrary loaded before any card initialization
+- Test with network (host + client both see same card)

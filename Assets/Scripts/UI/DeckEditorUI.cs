@@ -13,11 +13,13 @@ namespace KOA.UI
 {
     /// <summary>
     /// UI controller for editing DeckData assets.
+    /// Uses a deck list panel instead of dropdown for deck selection.
     /// </summary>
     public class DeckEditorUI : MonoBehaviour
     {
-        [Header("Deck Selection")]
-        [SerializeField] private TMP_Dropdown deckDropdown;
+        [Header("Deck List")]
+        [SerializeField] private Transform deckListContent;
+        [SerializeField] private GameObject deckListItemPrefab;
         [SerializeField] private Button newDeckButton;
         [SerializeField] private Button deleteDeckButton;
         
@@ -45,15 +47,20 @@ namespace KOA.UI
         private DeckData currentDeck;
         private List<CardData> workingDeckCards = new List<CardData>();
         private bool hasUnsavedChanges;
+        private int selectedDeckIndex = -1;
         
         private System.Action pendingConfirmAction;
+        
+        // Colors for selection
+        private readonly Color normalColor = new Color(0.3f, 0.3f, 0.4f, 1f);
+        private readonly Color selectedColor = new Color(0.3f, 0.5f, 0.7f, 1f);
         
         private void Start()
         {
             LoadAllDecks();
             LoadAllCards();
             SetupUI();
-            RefreshDeckDropdown();
+            RefreshDeckList();
             
             if (allDecks.Count > 0)
             {
@@ -67,26 +74,20 @@ namespace KOA.UI
         
         private void LoadAllDecks()
         {
-            allDecks = Resources.LoadAll<DeckData>("Data/Decks").ToList();
+            allDecks = Resources.LoadAll<DeckData>("Decks").ToList();
             allDecks.Sort((a, b) => string.Compare(a.deckName, b.deckName));
             Debug.Log($"[DeckEditor] Loaded {allDecks.Count} decks");
         }
         
         private void LoadAllCards()
         {
-            allCards = Resources.LoadAll<CardData>("Data/Cards").ToList();
+            allCards = Resources.LoadAll<CardData>("Cards").ToList();
             allCards.Sort((a, b) => string.Compare(a.displayName, b.displayName));
             Debug.Log($"[DeckEditor] Loaded {allCards.Count} cards");
         }
         
         private void SetupUI()
         {
-            // Dropdown
-            if (deckDropdown != null)
-            {
-                deckDropdown.onValueChanged.AddListener(OnDeckDropdownChanged);
-            }
-            
             // Buttons
             if (newDeckButton != null)
             {
@@ -117,23 +118,57 @@ namespace KOA.UI
             HideConfirmDialog();
         }
         
-        private void RefreshDeckDropdown()
+        private void RefreshDeckList()
         {
-            if (deckDropdown == null) return;
+            ClearContent(deckListContent);
             
-            deckDropdown.ClearOptions();
+            if (deckListItemPrefab == null || deckListContent == null) return;
             
-            var options = new List<string>();
-            foreach (var deck in allDecks)
+            for (int i = 0; i < allDecks.Count; i++)
             {
-                string name = deck != null ? deck.deckName : "(null)";
-                options.Add(name);
+                var deck = allDecks[i];
+                if (deck == null) continue;
+                
+                int index = i; // Capture for closure
+                GameObject item = Instantiate(deckListItemPrefab, deckListContent);
+                SetupDeckListItem(item, deck, index);
             }
-            
-            deckDropdown.AddOptions(options);
         }
         
-        private void OnDeckDropdownChanged(int index)
+        private void SetupDeckListItem(GameObject item, DeckData deck, int index)
+        {
+            // Name
+            var nameText = item.transform.Find("NameText")?.GetComponent<TMP_Text>();
+            if (nameText != null)
+            {
+                nameText.text = deck.deckName;
+            }
+            
+            // Card count
+            var countText = item.transform.Find("CountText")?.GetComponent<TMP_Text>();
+            if (countText != null)
+            {
+                int cardCount = deck.cards != null ? deck.cards.Count : 0;
+                countText.text = $"{cardCount} cards";
+            }
+            
+            // Background for selection state
+            var bg = item.GetComponent<Image>();
+            if (bg != null)
+            {
+                bg.color = (index == selectedDeckIndex) ? selectedColor : normalColor;
+            }
+            
+            // Click handler
+            var button = item.GetComponent<Button>();
+            if (button == null)
+            {
+                button = item.AddComponent<Button>();
+            }
+            button.onClick.AddListener(() => OnDeckItemClicked(index));
+        }
+        
+        private void OnDeckItemClicked(int index)
         {
             if (hasUnsavedChanges)
             {
@@ -156,6 +191,7 @@ namespace KOA.UI
                 return;
             }
             
+            selectedDeckIndex = index;
             currentDeck = allDecks[index];
             
             // Copy deck cards to working list
@@ -167,8 +203,7 @@ namespace KOA.UI
             
             hasUnsavedChanges = false;
             
-            deckDropdown.SetValueWithoutNotify(index);
-            
+            RefreshDeckList(); // Update selection highlighting
             RefreshAvailableCards();
             RefreshDeckContents();
             UpdateStats();
@@ -179,6 +214,7 @@ namespace KOA.UI
         private void ClearEditor()
         {
             currentDeck = null;
+            selectedDeckIndex = -1;
             workingDeckCards.Clear();
             hasUnsavedChanges = false;
             
@@ -381,7 +417,7 @@ namespace KOA.UI
             newDeck.cards = new List<CardData>();
             
             // Ensure directory exists
-            string dir = "Assets/Resources/Data/Decks";
+            string dir = "Assets/Resources/Decks";
             if (!System.IO.Directory.Exists(dir))
             {
                 System.IO.Directory.CreateDirectory(dir);
@@ -402,7 +438,7 @@ namespace KOA.UI
             
             // Refresh and select
             LoadAllDecks();
-            RefreshDeckDropdown();
+            RefreshDeckList();
             
             int newIndex = allDecks.IndexOf(newDeck);
             if (newIndex >= 0)
@@ -435,7 +471,7 @@ namespace KOA.UI
             
             // Refresh
             LoadAllDecks();
-            RefreshDeckDropdown();
+            RefreshDeckList();
             
             if (allDecks.Count > 0)
             {
@@ -461,6 +497,7 @@ namespace KOA.UI
             
             hasUnsavedChanges = false;
             UpdateStats();
+            RefreshDeckList(); // Update card count in list
             
             Debug.Log($"[DeckEditor] Saved deck: {currentDeck.deckName} with {currentDeck.cards.Count} cards");
 #endif
@@ -501,16 +538,6 @@ namespace KOA.UI
         private void OnConfirmNo()
         {
             HideConfirmDialog();
-            
-            // Restore dropdown selection if needed
-            if (currentDeck != null)
-            {
-                int index = allDecks.IndexOf(currentDeck);
-                if (index >= 0)
-                {
-                    deckDropdown.SetValueWithoutNotify(index);
-                }
-            }
         }
         
         #endregion

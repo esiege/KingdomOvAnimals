@@ -1186,14 +1186,14 @@ namespace KOA.Editor
             backRect.offsetMin = Vector2.zero;
             backRect.offsetMax = Vector2.zero;
             
-            // Deck selection row
-            GameObject deckSelectionRow = CreateDeckSelectionRow(panel.transform);
+            // Left Panel - Deck List
+            GameObject deckListPanel = CreateDeckListPanel(panel.transform);
             
-            // Left Panel - Available Cards
-            GameObject leftPanel = CreateAvailableCardsPanel(panel.transform);
+            // Middle Panel - Available Cards
+            GameObject availableCardsPanel = CreateAvailableCardsPanelNew(panel.transform);
             
             // Right Panel - Deck Contents
-            GameObject rightPanel = CreateDeckContentsPanel(panel.transform);
+            GameObject rightPanel = CreateDeckContentsPanelNew(panel.transform);
             
             // Stats row at bottom
             GameObject statsRow = CreateDeckStatsRow(panel.transform);
@@ -1204,17 +1204,20 @@ namespace KOA.Editor
             
             // Create prefabs
             CreateDeckCardItemPrefab();
+            CreateDeckListItemPrefab();
             
             // Wire up DeckEditorUI
             SerializedObject so = new SerializedObject(deckEditor);
             
-            // Deck selection
-            so.FindProperty("deckDropdown").objectReferenceValue = deckSelectionRow.transform.Find("DeckDropdown")?.GetComponent<TMP_Dropdown>();
-            so.FindProperty("newDeckButton").objectReferenceValue = deckSelectionRow.transform.Find("NewDeckButton")?.GetComponent<Button>();
-            so.FindProperty("deleteDeckButton").objectReferenceValue = deckSelectionRow.transform.Find("DeleteDeckButton")?.GetComponent<Button>();
+            // Deck list
+            so.FindProperty("deckListContent").objectReferenceValue = deckListPanel.transform.Find("ScrollView/Viewport/Content");
+            var deckListPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/UI/DeckListItem.prefab");
+            so.FindProperty("deckListItemPrefab").objectReferenceValue = deckListPrefab;
+            so.FindProperty("newDeckButton").objectReferenceValue = deckListPanel.transform.Find("ButtonRow/NewDeckButton")?.GetComponent<Button>();
+            so.FindProperty("deleteDeckButton").objectReferenceValue = deckListPanel.transform.Find("ButtonRow/DeleteDeckButton")?.GetComponent<Button>();
             
             // Available cards
-            so.FindProperty("availableCardsContent").objectReferenceValue = leftPanel.transform.Find("ScrollView/Viewport/Content");
+            so.FindProperty("availableCardsContent").objectReferenceValue = availableCardsPanel.transform.Find("ScrollView/Viewport/Content");
             var availablePrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/UI/AvailableCardItem.prefab");
             so.FindProperty("availableCardItemPrefab").objectReferenceValue = availablePrefab;
             
@@ -1237,6 +1240,200 @@ namespace KOA.Editor
             so.ApplyModifiedProperties();
             
             return panel;
+        }
+
+        private static GameObject CreateDeckListPanel(Transform parent)
+        {
+            GameObject deckListPanel = new GameObject("DeckListPanel");
+            deckListPanel.transform.SetParent(parent, false);
+            
+            RectTransform rect = deckListPanel.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.02f, 0.1f);
+            rect.anchorMax = new Vector2(0.22f, 0.9f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            
+            Image bg = deckListPanel.AddComponent<Image>();
+            bg.color = new Color(0.2f, 0.2f, 0.25f, 1f);
+            
+            // Title
+            GameObject titleObj = CreateTMPText(deckListPanel.transform, "Title", "Decks", 22, TextAlignmentOptions.Center);
+            RectTransform titleRect = titleObj.GetComponent<RectTransform>();
+            titleRect.anchorMin = new Vector2(0.05f, 0.92f);
+            titleRect.anchorMax = new Vector2(0.95f, 0.98f);
+            titleRect.offsetMin = Vector2.zero;
+            titleRect.offsetMax = Vector2.zero;
+            
+            // Scroll view for deck list
+            GameObject scrollView = CreateScrollView(deckListPanel.transform, "ScrollView");
+            RectTransform scrollRect = scrollView.GetComponent<RectTransform>();
+            scrollRect.anchorMin = new Vector2(0.02f, 0.12f);
+            scrollRect.anchorMax = new Vector2(0.98f, 0.9f);
+            scrollRect.offsetMin = Vector2.zero;
+            scrollRect.offsetMax = Vector2.zero;
+            
+            // Button row at bottom
+            GameObject buttonRow = new GameObject("ButtonRow");
+            buttonRow.transform.SetParent(deckListPanel.transform, false);
+            RectTransform buttonRowRect = buttonRow.AddComponent<RectTransform>();
+            buttonRowRect.anchorMin = new Vector2(0.02f, 0.02f);
+            buttonRowRect.anchorMax = new Vector2(0.98f, 0.1f);
+            buttonRowRect.offsetMin = Vector2.zero;
+            buttonRowRect.offsetMax = Vector2.zero;
+            
+            // New button
+            GameObject newBtn = CreateTMPButton(buttonRow.transform, "NewDeckButton", "+ New", 25);
+            RectTransform newRect = newBtn.GetComponent<RectTransform>();
+            newRect.anchorMin = new Vector2(0f, 0f);
+            newRect.anchorMax = new Vector2(0.48f, 1f);
+            newRect.offsetMin = Vector2.zero;
+            newRect.offsetMax = Vector2.zero;
+            
+            // Delete button
+            GameObject delBtn = CreateTMPButton(buttonRow.transform, "DeleteDeckButton", "Delete", 25);
+            RectTransform delRect = delBtn.GetComponent<RectTransform>();
+            delRect.anchorMin = new Vector2(0.52f, 0f);
+            delRect.anchorMax = new Vector2(1f, 1f);
+            delRect.offsetMin = Vector2.zero;
+            delRect.offsetMax = Vector2.zero;
+            delBtn.GetComponent<Image>().color = new Color(0.5f, 0.25f, 0.25f, 1f);
+            
+            return deckListPanel;
+        }
+
+        private static GameObject CreateAvailableCardsPanelNew(Transform parent)
+        {
+            GameObject middlePanel = new GameObject("AvailableCardsPanel");
+            middlePanel.transform.SetParent(parent, false);
+            
+            RectTransform rect = middlePanel.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.24f, 0.1f);
+            rect.anchorMax = new Vector2(0.54f, 0.9f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            
+            Image bg = middlePanel.AddComponent<Image>();
+            bg.color = new Color(0.2f, 0.2f, 0.25f, 1f);
+            
+            // Title
+            GameObject titleObj = CreateTMPText(middlePanel.transform, "Title", "Available Cards", 22, TextAlignmentOptions.Center);
+            RectTransform titleRect = titleObj.GetComponent<RectTransform>();
+            titleRect.anchorMin = new Vector2(0.05f, 0.92f);
+            titleRect.anchorMax = new Vector2(0.95f, 0.98f);
+            titleRect.offsetMin = Vector2.zero;
+            titleRect.offsetMax = Vector2.zero;
+            
+            // Scroll view for cards
+            GameObject scrollView = CreateScrollView(middlePanel.transform, "ScrollView");
+            RectTransform scrollRect = scrollView.GetComponent<RectTransform>();
+            scrollRect.anchorMin = new Vector2(0.02f, 0.02f);
+            scrollRect.anchorMax = new Vector2(0.98f, 0.9f);
+            scrollRect.offsetMin = Vector2.zero;
+            scrollRect.offsetMax = Vector2.zero;
+            
+            return middlePanel;
+        }
+
+        private static GameObject CreateDeckContentsPanelNew(Transform parent)
+        {
+            GameObject rightPanel = new GameObject("DeckContentsPanel");
+            rightPanel.transform.SetParent(parent, false);
+            
+            RectTransform rect = rightPanel.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.56f, 0.1f);
+            rect.anchorMax = new Vector2(0.98f, 0.9f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            
+            Image bg = rightPanel.AddComponent<Image>();
+            bg.color = new Color(0.2f, 0.2f, 0.25f, 1f);
+            
+            // Title
+            GameObject titleObj = CreateTMPText(rightPanel.transform, "Title", "Deck Contents (0/30)", 22, TextAlignmentOptions.Center);
+            RectTransform titleRect = titleObj.GetComponent<RectTransform>();
+            titleRect.anchorMin = new Vector2(0.05f, 0.92f);
+            titleRect.anchorMax = new Vector2(0.95f, 0.98f);
+            titleRect.offsetMin = Vector2.zero;
+            titleRect.offsetMax = Vector2.zero;
+            
+            // Scroll view for deck cards
+            GameObject scrollView = CreateScrollView(rightPanel.transform, "ScrollView");
+            RectTransform scrollRect = scrollView.GetComponent<RectTransform>();
+            scrollRect.anchorMin = new Vector2(0.02f, 0.02f);
+            scrollRect.anchorMax = new Vector2(0.98f, 0.9f);
+            scrollRect.offsetMin = Vector2.zero;
+            scrollRect.offsetMax = Vector2.zero;
+            
+            return rightPanel;
+        }
+
+        private static void CreateDeckListItemPrefab()
+        {
+            string prefabPath = "Assets/Resources/UI/DeckListItem.prefab";
+            
+            // Check if prefab already exists
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath) != null)
+            {
+                Debug.Log($"[CardManagement] Prefab already exists: {prefabPath}");
+                return;
+            }
+            
+            // Ensure directory exists
+            string dir = System.IO.Path.GetDirectoryName(prefabPath);
+            if (!System.IO.Directory.Exists(dir))
+            {
+                System.IO.Directory.CreateDirectory(dir);
+            }
+            
+            // Create prefab
+            GameObject itemObj = new GameObject("DeckListItem");
+            
+            RectTransform rect = itemObj.AddComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(0, 60);
+            
+            Image bg = itemObj.AddComponent<Image>();
+            bg.color = new Color(0.3f, 0.3f, 0.4f, 1f);
+            
+            // Layout element for scroll view
+            var layout = itemObj.AddComponent<LayoutElement>();
+            layout.minHeight = 60;
+            layout.preferredHeight = 60;
+            
+            // Name text
+            GameObject nameObj = new GameObject("NameText");
+            nameObj.transform.SetParent(itemObj.transform, false);
+            RectTransform nameRect = nameObj.AddComponent<RectTransform>();
+            nameRect.anchorMin = new Vector2(0.05f, 0.5f);
+            nameRect.anchorMax = new Vector2(0.95f, 0.95f);
+            nameRect.offsetMin = Vector2.zero;
+            nameRect.offsetMax = Vector2.zero;
+            
+            TextMeshProUGUI nameTmp = nameObj.AddComponent<TextMeshProUGUI>();
+            nameTmp.fontSize = 18;
+            nameTmp.color = Color.white;
+            nameTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            nameTmp.text = "Deck Name";
+            
+            // Count text
+            GameObject countObj = new GameObject("CountText");
+            countObj.transform.SetParent(itemObj.transform, false);
+            RectTransform countRect = countObj.AddComponent<RectTransform>();
+            countRect.anchorMin = new Vector2(0.05f, 0.05f);
+            countRect.anchorMax = new Vector2(0.95f, 0.5f);
+            countRect.offsetMin = Vector2.zero;
+            countRect.offsetMax = Vector2.zero;
+            
+            TextMeshProUGUI countTmp = countObj.AddComponent<TextMeshProUGUI>();
+            countTmp.fontSize = 14;
+            countTmp.color = new Color(0.7f, 0.7f, 0.7f, 1f);
+            countTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            countTmp.text = "10 cards";
+            
+            // Save as prefab
+            PrefabUtility.SaveAsPrefabAsset(itemObj, prefabPath);
+            Object.DestroyImmediate(itemObj);
+            
+            Debug.Log($"[CardManagement] Created prefab: {prefabPath}");
         }
 
         private static GameObject CreateDeckSelectionRow(Transform parent)
