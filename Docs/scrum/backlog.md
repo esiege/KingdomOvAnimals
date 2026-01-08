@@ -39,10 +39,11 @@ Integrate the card management system into the actual duel/match gameplay.
 | Story | Title | Status | Dependencies |
 |-------|-------|--------|--------------|
 | 021 | Deck Loader System | Complete ✓ | 020 |
-| 022 | CardController Uses CardData | In Progress | 012, 021 |
+| 022 | CardController Uses CardData | Complete ✓ | 012, 021 |
 | 023 | Ability Execution System | Not Started | 018, 022 |
-| 024 | Match Setup with Decks | Not Started | 021, 022 |
-| 025 | Card Drawing System | Not Started | 021, 024 |
+| 024 | Match Setup with Decks | Not Started | 026 |
+| 025 | Card Drawing System | Not Started | 026 |
+| 026 | Data-Driven Card Spawning | In Progress | 022 |
 
 ---
 

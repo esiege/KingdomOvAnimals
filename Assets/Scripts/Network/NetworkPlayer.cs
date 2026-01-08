@@ -558,6 +558,7 @@ public class NetworkPlayer : NetworkBehaviour
         card.isInHand = false;
         card.SetSummoningSickness(true);
         card.UnflipCard();
+        card.UnHighlightCard(); // Clear any highlight from hand
         card.EnterPlay();
         
         // Remove from hand
@@ -597,8 +598,8 @@ public class NetworkPlayer : NetworkBehaviour
         }
         
         // Get the card name that will be drawn (top of deck)
-        var topCard = LinkedPlayerController.deck[0];
-        string cardName = topCard.cardName;
+        var topCardData = LinkedPlayerController.deck[0];
+        string cardName = topCardData.displayName;
         
         Debug.Log($"[Server] {PlayerName.Value} drawing card: {cardName}");
         
@@ -650,17 +651,26 @@ public class NetworkPlayer : NetworkBehaviour
             return;
         }
         
-        // Draw the top card from deck
-        CardController drawnCard = LinkedPlayerController.deck[0];
+        // Draw the top CardData from deck
+        KOA.Data.CardData cardData = LinkedPlayerController.deck[0];
         LinkedPlayerController.deck.RemoveAt(0);
         
         // Verify it's the expected card (sanity check)
-        if (drawnCard.cardName != cardName)
+        if (cardData.displayName != cardName)
         {
-            Debug.LogWarning($"[Client] Card mismatch! Expected {cardName}, got {drawnCard.cardName}. Decks may be out of sync.");
+            Debug.LogWarning($"[Client] Card mismatch! Expected {cardName}, got {cardData.displayName}. Decks may be out of sync.");
         }
         
-        // Set ownership and add to hand
+        // Instantiate card from prefab
+        if (encounterController.cardPrefab == null)
+        {
+            Debug.LogError("[Client] RpcExecuteCardDraw: cardPrefab is not assigned!");
+            return;
+        }
+        
+        GameObject cardObj = Instantiate(encounterController.cardPrefab);
+        CardController drawnCard = cardObj.GetComponent<CardController>();
+        drawnCard.InitializeFromData(cardData);
         drawnCard.owningPlayer = LinkedPlayerController;
         handController.AddCardToHand(drawnCard);
         
@@ -1336,20 +1346,38 @@ public class NetworkPlayer : NetworkBehaviour
             return $"PlayerSlot-{slotIndex + 1}";
         }
         
-        // If the target owner is the local player, use PlayerSlot, otherwise OpponentSlot
-        // For opponent slots, mirror the index: 0<->2 (front/back swap for visual consistency)
-        if (targetOwnerId == localPlayer.PlayerId.Value)
+        // Server stores slots from Player 0's perspective.
+        // If the local player is Player 0, use slots directly.
+        // If the local player is Player 1, flip perspective (their Player slots are server's Opponent slots).
+        bool localIsPlayer0 = localPlayer.PlayerId.Value == 0;
+        bool targetIsPlayer0 = targetOwnerId == 0;
+        
+        // Determine if target is "local" or "opponent" from local player's view
+        bool targetIsLocal = targetOwnerId == localPlayer.PlayerId.Value;
+        
+        if (localIsPlayer0)
         {
-            return $"PlayerSlot-{slotIndex + 1}";
+            // Player 0: use server perspective directly
+            if (targetIsPlayer0)
+            {
+                return $"PlayerSlot-{slotIndex + 1}";
+            }
+            else
+            {
+                return $"OpponentSlot-{slotIndex + 1}";
+            }
         }
         else
         {
-            // Mirror slots for opponent: 0->2, 1->1, 2->0
-            int mirroredIndex = slotIndex;
-            if (slotIndex == 0) mirroredIndex = 2;
-            else if (slotIndex == 2) mirroredIndex = 0;
-            
-            return $"OpponentSlot-{mirroredIndex + 1}";
+            // Player 1: flip perspective (server's Player = my Opponent, server's Opponent = my Player)
+            if (targetIsPlayer0)
+            {
+                return $"OpponentSlot-{slotIndex + 1}";
+            }
+            else
+            {
+                return $"PlayerSlot-{slotIndex + 1}";
+            }
         }
     }
     

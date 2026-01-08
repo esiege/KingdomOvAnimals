@@ -1,4 +1,5 @@
 using UnityEngine;
+using KOA.Abilities;
 
 namespace KOA.Abilities.Behaviors
 {

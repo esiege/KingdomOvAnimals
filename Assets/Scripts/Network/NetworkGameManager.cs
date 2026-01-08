@@ -920,14 +920,10 @@ public class NetworkGameManager : NetworkBehaviour
             controller.deck.Clear();
             foreach (var cardId in state.deckCardIds)
             {
-                var card = CardLibrary.Instance?.InstantiateCard(cardId);
-                if (card != null)
+                var cardData = CardLibrary.Instance?.GetCardDataById(cardId);
+                if (cardData != null)
                 {
-                    card.owningPlayer = controller;
-                    card.isInHand = false;
-                    card.isInPlay = false;
-                    card.gameObject.SetActive(false);
-                    controller.deck.Add(card);
+                    controller.deck.Add(cardData);
                 }
             }
         }
@@ -1134,17 +1130,7 @@ public class NetworkGameManager : NetworkBehaviour
             }
         }
         
-        // Capture deck
-        if (controller.deck != null)
-        {
-            foreach (var card in controller.deck)
-            {
-                if (card != null)
-                {
-                    snapshot.deckCardIds.Add(card.cardName);
-                }
-            }
-        }
+        // Capture deck (now CardData)\n        if (controller.deck != null)\n        {\n            foreach (var cardData in controller.deck)\n            {\n                if (cardData != null)\n                {\n                    snapshot.deckCardIds.Add(cardData.id ?? cardData.displayName);\n                }\n            }\n        }
         
         return snapshot;
     }
@@ -1847,15 +1833,10 @@ public class NetworkGameManager : NetworkBehaviour
             controller.deck.Clear();
             foreach (var cardId in snapshot.deckCardIds)
             {
-                var newCard = CardLibrary.Instance.InstantiateCard(cardId);
-                if (newCard != null)
+                var cardData = CardLibrary.Instance.GetCardDataById(cardId);
+                if (cardData != null)
                 {
-                    newCard.owningPlayer = controller;
-                    newCard.isInHand = false;
-                    newCard.isInPlay = false;
-                    // Hide deck cards
-                    newCard.gameObject.SetActive(false);
-                    controller.deck.Add(newCard);
+                    controller.deck.Add(cardData);
                 }
             }
             Debug.Log($"[Client] Restored {controller.deck.Count} deck cards to {controller.gameObject.name}");

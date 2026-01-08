@@ -1,9 +1,10 @@
 # Story 022: CardController Uses CardData
 
-## Status: In Progress
+## Status: Complete ✓
 ## Sprint: 03
 ## Dependencies: 012, 021
 ## Started: 2025-01-08
+## Completed: 2026-01-07
 
 ---
 

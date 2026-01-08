@@ -127,18 +127,18 @@ public class HandController : MonoBehaviour
 
         int positionIndex = playerHand.Count;
 
-        // Instantiate the card and position it correctly in the hand
-        GameObject cardObject = Instantiate(card.gameObject, cardPositions[positionIndex].transform.position, Quaternion.identity);
+        // Position the already-instantiated card in the hand
+        GameObject cardObject = card.gameObject;
+        cardObject.transform.position = cardPositions[positionIndex].transform.position;
         cardObject.transform.SetParent(cardPositions[positionIndex].transform);
 
-        CardController instantiatedCard = cardObject.GetComponent<CardController>();
-        playerHand.Add(instantiatedCard);
+        playerHand.Add(card);
 
         if (cardObject.GetComponent<BoxCollider2D>() == null)
             cardObject.AddComponent<BoxCollider2D>();
 
         //HoverHandler hoverHandler = cardObject.AddComponent<HoverHandler>();
-        //hoverHandler.Initialize(this, instantiatedCard, positionIndex, cardPositions[positionIndex].transform.localPosition, hoverOffset, transitionSpeed);
+        //hoverHandler.Initialize(this, card, positionIndex, cardPositions[positionIndex].transform.localPosition, hoverOffset, transitionSpeed);
 
         // Re-arrange the cards in hand to ensure proper positioning
         ArrangeCardsInHand();
@@ -513,6 +513,7 @@ public class HandController : MonoBehaviour
         card.isInHand = false;
         card.SetSummoningSickness(true);
         card.UnflipCard();
+        card.UnHighlightCard(); // Clear any highlight from hand
         card.EnterPlay();
 
         RemoveCardFromHand(card.id);
@@ -623,6 +624,8 @@ public class HandController : MonoBehaviour
                 string attackerSlotName = GetCardSlotName(activeCard);
                 int targetPlayerId = targetPlayer.networkPlayer?.PlayerId.Value ?? -1;
                 
+                Debug.Log($"[HandController] DEBUG: targetPlayer={targetPlayer.gameObject.name}, targetPlayer.networkPlayer={(targetPlayer.networkPlayer != null ? targetPlayer.networkPlayer.PlayerName.Value : "null")}, targetPlayerId={targetPlayerId}");
+                
                 if (attackerSlotName != null && targetPlayerId >= 0)
                 {
                     Debug.Log($"[HandController] Sending network ability use on player: {activeCard.cardName} ({attackerSlotName}) -> Player {targetPlayerId}");
@@ -635,6 +638,8 @@ public class HandController : MonoBehaviour
                 // Card is in hand (flip ability) - use hand index
                 int handIndex = playerHand.IndexOf(activeCard);
                 int targetPlayerId = targetPlayer.networkPlayer?.PlayerId.Value ?? -1;
+                
+                Debug.Log($"[HandController] DEBUG: targetPlayer={targetPlayer.gameObject.name}, targetPlayer.networkPlayer={(targetPlayer.networkPlayer != null ? targetPlayer.networkPlayer.PlayerName.Value : "null")}, targetPlayerId={targetPlayerId}");
                 
                 if (handIndex >= 0 && targetPlayerId >= 0)
                 {

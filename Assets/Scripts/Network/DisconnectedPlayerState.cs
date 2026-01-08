@@ -111,14 +111,14 @@ public class DisconnectedPlayerState
                 }
             }
             
-            // Capture deck
+            // Capture deck (now CardData)
             if (controller.deck != null)
             {
-                foreach (var card in controller.deck)
+                foreach (var cardData in controller.deck)
                 {
-                    if (card != null)
+                    if (cardData != null)
                     {
-                        state.deckCardIds.Add(card.cardName);
+                        state.deckCardIds.Add(cardData.id ?? cardData.displayName);
                     }
                 }
             }

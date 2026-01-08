@@ -283,23 +283,10 @@ public class CardLibrary : MonoBehaviour
         {
             Debug.Log($"[CardLibrary] Checking {player.name}: deck={(player.deck != null ? player.deck.Count.ToString() : "null")}, board={(player.board != null ? player.board.Count.ToString() : "null")}");
             
-            if (player.deck != null)
-            {
-                foreach (var card in player.deck)
-                {
-                    if (card != null && !string.IsNullOrEmpty(card.cardName))
-                    {
-                        if (!_cardLookup.ContainsKey(card.cardName))
-                        {
-                            // Store a reference to the original card as a "template"
-                            _cardLookup[card.cardName] = card;
-                            Debug.Log($"[CardLibrary] Auto-registered card from scene: {card.cardName}");
-                        }
-                    }
-                }
-            }
+            // Deck now contains CardData assets - no need to extract from there
+            // CardData is loaded from Resources/Cards in LoadCardDataAssets()
             
-            // Also check board for cards that might already be in play
+            // Check board for instantiated cards that might already be in play
             if (player.board != null)
             {
                 foreach (var card in player.board)
@@ -308,8 +295,9 @@ public class CardLibrary : MonoBehaviour
                     {
                         if (!_cardLookup.ContainsKey(card.cardName))
                         {
+                            // Store a reference to the original card as a "template"
                             _cardLookup[card.cardName] = card;
-                            Debug.Log($"[CardLibrary] Auto-registered board card from scene: {card.cardName}");
+                            Debug.Log($"[CardLibrary] Auto-registered card from board: {card.cardName}");
                         }
                     }
                 }

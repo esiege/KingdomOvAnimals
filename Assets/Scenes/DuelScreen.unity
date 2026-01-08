@@ -30403,26 +30403,11 @@ MonoBehaviour:
   currentMana: 0
   maxMana: 0
   deck:
-  - {fileID: 1718302626}
-  - {fileID: 1718302626}
-  - {fileID: 1718302626}
-  - {fileID: 1718302626}
-  - {fileID: 1718302626}
-  - {fileID: 1718302626}
-  - {fileID: 2000839966}
-  - {fileID: 2000839966}
-  - {fileID: 2000839966}
-  - {fileID: 361970590}
-  - {fileID: 1072545417}
-  - {fileID: 1072545417}
-  - {fileID: 1072545417}
-  - {fileID: 1072545417}
-  - {fileID: 361970590}
-  - {fileID: 361970590}
-  - {fileID: 361970590}
-  - {fileID: 5595670864368881169}
-  - {fileID: 5595670864368881169}
-  - {fileID: 5595670864368881169}
+  - {fileID: 11400000, guid: 53571ad064b497d4eaab4eb7c9586bea, type: 2}
+  - {fileID: 11400000, guid: 3933165d6747a304c9b236b2c1895b32, type: 2}
+  - {fileID: 11400000, guid: d956c3499bab74b438dedd0db4a7553b, type: 2}
+  - {fileID: 11400000, guid: cb34609a1ff70cd45815f0b19f383ba8, type: 2}
+  - {fileID: 11400000, guid: 79eadd66dd24c8740a0a00670bbc14ae, type: 2}
   board: []
   graveyard: []
   currentHealthText: {fileID: 953723515}
@@ -35818,17 +35803,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4287685259586655555, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
   m_PrefabInstance: {fileID: 345857187}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &361970590 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1631415180478802473, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
-  m_PrefabInstance: {fileID: 345857187}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffcdd668b47d70a4987334af17410ddf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &370699161
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -76599,26 +76573,11 @@ MonoBehaviour:
   currentMana: 0
   maxMana: 0
   deck:
-  - {fileID: 1718302626}
-  - {fileID: 1718302626}
-  - {fileID: 1718302626}
-  - {fileID: 1718302626}
-  - {fileID: 1718302626}
-  - {fileID: 1718302626}
-  - {fileID: 2000839966}
-  - {fileID: 2000839966}
-  - {fileID: 2000839966}
-  - {fileID: 361970590}
-  - {fileID: 1072545417}
-  - {fileID: 1072545417}
-  - {fileID: 1072545417}
-  - {fileID: 1072545417}
-  - {fileID: 361970590}
-  - {fileID: 361970590}
-  - {fileID: 361970590}
-  - {fileID: 5595670864368881169}
-  - {fileID: 5595670864368881169}
-  - {fileID: 5595670864368881169}
+  - {fileID: 11400000, guid: 53571ad064b497d4eaab4eb7c9586bea, type: 2}
+  - {fileID: 11400000, guid: 3933165d6747a304c9b236b2c1895b32, type: 2}
+  - {fileID: 11400000, guid: d956c3499bab74b438dedd0db4a7553b, type: 2}
+  - {fileID: 11400000, guid: cb34609a1ff70cd45815f0b19f383ba8, type: 2}
+  - {fileID: 11400000, guid: 79eadd66dd24c8740a0a00670bbc14ae, type: 2}
   board: []
   graveyard: []
   currentHealthText: {fileID: 1320239281}
@@ -111918,17 +111877,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4287685259586655555, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
   m_PrefabInstance: {fileID: 1072545413}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1072545417 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1631415180478802473, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
-  m_PrefabInstance: {fileID: 1072545413}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffcdd668b47d70a4987334af17410ddf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1076224958
 GameObject:
   m_ObjectHideFlags: 0
@@ -142411,6 +142359,7 @@ MonoBehaviour:
   opponent: {fileID: 734513106}
   playerHandController: {fileID: 2041307555}
   opponentHandController: {fileID: 1338780135}
+  cardPrefab: {fileID: 4287685259586655554, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
   currentPlayer: {fileID: 0}
   turnNumber: 1
   maxHandSize: 10
@@ -173433,17 +173382,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 2, y: 2}
   m_EdgeRadius: 0
---- !u!114 &1718302626 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1631415180478802473, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
-  m_PrefabInstance: {fileID: 1009816952}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffcdd668b47d70a4987334af17410ddf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1724371138
 GameObject:
   m_ObjectHideFlags: 0
@@ -208654,17 +208592,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &2000839966 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1631415180478802473, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
-  m_PrefabInstance: {fileID: 1658934697}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1351971506}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffcdd668b47d70a4987334af17410ddf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!210 &2000839968
 SortingGroup:
   m_ObjectHideFlags: 0
@@ -209234,17 +209161,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &5595670864368881169 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1631415180478802473, guid: 05652a0e01477ac46a813a8689c85e18, type: 3}
-  m_PrefabInstance: {fileID: 6558404854256739384}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffcdd668b47d70a4987334af17410ddf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &6558404854256739384
 PrefabInstance:
   m_ObjectHideFlags: 0

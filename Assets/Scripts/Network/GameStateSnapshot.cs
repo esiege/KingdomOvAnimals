@@ -216,14 +216,14 @@ public class PlayerSnapshot
             }
         }
         
-        // Capture deck (remaining cards)
+        // Capture deck (remaining cards - now CardData)
         if (controller.deck != null)
         {
-            foreach (var card in controller.deck)
+            foreach (var cardData in controller.deck)
             {
-                if (card != null)
+                if (cardData != null)
                 {
-                    snapshot.deckCardIds.Add(card.cardName);
+                    snapshot.deckCardIds.Add(cardData.id ?? cardData.displayName);
                 }
             }
         }

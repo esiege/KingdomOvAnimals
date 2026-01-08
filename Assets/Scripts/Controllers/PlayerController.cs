@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using TMPro; // Required for TextMeshPro components
 using System.Collections.Generic;
+using KOA.Data;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,7 +12,11 @@ public class PlayerController : MonoBehaviour
     public int currentMana;
     public int maxMana;
 
-    public List<CardController> deck = new List<CardController>();
+    [Header("Deck (CardData Assets)")]
+    [Tooltip("Assign CardData assets here - cards will be instantiated at runtime")]
+    public List<CardData> deck = new List<CardData>();
+    
+    [Header("Runtime Card Lists")]
     public List<CardController> board = new List<CardController>();
     public List<CardController> graveyard = new List<CardController>();
 
@@ -175,7 +180,7 @@ public class PlayerController : MonoBehaviour
         {
             int randomIndex = Random.Range(0, deck.Count);
             // Swap current card with a card at a random index
-            CardController temp = deck[i];
+            CardData temp = deck[i];
             deck[i] = deck[randomIndex];
             deck[randomIndex] = temp;
         }
@@ -194,7 +199,7 @@ public class PlayerController : MonoBehaviour
         {
             int randomIndex = rng.Next(i + 1);
             // Swap current card with a card at a random index
-            CardController temp = deck[i];
+            CardData temp = deck[i];
             deck[i] = deck[randomIndex];
             deck[randomIndex] = temp;
         }
@@ -251,17 +256,17 @@ public class PlayerController : MonoBehaviour
 
     
 
-    public void AddCardToDeck(CardController newCard)
+    public void AddCardToDeck(CardData cardData)
     {
-        deck.Add(newCard);
+        deck.Add(cardData);
         UpdatePlayerUI();
     }
 
-    public void RemoveCardFromDeck(CardController card)
+    public void RemoveCardFromDeck(CardData cardData)
     {
-        if (deck.Contains(card))
+        if (deck.Contains(cardData))
         {
-            deck.Remove(card);
+            deck.Remove(cardData);
             UpdatePlayerUI();
         }
         else

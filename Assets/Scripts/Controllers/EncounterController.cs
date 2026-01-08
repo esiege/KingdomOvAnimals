@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
+using KOA.Data;
 
 public class EncounterController : MonoBehaviour
 {
@@ -13,6 +14,10 @@ public class EncounterController : MonoBehaviour
     // Hand Controllers for both players
     public HandController playerHandController;
     public HandController opponentHandController;
+    
+    [Header("Card Spawning")]
+    [Tooltip("Generic card prefab - instantiated and populated from CardData")]
+    public GameObject cardPrefab;
 
     // Turn Management
     public PlayerController currentPlayer;
@@ -462,11 +467,29 @@ public class EncounterController : MonoBehaviour
 
         if (player.deck.Count > 0)
         {
-            // Draw the top card from the deck
-            CardController drawnCard = player.deck[0];
-            player.deck.RemoveAt(0); // Remove the card from the deck
-
-            // Set the owning player on the card
+            // Draw the top CardData from the deck
+            CardData cardData = player.deck[0];
+            player.deck.RemoveAt(0); // Remove from deck
+            
+            // Instantiate generic card prefab
+            if (cardPrefab == null)
+            {
+                Debug.LogError("[EncounterController] cardPrefab is not assigned!");
+                return;
+            }
+            
+            GameObject cardObj = Instantiate(cardPrefab);
+            CardController drawnCard = cardObj.GetComponent<CardController>();
+            
+            if (drawnCard == null)
+            {
+                Debug.LogError("[EncounterController] cardPrefab does not have CardController!");
+                Destroy(cardObj);
+                return;
+            }
+            
+            // Initialize from CardData
+            drawnCard.InitializeFromData(cardData);
             drawnCard.owningPlayer = player;
 
             // Add the card to the player's hand using the HandController
@@ -728,11 +751,16 @@ public class EncounterController : MonoBehaviour
             // Also link opponent
             if (opponent != null && ngm.opponentPlayerController != null && ngm.opponentPlayerController.networkPlayer != null)
             {
-                if (opponent.networkPlayer == null)
+                if (opponent.networkPlayer == null || opponent.networkPlayer != ngm.opponentPlayerController.networkPlayer)
                 {
-                    Debug.Log("[EncounterController] Linking networkPlayer to encounterController.opponent");
+                    Debug.Log($"[EncounterController] Linking networkPlayer to encounterController.opponent (was: {(opponent.networkPlayer != null ? opponent.networkPlayer.PlayerName.Value : "null")})");
                     opponent.networkPlayer = ngm.opponentPlayerController.networkPlayer;
                 }
+                Debug.Log($"[EncounterController] opponent.networkPlayer={(opponent.networkPlayer != null ? opponent.networkPlayer.PlayerName.Value : "null")}, PlayerId={(opponent.networkPlayer != null ? opponent.networkPlayer.PlayerId.Value.ToString() : "null")}");
+            }
+            else
+            {
+                Debug.LogWarning($"[EncounterController] Could not link opponent.networkPlayer! opponent={opponent != null}, ngm.opponentPlayerController={ngm.opponentPlayerController != null}, ngm.opponentPlayerController.networkPlayer={ngm.opponentPlayerController?.networkPlayer != null}");
             }
         }
         

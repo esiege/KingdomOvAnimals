@@ -414,6 +414,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8329533514319088995}
+  - component: {fileID: 2469692637450060274}
   m_Layer: 0
   m_Name: DamageAbility
   m_TagString: Untagged
@@ -438,6 +439,20 @@ Transform:
   m_Father: {fileID: 6876089256449832706}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2469692637450060274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2490211994731553419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc1c0ca5940b58f40bd75b3e903435bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damageAmount: 2
+  damageAmountText: {fileID: 393646871206933697}
 --- !u!1 &2709863938675434191
 GameObject:
   m_ObjectHideFlags: 0
@@ -1272,7 +1287,7 @@ GameObject:
   - component: {fileID: 2704030529723960761}
   - component: {fileID: 5258021962298196721}
   m_Layer: 0
-  m_Name: Card
+  m_Name: Card Backup1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1306,14 +1321,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffcdd668b47d70a4987334af17410ddf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cardData: {fileID: 0}
   cardName: Card
   manaCost: 2
   health: 5
-  attack: 0
-  defense: 0
   owningPlayer: {fileID: 0}
-  id: 
   isInHand: 1
   isActive: 0
   isTapped: 0
@@ -1329,9 +1340,6 @@ MonoBehaviour:
   cardNameText: {fileID: 4732824199816059743}
   manaCostText: {fileID: 4287685259530119118}
   healthText: {fileID: 4287685259328481866}
-  attackText: {fileID: 393646871206933697}
-  defenseText: {fileID: 2649897692750811516}
-  artworkRenderer: {fileID: 0}
   summoningSicknessIcon: {fileID: 8610948879989911521}
   tappedIcon: {fileID: 8188743995264107024}
   flippedIcon: {fileID: 5583491570198933734}
@@ -1690,6 +1698,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1110855052999454645}
+  - component: {fileID: 3769897449567115715}
   m_Layer: 0
   m_Name: HealAbility
   m_TagString: Untagged
@@ -1714,6 +1723,20 @@ Transform:
   m_Father: {fileID: 6876089256361442564}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3769897449567115715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4349158463947435834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a59f9c31c350dc14da998537031f8b0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healAmount: 2
+  healAmountText: {fileID: 2649897692750811516}
 --- !u!1 &4419921031247330396
 GameObject:
   m_ObjectHideFlags: 0

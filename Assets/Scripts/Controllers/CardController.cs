@@ -18,6 +18,8 @@ public class CardController : MonoBehaviour
     public int manaCost;
     public int health;
     private int maxHealth;
+    public int attack;  // Derived from offensive ability damage
+    public int defense; // Derived from defensive ability damage (for damage reduction)
 
     // Owner reference
     public PlayerController owningPlayer;
@@ -48,6 +50,8 @@ public class CardController : MonoBehaviour
     public TextMeshProUGUI cardNameText;
     public TextMeshProUGUI manaCostText;
     public TextMeshProUGUI healthText;
+    public TextMeshProUGUI attackText;
+    public TextMeshProUGUI defenseText;
 
     // Card Visuals
     [Header("Card Artwork")]
@@ -92,6 +96,12 @@ public class CardController : MonoBehaviour
         health = data.health;
         maxHealth = data.health;
         
+        // Set attack from offensive ability damage
+        attack = data.offensiveAbility != null ? data.offensiveAbility.damage : 0;
+        
+        // Set defense from defensive ability (could be heal or damage reduction)
+        defense = data.defensiveAbility != null ? data.defensiveAbility.damage : 0;
+        
         // Set artwork if available
         if (data.artwork != null && artworkRenderer != null)
         {
@@ -104,14 +114,16 @@ public class CardController : MonoBehaviour
     // Method to update the card's UI elements
     public void UpdateCardUI()
     {
-        Debug.Log($"[CardController] UpdateCardUI called for '{cardName}' - Health: {health}, Mana: {manaCost}");
-        Debug.Log($"[CardController] Text refs - Name: {(cardNameText != null ? "OK" : "NULL")}, Mana: {(manaCostText != null ? "OK" : "NULL")}, Health: {(healthText != null ? "OK" : "NULL")}");
+        Debug.Log($"[CardController] UpdateCardUI called for '{cardName}' - Health: {health}, Mana: {manaCost}, Attack: {attack}, Defense: {defense}");
+        Debug.Log($"[CardController] Text refs - Name: {(cardNameText != null ? "OK" : "NULL")}, Mana: {(manaCostText != null ? "OK" : "NULL")}, Health: {(healthText != null ? "OK" : "NULL")}, Attack: {(attackText != null ? "OK" : "NULL")}, Defense: {(defenseText != null ? "OK" : "NULL")}");
         
         if (cardNameText != null) cardNameText.text = cardName;
         if (manaCostText != null) manaCostText.text = manaCost.ToString();
         if (healthText != null) healthText.text = health.ToString();
+        if (attackText != null) attackText.text = attack.ToString();
+        if (defenseText != null) defenseText.text = defense.ToString();
         
-        // Also update health on the Condensed view if it exists (for in-play cards)
+        // Also update stats on the Condensed view if it exists (for in-play cards)
         Transform condensedView = transform.Find("Canvas/Condensed");
         if (condensedView != null)
         {
@@ -122,6 +134,17 @@ public class CardController : MonoBehaviour
                 if (condensedHealthText != null)
                 {
                     condensedHealthText.text = health.ToString();
+                }
+            }
+            
+            // Update attack on condensed view
+            Transform attackTransform = condensedView.Find("Attack");
+            if (attackTransform != null)
+            {
+                TextMeshProUGUI condensedAttackText = attackTransform.GetComponent<TextMeshProUGUI>();
+                if (condensedAttackText != null)
+                {
+                    condensedAttackText.text = attack.ToString();
                 }
             }
         }
