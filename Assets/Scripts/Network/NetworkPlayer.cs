@@ -517,20 +517,29 @@ public class NetworkPlayer : NetworkBehaviour
         
         var card = hand[cardIndex];
         
-        // Find the slot
-        // For opponent cards, mirror the slot index so front/back perspective is correct
-        // Slot 1 (front) <-> Slot 3 (back) swap for opponent view
+        // Find the slot based on whether this player is local or opponent
+        // For opponent cards, we need to mirror the slot visually:
+        // - Slot 0 (front from player's view) should appear at slot 2 (back from opponent's view)
+        // - Slot 2 (back from player's view) should appear at slot 0 (front from opponent's view)
+        // - Slot 1 (middle) stays in the middle
         int displaySlotIndex = slotIndex;
-        string slotName = $"PlayerSlot-{slotIndex + 1}";
+        string slotName;
         if (LinkedPlayerController != null && LinkedPlayerController.gameObject.name == "Opponent")
         {
-            // Mirror slots: 0->2, 1->1, 2->0 (slot 1 stays, slots 0 and 2 swap)
+            // This is an opponent's card - mirror for visual perspective
             if (slotIndex == 0) displaySlotIndex = 2;
             else if (slotIndex == 2) displaySlotIndex = 0;
             // slotIndex 1 (middle) stays the same
             
             slotName = $"OpponentSlot-{displaySlotIndex + 1}";
         }
+        else
+        {
+            // This is the local player's own card - no mirroring needed
+            slotName = $"PlayerSlot-{slotIndex + 1}";
+        }
+        
+        Debug.Log($"[Client] Card play slot resolution: slotIndex={slotIndex}, displaySlotIndex={displaySlotIndex}, LinkedController={LinkedPlayerController?.gameObject.name}, slotName={slotName}");
         
         var slot = GameObject.Find(slotName);
         if (slot == null)
@@ -1122,7 +1131,19 @@ public class NetworkPlayer : NetworkBehaviour
     [ObserversRpc]
     private void RpcExecuteFlipAbilityOnCard(int handIndex, int targetOwnerId, int targetSlotIndex, bool isOffensive, int damageAmount)
     {
-        Debug.Log($"[Client] Executing flip ability: hand index={handIndex}, targetOwner={targetOwnerId}, slotIndex={targetSlotIndex}, damage={damageAmount}");
+        // Get local player info for debug
+        NetworkPlayer localPlayer = null;
+        foreach (var np in GameObject.FindObjectsOfType<NetworkPlayer>())
+        {
+            if (np.IsOwner)
+            {
+                localPlayer = np;
+                break;
+            }
+        }
+        int localPlayerId = localPlayer != null ? localPlayer.PlayerId.Value : -1;
+        
+        Debug.Log($"[Client PlayerId={localPlayerId}] Executing flip ability: hand index={handIndex}, targetOwner={targetOwnerId}, slotIndex={targetSlotIndex}, damage={damageAmount}");
         
         // Get the hand controller and card
         var handController = GetHandController();
@@ -1143,6 +1164,7 @@ public class NetworkPlayer : NetworkBehaviour
         
         // Resolve slot name based on whether target owner is local player or opponent
         string targetSlotName = ResolveSlotNameForPlayer(targetOwnerId, targetSlotIndex);
+        Debug.Log($"[Client PlayerId={localPlayerId}] Resolved targetOwner={targetOwnerId}, slotIndex={targetSlotIndex} -> {targetSlotName}");
         
         // Find target card by slot
         CardController target = FindCardInSlot(targetSlotName);
@@ -1151,6 +1173,8 @@ public class NetworkPlayer : NetworkBehaviour
             Debug.LogWarning($"[Client] Could not find target card in slot {targetSlotName}");
             return;
         }
+        
+        Debug.Log($"[Client PlayerId={localPlayerId}] Found target card '{target.cardName}' in slot {targetSlotName}");
         
         // Flip the attacker card
         attacker.FlipCard();
@@ -1203,36 +1227,31 @@ public class NetworkPlayer : NetworkBehaviour
     
     /// <summary>
     /// Finds a card in a specific slot by slot name.
-    /// Tries the exact slot name first, then tries the flipped perspective if not found.
-    /// This handles the case where slot names are relative to each client's perspective.
     /// </summary>
     private CardController FindCardInSlot(string slotName)
     {
-        // Try the exact slot name first
+        // Try the exact slot name
         var slot = GameObject.Find(slotName);
         if (slot != null)
         {
             var card = slot.GetComponentInChildren<CardController>();
-            if (card != null) return card;
-        }
-        
-        // Try the flipped perspective (OpponentSlot <-> PlayerSlot)
-        string flippedSlotName = FlipSlotPerspective(slotName);
-        if (flippedSlotName != null)
-        {
-            slot = GameObject.Find(flippedSlotName);
-            if (slot != null)
+            if (card != null)
             {
-                var card = slot.GetComponentInChildren<CardController>();
-                if (card != null)
-                {
-                    Debug.Log($"Found card in flipped slot: {slotName} -> {flippedSlotName}");
-                    return card;
-                }
+                Debug.Log($"[FindCardInSlot] Found '{card.cardName}' in slot '{slotName}'");
+                return card;
+            }
+            else
+            {
+                Debug.Log($"[FindCardInSlot] Slot '{slotName}' exists but has no card");
             }
         }
+        else
+        {
+            Debug.LogWarning($"[FindCardInSlot] Slot '{slotName}' not found in scene");
+        }
         
-        Debug.LogWarning($"Could not find card in slot: {slotName} or {flippedSlotName}");
+        // No fallback - if card isn't in the expected slot, it's not there
+        Debug.LogWarning($"[FindCardInSlot] Could not find card in slot: {slotName}");
         return null;
     }
     
@@ -1355,30 +1374,28 @@ public class NetworkPlayer : NetworkBehaviour
         // Determine if target is "local" or "opponent" from local player's view
         bool targetIsLocal = targetOwnerId == localPlayer.PlayerId.Value;
         
-        if (localIsPlayer0)
+        // Determine display slot index - mirror for opponent cards (front<->back swap)
+        int displaySlotIndex = slotIndex;
+        bool isOpponentCard = targetOwnerId != localPlayer.PlayerId.Value;
+        if (isOpponentCard)
         {
-            // Player 0: use server perspective directly
-            if (targetIsPlayer0)
-            {
-                return $"PlayerSlot-{slotIndex + 1}";
-            }
-            else
-            {
-                return $"OpponentSlot-{slotIndex + 1}";
-            }
+            // Mirror slots for opponent: 0<->2, 1 stays
+            if (slotIndex == 0) displaySlotIndex = 2;
+            else if (slotIndex == 2) displaySlotIndex = 0;
+        }
+        
+        string result;
+        if (isOpponentCard)
+        {
+            result = $"OpponentSlot-{displaySlotIndex + 1}";
         }
         else
         {
-            // Player 1: flip perspective (server's Player = my Opponent, server's Opponent = my Player)
-            if (targetIsPlayer0)
-            {
-                return $"OpponentSlot-{slotIndex + 1}";
-            }
-            else
-            {
-                return $"PlayerSlot-{slotIndex + 1}";
-            }
+            result = $"PlayerSlot-{displaySlotIndex + 1}";
         }
+        
+        Debug.Log($"[ResolveSlot] localPlayerId={localPlayer.PlayerId.Value}, targetOwnerId={targetOwnerId}, slotIndex={slotIndex}, displaySlotIndex={displaySlotIndex}, isOpponentCard={isOpponentCard} => {result}");
+        return result;
     }
     
     #endregion
