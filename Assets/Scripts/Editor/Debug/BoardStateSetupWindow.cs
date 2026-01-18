@@ -1,14 +1,18 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using KOA.Network;
 using KOA.View;
-using KOA.Migration;
+using KOA.Data;
 using FishNet.Object;
+using FishNet.Component.Spawning;
+using FishNet.Managing;
 
 namespace KOA.Editor
 {
     /// <summary>
-    /// Editor window to help set up and test the new Board State Architecture (Story 030).
+    /// Editor window to help set up and test the new Board State Architecture (Story 036).
+    /// Phase 6 cleanup removes all deprecated components - this is the canonical setup tool.
     /// </summary>
     public class BoardStateSetupWindow : EditorWindow
     {
@@ -31,6 +35,13 @@ namespace KOA.Editor
             DrawHeader();
             EditorGUILayout.Space(10);
             
+            // Check scene first
+            if (!DrawSceneValidation())
+            {
+                EditorGUILayout.EndScrollView();
+                return;
+            }
+            
             DrawSetupSection();
             EditorGUILayout.Space(10);
             
@@ -42,12 +53,173 @@ namespace KOA.Editor
             EditorGUILayout.EndScrollView();
         }
         
+        /// <summary>
+        /// Validates the current scene is appropriate for board state setup.
+        /// Returns true if setup can proceed, false if wrong scene.
+        /// </summary>
+        private bool DrawSceneValidation()
+        {
+            string currentScene = GetCurrentSceneName();
+            
+            // Always show current scene name for debugging
+            EditorGUILayout.LabelField($"Current Scene: {currentScene}", EditorStyles.boldLabel);
+            EditorGUILayout.Space(5);
+            
+            // DuelScreen is the main scene for board state setup
+            if (string.Equals(currentScene, "DuelScreen", System.StringComparison.OrdinalIgnoreCase))
+            {
+                EditorGUILayout.HelpBox($"✓ Scene: {currentScene} (correct scene for board setup)", MessageType.Info);
+                return true;
+            }
+            
+            // MainMenu needs PlayerSpawner setup
+            if (string.Equals(currentScene, "MainMenu", System.StringComparison.OrdinalIgnoreCase))
+            {
+                EditorGUILayout.HelpBox(
+                    $"Scene: {currentScene}\n\n" +
+                    "MainMenu scene only needs PlayerSpawner configuration.\n" +
+                    "For full board setup, open DuelScreen scene.",
+                    MessageType.Warning);
+                
+                EditorGUILayout.Space(5);
+                
+                // Show only PlayerSpawner validation for MainMenu
+                DrawMainMenuSetup();
+                
+                EditorGUILayout.Space(10);
+                
+                if (GUILayout.Button("Open DuelScreen Scene"))
+                {
+                    OpenScene("DuelScreen");
+                }
+                
+                return false;
+            }
+            
+            // CardManagement or other scenes
+            EditorGUILayout.HelpBox(
+                $"Scene: {currentScene}\n\n" +
+                "Board state setup requires DuelScreen scene.\n" +
+                "Please open the correct scene.",
+                MessageType.Error);
+            
+            EditorGUILayout.Space(10);
+            
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Open MainMenu"))
+            {
+                OpenScene("MainMenu");
+            }
+            if (GUILayout.Button("Open DuelScreen"))
+            {
+                OpenScene("DuelScreen");
+            }
+            EditorGUILayout.EndHorizontal();
+            
+            return false;
+        }
+        
+        private string GetCurrentSceneName()
+        {
+            var scene = EditorSceneManager.GetActiveScene();
+            return scene.name;
+        }
+        
+        private void OpenScene(string sceneName)
+        {
+            // Check for unsaved changes
+            if (EditorSceneManager.GetActiveScene().isDirty)
+            {
+                if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+                {
+                    return; // User cancelled
+                }
+            }
+            
+            // Try common scene paths
+            string[] possiblePaths = new string[]
+            {
+                $"Assets/Scenes/{sceneName}.unity",
+                $"Assets/Scenes/{sceneName}/{sceneName}.unity",
+                $"Assets/{sceneName}.unity"
+            };
+            
+            foreach (var path in possiblePaths)
+            {
+                if (System.IO.File.Exists(path))
+                {
+                    EditorSceneManager.OpenScene(path);
+                    return;
+                }
+            }
+            
+            // Search for scene asset
+            string[] guids = AssetDatabase.FindAssets($"t:Scene {sceneName}");
+            if (guids.Length > 0)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+                EditorSceneManager.OpenScene(path);
+                return;
+            }
+            
+            Debug.LogWarning($"[BoardStateSetup] Could not find scene: {sceneName}");
+        }
+        
+        private void DrawMainMenuSetup()
+        {
+            EditorGUILayout.LabelField("MainMenu Scene Setup", EditorStyles.boldLabel);
+            
+            // Check NetworkManager exists
+            var networkManager = FindObjectOfType<NetworkManager>();
+            DrawValidationItemWithFix("NetworkManager", networkManager != null,
+                networkManager != null ? "Found" : "Missing!",
+                null);
+            
+            // Check PlayerSpawner
+            var playerSpawner = FindObjectOfType<PlayerSpawner>();
+            DrawValidationItemWithFix("PlayerSpawner", playerSpawner != null,
+                playerSpawner != null ? "Found" : "Missing on NetworkManager!",
+                playerSpawner == null && networkManager != null ? AddPlayerSpawner : (System.Action)null);
+            
+            // Check PlayerSpawner prefab
+            if (playerSpawner != null)
+            {
+                var so = new SerializedObject(playerSpawner);
+                var prefabProp = so.FindProperty("_playerPrefab");
+                bool hasPrefab = prefabProp != null && prefabProp.objectReferenceValue != null;
+                DrawValidationItemWithFix("PlayerSpawner.PlayerPrefab", hasPrefab,
+                    hasPrefab ? "Assigned" : "NOT ASSIGNED - Players won't spawn!",
+                    !hasPrefab ? () => AssignPlayerPrefabToSpawner(playerSpawner) : (System.Action)null);
+            }
+            
+            EditorGUILayout.Space(5);
+            
+            if (GUILayout.Button("Auto-Fix MainMenu"))
+            {
+                if (networkManager != null)
+                {
+                    var spawner = FindObjectOfType<PlayerSpawner>();
+                    if (spawner == null)
+                    {
+                        AddPlayerSpawner();
+                        spawner = FindObjectOfType<PlayerSpawner>();
+                    }
+                    if (spawner != null)
+                    {
+                        AssignPlayerPrefabToSpawner(spawner);
+                    }
+                }
+                Repaint();
+            }
+        }
+        
         private void DrawHeader()
         {
-            EditorGUILayout.LabelField("Story 030: Board State Architecture", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Story 036: Board State Architecture", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox(
-                "This tool helps set up and validate the new board state architecture.\n" +
-                "Follow the steps below to integrate the new system.",
+                "This tool helps set up the new board state architecture.\n" +
+                "Phase 6 complete: Old controllers deprecated, NetworkPlayer simplified.\n" +
+                "Required: NetworkBoardState, BoardView, InputController, CardLibrary.",
                 MessageType.Info);
         }
         
@@ -92,14 +264,30 @@ namespace KOA.Editor
                 CreateTurnUI
             );
             
-            // Step 5: BoardStateBridge (optional)
+            // Step 5: Validate Resources
             DrawSetupStep(
-                "5. Add BoardStateBridge (Migration)",
-                "Optional: Bridge between old and new systems during migration.",
-                HasBoardStateBridge(),
-                CreateBoardStateBridge
+                "5. Validate Resources",
+                "Checks for DeckData in Resources/Decks and CardData in Resources/Cards.",
+                HasRequiredResources(),
+                null // Can't auto-create, just show status
             );
             
+            // Step 6: Validate NetworkGameManager
+            DrawSetupStep(
+                "6. NetworkGameManager Present",
+                "NetworkGameManager handles turn management and game start.",
+                HasNetworkGameManager(),
+                null // NetworkGameManager should already exist
+            );
+            
+            // Step 7: PlayerSpawner with prefab
+            DrawSetupStep(
+                "7. PlayerSpawner Configured",
+                "PlayerSpawner must have NetworkPlayer prefab assigned to spawn players.",
+                HasPlayerSpawnerWithPrefab(),
+                FixPlayerSpawner
+            );
+
             EditorGUILayout.Space(5);
             
             // Create All button
@@ -194,6 +382,27 @@ namespace KOA.Editor
                     networkObj == null ? () => networkBoardState.gameObject.AddComponent<NetworkObject>() : (System.Action)null);
             }
             
+            // Check PlayerSpawner has NetworkPlayer prefab
+            var playerSpawner = FindObjectOfType<PlayerSpawner>();
+            bool hasPlayerSpawner = playerSpawner != null;
+            bool hasPlayerPrefab = false;
+            if (playerSpawner != null)
+            {
+                var spawnerSo = new SerializedObject(playerSpawner);
+                var prefabProp = spawnerSo.FindProperty("_playerPrefab");
+                hasPlayerPrefab = prefabProp != null && prefabProp.objectReferenceValue != null;
+            }
+            DrawValidationItemWithFix("PlayerSpawner", hasPlayerSpawner,
+                hasPlayerSpawner ? "Found in scene" : "Missing! Add to NetworkManager",
+                !hasPlayerSpawner ? AddPlayerSpawner : (System.Action)null);
+            
+            if (hasPlayerSpawner)
+            {
+                DrawValidationItemWithFix("PlayerSpawner.PlayerPrefab", hasPlayerPrefab,
+                    hasPlayerPrefab ? "NetworkPlayer prefab assigned" : "NOT ASSIGNED - Players won't spawn!",
+                    !hasPlayerPrefab ? () => AssignPlayerPrefabToSpawner(playerSpawner) : (System.Action)null);
+            }
+
             EditorGUILayout.Space(5);
             
             EditorGUILayout.BeginHorizontal();
@@ -269,6 +478,23 @@ namespace KOA.Editor
             if (networkBoardState != null && networkBoardState.GetComponent<NetworkObject>() == null)
             {
                 networkBoardState.gameObject.AddComponent<NetworkObject>();
+            }
+            
+            // Fix PlayerSpawner prefab
+            var playerSpawner = FindObjectOfType<PlayerSpawner>();
+            if (playerSpawner != null)
+            {
+                var so = new SerializedObject(playerSpawner);
+                var prefabProp = so.FindProperty("_playerPrefab");
+                if (prefabProp == null || prefabProp.objectReferenceValue == null)
+                {
+                    AssignPlayerPrefabToSpawner(playerSpawner);
+                }
+            }
+            else
+            {
+                // No PlayerSpawner at all - add one
+                AddPlayerSpawner();
             }
             
             Debug.Log("[BoardStateSetup] Auto-fix complete!");
@@ -507,7 +733,24 @@ namespace KOA.Editor
         private bool HasBoardView() => FindObjectOfType<BoardView>() != null;
         private bool HasInputController() => FindObjectOfType<InputController>() != null;
         private bool HasTurnUI() => FindObjectOfType<TurnUI>() != null;
-        private bool HasBoardStateBridge() => FindObjectOfType<BoardStateBridge>() != null;
+        private bool HasNetworkGameManager() => FindObjectOfType<NetworkGameManager>() != null;
+        
+        private bool HasPlayerSpawnerWithPrefab()
+        {
+            var playerSpawner = FindObjectOfType<PlayerSpawner>();
+            if (playerSpawner == null) return false;
+            
+            var so = new SerializedObject(playerSpawner);
+            var prefabProp = so.FindProperty("_playerPrefab");
+            return prefabProp != null && prefabProp.objectReferenceValue != null;
+        }
+        
+        private bool HasRequiredResources()
+        {
+            var decks = Resources.LoadAll<DeckData>("Decks");
+            var cards = Resources.LoadAll<CardData>("Cards");
+            return decks != null && decks.Length > 0 && cards != null && cards.Length > 0;
+        }
         
         #endregion
         
@@ -572,7 +815,7 @@ namespace KOA.Editor
             // Assign slots to BoardView
             var so = new SerializedObject(go.GetComponent<BoardView>());
             
-            var playerSlotsProp = so.FindProperty("_playerSlots");
+            var playerSlotsProp = so.FindProperty("_player0Slots");
             if (playerSlotsProp != null)
             {
                 playerSlotsProp.arraySize = 3;
@@ -582,7 +825,7 @@ namespace KOA.Editor
                 }
             }
             
-            var opponentSlotsProp = so.FindProperty("_opponentSlots");
+            var opponentSlotsProp = so.FindProperty("_player1Slots");
             if (opponentSlotsProp != null)
             {
                 opponentSlotsProp.arraySize = 3;
@@ -645,26 +888,115 @@ namespace KOA.Editor
             Debug.Log("[BoardStateSetup] Created TurnUI (configure UI references manually)");
         }
         
-        private void CreateBoardStateBridge()
-        {
-            var go = new GameObject("BoardStateBridge");
-            go.AddComponent<BoardStateBridge>();
-            go.AddComponent<NetworkObject>();
-            
-            Selection.activeGameObject = go;
-            Undo.RegisterCreatedObjectUndo(go, "Create BoardStateBridge");
-            Debug.Log("[BoardStateSetup] Created BoardStateBridge");
-        }
-        
         private void CreateAllMissing()
         {
             if (!HasNetworkBoardState()) CreateNetworkBoardState();
             if (!HasBoardView()) CreateBoardView();
             if (!HasInputController()) CreateInputController();
             if (!HasTurnUI()) CreateTurnUI();
-            if (!HasBoardStateBridge()) CreateBoardStateBridge();
+            if (!HasPlayerSpawnerWithPrefab()) FixPlayerSpawner();
             
-            Debug.Log("[BoardStateSetup] Created all missing components");
+            // Auto-fix references after creating components
+            AutoFixAll();
+            
+            Debug.Log("[BoardStateSetup] Created all missing components and fixed references");
+        }
+        
+        private void FixPlayerSpawner()
+        {
+            // First, find or add PlayerSpawner
+            var playerSpawner = FindObjectOfType<PlayerSpawner>();
+            if (playerSpawner == null)
+            {
+                AddPlayerSpawner();
+                playerSpawner = FindObjectOfType<PlayerSpawner>();
+            }
+            
+            if (playerSpawner != null)
+            {
+                AssignPlayerPrefabToSpawner(playerSpawner);
+            }
+        }
+        
+        private void AddPlayerSpawner()
+        {
+            // Find NetworkManager first
+            var networkManager = FindObjectOfType<NetworkManager>();
+            if (networkManager == null)
+            {
+                Debug.LogError("[BoardStateSetup] Cannot add PlayerSpawner - no NetworkManager found in scene!");
+                return;
+            }
+            
+            // Add PlayerSpawner to NetworkManager GameObject
+            var spawner = networkManager.gameObject.AddComponent<PlayerSpawner>();
+            Undo.RegisterCreatedObjectUndo(spawner, "Add PlayerSpawner");
+            Debug.Log("[BoardStateSetup] Added PlayerSpawner to NetworkManager");
+            
+            // Try to assign prefab
+            AssignPlayerPrefabToSpawner(spawner);
+        }
+        
+        private void AssignPlayerPrefabToSpawner(PlayerSpawner spawner)
+        {
+            // Try to load NetworkPlayer prefab from standard location
+            string[] prefabPaths = new string[]
+            {
+                "Assets/Prefabs/Network/NetworkPlayer.prefab",
+                "Assets/Prefabs/NetworkPlayer.prefab",
+                "Assets/Resources/NetworkPlayer.prefab"
+            };
+            
+            GameObject prefab = null;
+            foreach (var path in prefabPaths)
+            {
+                prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                if (prefab != null)
+                {
+                    Debug.Log($"[BoardStateSetup] Found NetworkPlayer prefab at: {path}");
+                    break;
+                }
+            }
+            
+            // If not found in standard paths, search project
+            if (prefab == null)
+            {
+                string[] guids = AssetDatabase.FindAssets("NetworkPlayer t:Prefab");
+                foreach (var guid in guids)
+                {
+                    var path = AssetDatabase.GUIDToAssetPath(guid);
+                    var go = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                    if (go != null && go.GetComponent<KOA.Network.NetworkPlayer>() != null)
+                    {
+                        prefab = go;
+                        Debug.Log($"[BoardStateSetup] Found NetworkPlayer prefab via search: {path}");
+                        break;
+                    }
+                }
+            }
+            
+            if (prefab == null)
+            {
+                Debug.LogWarning("[BoardStateSetup] Could not find NetworkPlayer prefab! Please assign manually.");
+                return;
+            }
+            
+            var networkObject = prefab.GetComponent<NetworkObject>();
+            if (networkObject == null)
+            {
+                Debug.LogWarning("[BoardStateSetup] NetworkPlayer prefab is missing NetworkObject component!");
+                return;
+            }
+            
+            var so = new SerializedObject(spawner);
+            var prefabProp = so.FindProperty("_playerPrefab");
+            if (prefabProp != null)
+            {
+                prefabProp.objectReferenceValue = networkObject;
+                so.ApplyModifiedProperties();
+                EditorUtility.SetDirty(spawner);
+                Debug.Log("[BoardStateSetup] Assigned NetworkPlayer prefab to PlayerSpawner");
+            }
         }
         
         #endregion

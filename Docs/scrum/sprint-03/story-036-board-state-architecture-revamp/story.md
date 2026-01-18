@@ -1,5 +1,21 @@
 # Story 036: Board State Architecture Revamp
 
+## Status: 🟡 IN PROGRESS (Phase 4 Code Complete, Needs Testing)
+
+**Last Updated:** January 17, 2026
+
+| Phase | Status | Description |
+|-------|--------|-------------|
+| Phase 1: Data Model | ✅ Complete | CardState, PlayerBoardState, BoardState with FishNet serializers |
+| Phase 2: NetworkBoardState | ✅ Complete | Server-authoritative sync with SyncVar<BoardState> |
+| Phase 3: View Layer | ✅ Complete | BoardView, CardView, InputController - no game logic in views |
+| Phase 4: Card Play Flow | 🟡 Code Complete | CmdPlayCard fixed, InitializeGame wired up, needs scene setup & testing |
+| Phase 5: Ability Targeting | ❌ TODO | Combat through NetworkBoardState |
+| Phase 6: Delete Old Code | ❌ TODO | Remove deprecated NetworkPlayer/HandController methods |
+| Phase 7: Polish | ❌ TODO | Full game loop integration |
+
+---
+
 ## User Story
 **As a** developer  
 **I want** a clean data-driven board state architecture  
@@ -294,7 +310,7 @@ The current implementation has accumulated technical debt making multiplayer car
 
 ## Implementation Plan
 
-### Phase 1: Data Model (No behavior changes) ✅ DONE
+### Phase 1: Data Model (No behavior changes) ✅ COMPLETE
 1. Create `CardState` class (plain C# data)
 2. Create `PlayerBoardState` class with `CardState[3] Board`
 3. Create `BoardState` class aggregating players
@@ -302,7 +318,13 @@ The current implementation has accumulated technical debt making multiplayer car
 
 **Acceptance:** Classes compile, can instantiate, serialize
 
-### Phase 2: NetworkBoardState (Parallel to existing) ✅ DONE
+**Outcome (Jan 17, 2026):**
+- `Assets/Scripts/Model/CardState.cs` - Pure data class with FishNet serializer, `InstanceId`, `CardDataId`, `OwnerId`, status flags
+- `Assets/Scripts/Model/PlayerBoardState.cs` - `Board[3]`, `Hand`, `Deck`, `Health`, `Mana`, `DrawCard()`, `PlaceCard()`, `RemoveHandCard()`
+- `Assets/Scripts/Model/BoardState.cs` - `Players[2]`, `CurrentTurnPlayerId`, `TurnNumber`, `FindCardOnBoard()`, FishNet serializer
+- All use integer IDs (no magic strings), XML documented
+
+### Phase 2: NetworkBoardState (Parallel to existing) ✅ COMPLETE
 1. Create `NetworkBoardState : NetworkBehaviour`
 2. Add SyncLists for each player's board
 3. Implement server-side state modification methods
@@ -310,7 +332,15 @@ The current implementation has accumulated technical debt making multiplayer car
 
 **Acceptance:** Can spawn NetworkBoardState, see synced empty boards
 
-### Phase 3: View Layer (New, alongside existing) ✅ DONE
+**Outcome (Jan 17, 2026):**
+- `Assets/Scripts/Network/NetworkBoardState.cs` (649 lines) - Singleton with `SyncVar<BoardState>`
+- `InitializeGame(deck0, deck1)` - Shuffles decks, draws initial hands
+- `CmdPlayCard(playerId, handIndex, slotIndex)` - Server-authoritative card play with full validation
+- `CmdUseBoardAbility`, `CmdUseFlipAbility`, `CmdAttackPlayer`, `CmdEndTurn` - All use integer IDs
+- Events: `OnCardPlayed`, `OnCardDamaged`, `OnCardDied`, `OnTurnChanged`, `OnPlayerDamaged`, `OnGameEnded`
+- RPCs broadcast with `(playerId, slotIndex)` tuples - no magic strings
+
+### Phase 3: View Layer (New, alongside existing) ✅ COMPLETE
 1. Create `BoardView` with slot transforms setup
 2. Create `CardView` prefab and pool
 3. Implement `RenderBoard(BoardState)` 
@@ -318,22 +348,46 @@ The current implementation has accumulated technical debt making multiplayer car
 
 **Acceptance:** Empty board renders correctly for both players
 
-### Phase 4: Card Play Flow (REPLACEMENT) 🔴 IN PROGRESS
+**Outcome (Jan 17, 2026):**
+- `Assets/Scripts/View/BoardView.cs` (463 lines) - `RenderBoard()`, `GetSlotTransform()` with perspective mirroring, `FindAndSetLocalPlayerId()` from network
+- `Assets/Scripts/View/CardView.cs` (215 lines) - Visual only, `UpdateFromState()`, no game logic
+- `Assets/Scripts/View/InputController.cs` (397 lines) - Drag/drop, calls `NetworkBoardState.CmdPlayCard/CmdUseBoardAbility`
+- `Assets/Scripts/View/HandView.cs`, `TurnUI.cs`, `PlayerStatsView.cs` - Supporting views
+- `Assets/Scripts/Logic/TargetingHelper.cs` (211 lines) - Pure functions for valid target calculation
+
+### Phase 4: Card Play Flow (REPLACEMENT) � CODE COMPLETE - NEEDS TESTING
 
 **CRITICAL: BoardState is the ONLY source of truth. No bridging to old system.**
 
 1. Card dealing populates `BoardState.Players[].Hand` directly
-2. HandController reads from BoardState, sends commands to NetworkBoardState
+2. InputController reads from BoardState, sends commands to NetworkBoardState
 3. NetworkBoardState validates against BoardState (its own data)
 4. Server updates BoardState, broadcasts RPC with integer IDs
 5. Clients update visuals from BoardState changes
 
-**Status:** HandController still calls old NetworkPlayer.CmdPlayCard. BoardState.Hand is not populated when cards are dealt.
+**Changes Made (Jan 17, 2026):**
 
-**Blockers to fix:**
-- Card spawning must add CardState to BoardState.Hand, not just create CardController
-- HandController must call NetworkBoardState.CmdPlayCard, not NetworkPlayer
-- NetworkBoardState validates against its own BoardState data
+✅ **Fixed `NetworkBoardState.CmdPlayCard`** - Now self-contained:
+- Changed signature from `(playerId, handIndex, slotIndex, cardDataId, manaCost)` to `(playerId, handIndex, slotIndex)`
+- Server gets card from `BoardState.Players[playerId].Hand[handIndex]`
+- Server looks up `CardData` via `_cardLibrary.GetCardById()`
+- Validates: turn, mana, slot empty
+- Executes: `RemoveHandCard()`, `PlaceCard()`, `SpendMana()`
+
+✅ **Added `InitializeNetworkBoardState()` to `NetworkGameManager.ServerStartGame`**:
+- Loads decks from `Resources/Decks`
+- Converts `DeckData.cards` to list of card IDs
+- Calls `NetworkBoardState.Instance.InitializeGame(player0Deck, player1Deck)`
+- Hands are populated via `DrawCardInternal()` → `PlayerBoardState.DrawCard()`
+
+✅ **Added `FindAndSetLocalPlayerId()` to `BoardView.Start`**:
+- Finds `NetworkPlayer` with `IsOwner == true`
+- Sets `LocalPlayerId` for correct perspective rendering
+
+**Remaining Blockers:**
+- Scene setup: `NetworkBoardState` must be added to scene with `CardLibrary` reference
+- Prefab: `CardView` prefab must exist and be assigned to `BoardView._cardViewPrefab`
+- Resources: `DeckData` assets must exist in `Resources/Decks`
 
 **Acceptance:** Can play card, appears on both clients in correct position. Old NetworkPlayer.CmdPlayCard is NOT called.
 
@@ -446,24 +500,55 @@ Assets/Scripts/
 
 ## Estimation
 
-| Phase | Effort | 
-|-------|--------|
-| Phase 1: Data Model | 1 hour |
-| Phase 2: NetworkBoardState | 2 hours |
-| Phase 3: View Layer | 2 hours |
-| Phase 4: Card Play | 2 hours |
-| Phase 5: Ability Targeting | 2 hours |
-| Phase 6: Migration | 2 hours |
-| Phase 7: Polish | 2 hours |
-| **Total** | **~13 hours** |
+| Phase | Estimate | Actual | Status |
+|-------|----------|--------|--------|
+| Phase 1: Data Model | 1 hour | ~1 hour | ✅ Complete |
+| Phase 2: NetworkBoardState | 2 hours | ~2 hours | ✅ Complete |
+| Phase 3: View Layer | 2 hours | ~2 hours | ✅ Complete |
+| Phase 4: Card Play | 2 hours | ~1.5 hours | 🟡 Code Complete |
+| Phase 5: Ability Targeting | 2 hours | - | ❌ TODO |
+| Phase 6: Delete Old Code | 2 hours | - | ❌ TODO |
+| Phase 7: Polish | 2 hours | - | ❌ TODO |
+| **Total** | **~13 hours** | **~6.5 hours** | **~50%** |
+
+---
+
+## Phase 4 Testing Checklist
+
+Before Phase 4 can be marked complete, verify the following:
+
+### Scene Setup
+- [ ] `NetworkBoardState` GameObject exists in EncounterScene
+- [ ] `NetworkBoardState` has `NetworkObject` component
+- [ ] `NetworkBoardState._cardLibrary` is assigned to CardLibrary
+- [ ] `BoardView` GameObject exists with slot transforms configured
+- [ ] `BoardView._cardViewPrefab` is assigned
+- [ ] `BoardView._cardLibrary` is assigned
+- [ ] `InputController` exists with `_boardView` and `_cardLibrary` assigned
+
+### Resources
+- [ ] At least one `DeckData` asset exists in `Resources/Decks/`
+- [ ] Deck has cards with valid `CardData.id` values
+- [ ] `CardData` assets exist in `Resources/Cards/` matching deck card IDs
+
+### Functional Test
+1. [ ] Start as Host
+2. [ ] Connect second client
+3. [ ] Verify `ServerStartGame()` calls `InitializeNetworkBoardState()`
+4. [ ] Verify console shows "Initializing NetworkBoardState" with deck info
+5. [ ] Verify both clients show cards in hand (BoardView renders from BoardState.Hand)
+6. [ ] Drag card from hand to empty slot
+7. [ ] Verify card appears in slot on BOTH clients
+8. [ ] Verify mana is deducted
+9. [ ] Verify console shows integer-based logging: `player=0, slot=1` (no magic strings)
 
 ---
 
 ## Open Questions
 
 1. **Keep CardController or fully replace?** 
-   - Could keep CardController as CardView, just remove state tracking
-   - Or create new CardView for cleaner break
+   - ✅ RESOLVED: Created new `CardView` for cleaner break
+   - Old `CardController` is deprecated, will be deleted in Phase 6
 
 2. **How to handle reconnection?**
    - NetworkBoardState needs to re-sync full state on reconnect

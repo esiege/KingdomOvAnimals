@@ -36,6 +36,12 @@ KingdomOvAnimals is a multiplayer card game built with Unity and FishNet network
 - `offensiveAbility` - AbilityData for attacks
 - `defensiveAbility` - AbilityData for defense/support
 
+### When Deprecating or Refactoring Code
+- **Always update editor scripts** - When deprecating classes or changing architecture, check `Assets/Scripts/Editor/` for scripts that reference the old code
+- **Use BoardStateSetupWindow** - The canonical setup tool is at `KOA → Board State Setup` - update it when adding new required components
+- **Check PlayerSpawner** - FishNet's `PlayerSpawner` needs `NetworkPlayer` prefab assigned, or players won't spawn
+- **Scene setup matters** - Many runtime errors come from missing scene setup (prefab assignments, component references)
+
 ## File Locations
 - **Data (ScriptableObjects)**: `Assets/Scripts/Data/`
 - **Model (pure data classes)**: `Assets/Scripts/Model/`

@@ -1,0 +1,376 @@
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using KOA.Data;
+
+/// <summary>
+/// Singleton that provides access to card data by ID.
+/// Used for looking up CardData assets from Resources/Cards.
+/// 
+/// NOTE: The old CardController prefab system is DEPRECATED.
+/// Use GetCardDataById() and GetCardById() instead of GetCardTemplate()/InstantiateCard().
+/// </summary>
+public class CardLibrary : MonoBehaviour
+{
+    public static CardLibrary Instance { get; private set; }
+    
+    [Header("Card Prefabs (DEPRECATED - Use CardData assets instead)")]
+    [Tooltip("DEPRECATED: All card prefabs. Use Resources/Cards CardData assets instead.")]
+    [System.Obsolete("Use CardData assets in Resources/Cards instead")]
+    public List<CardController> cardPrefabs = new List<CardController>();
+    
+    // Lookup dictionary built at runtime - stores original card templates (DEPRECATED)
+    [System.Obsolete("Use _cardDataLookup instead")]
+    private Dictionary<string, CardController> _cardLookup = new Dictionary<string, CardController>();
+    
+    // NEW: CardData and AbilityData lookups (loaded from Resources)
+    private Dictionary<string, CardData> _cardDataLookup = new Dictionary<string, CardData>();
+    private Dictionary<string, AbilityData> _abilityDataLookup = new Dictionary<string, AbilityData>();
+    private List<CardData> _allCardDataList = new List<CardData>();
+    private List<AbilityData> _allAbilityDataList = new List<AbilityData>();
+    
+    // Flag to track if we've auto-populated
+    private bool _hasPopulated = false;
+    
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Debug.Log("[CardLibrary] Duplicate instance found, destroying this one");
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        
+        BuildLookup();
+        LoadCardDataAssets();
+        LoadAbilityDataAssets();
+    }
+    
+    private void BuildLookup()
+    {
+        _cardLookup.Clear();
+        foreach (var card in cardPrefabs)
+        {
+            if (card != null && !string.IsNullOrEmpty(card.cardName))
+            {
+                if (!_cardLookup.ContainsKey(card.cardName))
+                {
+                    _cardLookup[card.cardName] = card;
+                    Debug.Log($"[CardLibrary] Registered card: {card.cardName}");
+                }
+                else
+                {
+                    Debug.LogWarning($"[CardLibrary] Duplicate card name: {card.cardName}");
+                }
+            }
+        }
+        if (_cardLookup.Count > 0)
+        {
+            Debug.Log($"[CardLibrary] Built lookup with {_cardLookup.Count} cards");
+        }
+    }
+    
+    /// <summary>
+    /// Load all CardData assets from Resources/Cards folder.
+    /// </summary>
+    private void LoadCardDataAssets()
+    {
+        _cardDataLookup.Clear();
+        _allCardDataList.Clear();
+        
+        var loadedCards = Resources.LoadAll<CardData>("Cards");
+        
+        foreach (var card in loadedCards)
+        {
+            string id = !string.IsNullOrEmpty(card.id) ? card.id : card.name;
+            
+            if (_cardDataLookup.ContainsKey(id))
+            {
+                Debug.LogWarning($"[CardLibrary] Duplicate CardData ID: {id}");
+                continue;
+            }
+            
+            _cardDataLookup[id] = card;
+            _allCardDataList.Add(card);
+        }
+        
+        if (_cardDataLookup.Count > 0)
+        {
+            Debug.Log($"[CardLibrary] Loaded {_cardDataLookup.Count} CardData assets from Resources/Cards");
+        }
+    }
+    
+    /// <summary>
+    /// Load all AbilityData assets from Resources/Abilities folder.
+    /// </summary>
+    private void LoadAbilityDataAssets()
+    {
+        _abilityDataLookup.Clear();
+        _allAbilityDataList.Clear();
+        
+        var loadedAbilities = Resources.LoadAll<AbilityData>("Abilities");
+        
+        foreach (var ability in loadedAbilities)
+        {
+            string id = !string.IsNullOrEmpty(ability.id) ? ability.id : ability.name;
+            
+            if (_abilityDataLookup.ContainsKey(id))
+            {
+                Debug.LogWarning($"[CardLibrary] Duplicate AbilityData ID: {id}");
+                continue;
+            }
+            
+            _abilityDataLookup[id] = ability;
+            _allAbilityDataList.Add(ability);
+        }
+        
+        if (_abilityDataLookup.Count > 0)
+        {
+            Debug.Log($"[CardLibrary] Loaded {_abilityDataLookup.Count} AbilityData assets from Resources/Abilities");
+        }
+    }
+    
+    /// <summary>
+    /// DEPRECATED: Get a card prefab/template by name.
+    /// Use GetCardDataById() instead.
+    /// </summary>
+    [System.Obsolete("Use GetCardDataById() instead")]
+    public CardController GetCardTemplate(string cardName)
+    {
+        #pragma warning disable CS0612 // Suppress obsolete warning
+        if (_cardLookup.TryGetValue(cardName, out CardController card))
+        {
+            return card;
+        }
+        #pragma warning restore CS0612
+        Debug.LogWarning($"[CardLibrary] Card not found: {cardName}");
+        return null;
+    }
+    
+    /// <summary>
+    /// DEPRECATED: Instantiate a card by name.
+    /// Use GetCardDataById() and CardView instead.
+    /// </summary>
+    [System.Obsolete("Use GetCardDataById() and CardView instead")]
+    public CardController InstantiateCard(string cardName, Transform parent = null)
+    {
+        #pragma warning disable CS0612 // Suppress obsolete warning
+        CardController template = GetCardTemplate(cardName);
+        #pragma warning restore CS0612
+        if (template == null) return null;
+        
+        GameObject cardObj = Instantiate(template.gameObject, parent);
+        return cardObj.GetComponent<CardController>();
+    }
+    
+    /// <summary>
+    /// Check if a card exists in the library.
+    /// </summary>
+    public bool HasCard(string cardName)
+    {
+        return _cardLookup.ContainsKey(cardName);
+    }
+    
+    /// <summary>
+    /// Get all registered card names.
+    /// </summary>
+    public IEnumerable<string> GetAllCardNames()
+    {
+        return _cardLookup.Keys;
+    }
+    
+    /// <summary>
+    /// Get all registered cards.
+    /// </summary>
+    public Dictionary<string, CardController>.ValueCollection GetAllCards()
+    {
+        return _cardLookup.Values;
+    }
+    
+    #region CardData API (New System)
+    
+    /// <summary>
+    /// Get a CardData asset by its unique ID.
+    /// </summary>
+    public CardData GetCardDataById(string id)
+    {
+        if (_cardDataLookup.TryGetValue(id, out var cardData))
+        {
+            return cardData;
+        }
+        return null;
+    }
+    
+    /// <summary>
+    /// Alias for GetCardDataById - used by new Model/View system.
+    /// </summary>
+    public CardData GetCardById(string id) => GetCardDataById(id);
+    
+    /// <summary>
+    /// Get an AbilityData asset by its unique ID.
+    /// </summary>
+    public AbilityData GetAbilityDataById(string id)
+    {
+        if (_abilityDataLookup.TryGetValue(id, out var abilityData))
+        {
+            return abilityData;
+        }
+        return null;
+    }
+    
+    /// <summary>
+    /// Get all loaded CardData assets.
+    /// </summary>
+    public List<CardData> GetAllCardData()
+    {
+        return new List<CardData>(_allCardDataList);
+    }
+    
+    /// <summary>
+    /// Get all loaded AbilityData assets.
+    /// </summary>
+    public List<AbilityData> GetAllAbilityData()
+    {
+        return new List<AbilityData>(_allAbilityDataList);
+    }
+    
+    /// <summary>
+    /// Get CardData assets filtered by type.
+    /// </summary>
+    public List<CardData> GetCardDataByType(CardType type)
+    {
+        return _allCardDataList.Where(c => c.cardType == type).ToList();
+    }
+    
+    /// <summary>
+    /// Check if a CardData exists.
+    /// </summary>
+    public bool HasCardData(string id)
+    {
+        return _cardDataLookup.ContainsKey(id);
+    }
+    
+    /// <summary>
+    /// Check if an AbilityData exists.
+    /// </summary>
+    public bool HasAbilityData(string id)
+    {
+        return _abilityDataLookup.ContainsKey(id);
+    }
+    
+    /// <summary>
+    /// Get count of loaded CardData assets.
+    /// </summary>
+    public int CardDataCount => _cardDataLookup.Count;
+    
+    /// <summary>
+    /// Get count of loaded AbilityData assets.
+    /// </summary>
+    public int AbilityDataCount => _abilityDataLookup.Count;
+    
+    /// <summary>
+    /// Reload CardData and AbilityData from Resources (useful for editor).
+    /// </summary>
+    public void ReloadDataAssets()
+    {
+        LoadCardDataAssets();
+        LoadAbilityDataAssets();
+    }
+    
+    #endregion
+    
+    /// <summary>
+    /// Auto-populate the library from existing decks in the scene.
+    /// Should be called early in game startup (e.g., from EncounterController).
+    /// </summary>
+    public void AutoPopulateFromScene()
+    {
+        if (_hasPopulated)
+        {
+            Debug.Log("[CardLibrary] Already populated, skipping");
+            return;
+        }
+        
+        // Find all PlayerControllers and gather their deck cards
+        PlayerController[] players = FindObjectsOfType<PlayerController>();
+        Debug.Log($"[CardLibrary] Found {players.Length} PlayerController(s)");
+        
+        foreach (var player in players)
+        {
+            Debug.Log($"[CardLibrary] Checking {player.name}: deck={(player.deck != null ? player.deck.Count.ToString() : "null")}, board={(player.board != null ? player.board.Count.ToString() : "null")}");
+            
+            // Deck now contains CardData assets - no need to extract from there
+            // CardData is loaded from Resources/Cards in LoadCardDataAssets()
+            
+            // Check board for instantiated cards that might already be in play
+            if (player.board != null)
+            {
+                foreach (var card in player.board)
+                {
+                    if (card != null && !string.IsNullOrEmpty(card.cardName))
+                    {
+                        if (!_cardLookup.ContainsKey(card.cardName))
+                        {
+                            // Store a reference to the original card as a "template"
+                            _cardLookup[card.cardName] = card;
+                            Debug.Log($"[CardLibrary] Auto-registered card from board: {card.cardName}");
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Fallback: If still no cards found, search ALL CardControllers in the scene
+        if (_cardLookup.Count == 0)
+        {
+            Debug.Log("[CardLibrary] No cards found in PlayerController decks, searching all CardControllers...");
+            CardController[] allCards = FindObjectsOfType<CardController>(true); // Include inactive
+            Debug.Log($"[CardLibrary] Found {allCards.Length} CardController(s) in scene");
+            
+            foreach (var card in allCards)
+            {
+                if (card != null && !string.IsNullOrEmpty(card.cardName))
+                {
+                    if (!_cardLookup.ContainsKey(card.cardName))
+                    {
+                        _cardLookup[card.cardName] = card;
+                        Debug.Log($"[CardLibrary] Fallback registered: {card.cardName}");
+                    }
+                }
+            }
+        }
+        
+        _hasPopulated = true;
+        Debug.Log($"[CardLibrary] Auto-populate complete. Total cards: {_cardLookup.Count}");
+    }
+    
+    /// <summary>
+    /// Force re-population (useful for reconnection scenarios).
+    /// </summary>
+    public void ForceRepopulate()
+    {
+        _hasPopulated = false;
+        _cardLookup.Clear();
+        AutoPopulateFromScene();
+    }
+    
+    /// <summary>
+    /// Ensure the library is ready. Call this before using.
+    /// </summary>
+    public static void EnsureInitialized()
+    {
+        if (Instance == null)
+        {
+            // Create the CardLibrary if it doesn't exist
+            var go = new GameObject("CardLibrary");
+            Instance = go.AddComponent<CardLibrary>();
+        }
+        
+        if (!Instance._hasPopulated)
+        {
+            Instance.AutoPopulateFromScene();
+        }
+    }
+}

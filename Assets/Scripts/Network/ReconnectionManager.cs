@@ -9,6 +9,9 @@ using UnityEngine;
 /// Static reconnection manager that handles client reconnection attempts.
 /// This survives MonoBehaviour destruction because it uses static state
 /// and Unity's EditorApplication hooks.
+/// 
+/// Story 036: GameStateSnapshot removed - reconnection will use NetworkBoardState.
+/// State is now preserved via NetworkBoardState SyncVar, no snapshot needed.
 /// </summary>
 public static class ReconnectionManager
 {
@@ -20,7 +23,6 @@ public static class ReconnectionManager
     private static float _attemptInterval = 3f;
     private static string _serverAddress;
     private static ushort _serverPort;
-    private static GameStateSnapshot _savedState;
     private static NetworkManager _networkManager;
     
     // Logging
@@ -28,7 +30,6 @@ public static class ReconnectionManager
     private static bool _initialized = false;
     
     public static bool IsWaitingForReconnect => _isWaitingForReconnect;
-    public static GameStateSnapshot SavedState => _savedState;
     
     /// <summary>
     /// Initialize the reconnection manager. Call this early in the game.
@@ -78,15 +79,15 @@ public static class ReconnectionManager
     
     /// <summary>
     /// Start waiting for reconnection after host disconnects.
+    /// Note: With Story 036 architecture, NetworkBoardState will re-sync state on reconnect.
     /// </summary>
-    public static void StartReconnectionWait(NetworkManager networkManager, string address, ushort port, GameStateSnapshot savedState)
+    public static void StartReconnectionWait(NetworkManager networkManager, string address, ushort port)
     {
-        Log($"StartReconnectionWait called: address={address}:{port}, savedState={(savedState != null ? "exists" : "null")}");
+        Log($"StartReconnectionWait called: address={address}:{port}");
         
         _networkManager = networkManager;
         _serverAddress = address;
         _serverPort = port;
-        _savedState = savedState;
         _isWaitingForReconnect = true;
         _reconnectStartTime = Time.realtimeSinceStartup;
         _lastAttemptTime = _reconnectStartTime;
@@ -101,26 +102,15 @@ public static class ReconnectionManager
     {
         Log($"StopReconnectionWait called: reason={reason}");
         _isWaitingForReconnect = false;
-        _savedState = null;
     }
     
     /// <summary>
-    /// Called when successfully reconnected. Clears the saved state.
+    /// Called when successfully reconnected.
     /// </summary>
     public static void OnReconnected()
     {
-        Log("OnReconnected called - clearing saved state");
+        Log("OnReconnected called");
         _isWaitingForReconnect = false;
-        // Keep _savedState until it's been used by PlayerConnectionHandler
-    }
-    
-    /// <summary>
-    /// Clear the saved state after it's been used.
-    /// </summary>
-    public static void ClearSavedState()
-    {
-        Log("ClearSavedState called");
-        _savedState = null;
     }
     
 #if UNITY_EDITOR
@@ -145,8 +135,6 @@ public static class ReconnectionManager
         {
             Log($"Grace period expired after {elapsed:F1}s");
             _isWaitingForReconnect = false;
-            _savedState = null;
-            // Note: UI update would need to happen via PlayerConnectionHandler if it still exists
             return;
         }
         

@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using KOA.Data;
-using KOA.Effects;
 using KOA.Abilities;
 
 namespace KOA.UI
@@ -144,14 +143,13 @@ namespace KOA.UI
         {
             effectPrefabs.Clear();
             
-            // Load all prefabs with AbilityEffect component from Resources/Effects
+            // NOTE: AbilityEffect system deprecated in Story 036
+            // Effect prefabs are no longer used - abilities use AbilityBehavior instead
             var loadedPrefabs = Resources.LoadAll<GameObject>("Effects");
             foreach (var prefab in loadedPrefabs)
             {
-                if (prefab.GetComponent<AbilityEffect>() != null)
-                {
-                    effectPrefabs.Add(prefab);
-                }
+                // Just add all prefabs from Effects folder
+                effectPrefabs.Add(prefab);
             }
             
             Debug.Log($"[AbilityEditor] Loaded {effectPrefabs.Count} effect prefabs");

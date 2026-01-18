@@ -1,14 +1,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using KOA.Network;
-using KOA.Model;
 
 /// <summary>
 /// Captures complete state of a disconnected player for reconnection.
 /// Used by the Despawn/Respawn reconnection pattern.
-/// 
-/// NOTE: Now captures state from NetworkBoardState instead of deprecated PlayerController/HandController.
 /// </summary>
 [Serializable]
 public class DisconnectedPlayerState
@@ -21,13 +17,13 @@ public class DisconnectedPlayerState
     // Turn state
     public bool wasTheirTurn; // Was it this player's turn when they disconnected?
     
-    // Game state (from NetworkPlayer)
+    // Game state
     public int health;
     public int maxHealth;
     public int mana;
     public int maxMana;
     
-    // Cards (captured from NetworkBoardState)
+    // Cards
     public List<string> handCardIds = new List<string>();
     public List<BoardCardSnapshot> boardCards = new List<BoardCardSnapshot>();
     public List<string> deckCardIds = new List<string>();
@@ -37,10 +33,10 @@ public class DisconnectedPlayerState
     public float disconnectTime;
     
     /// <summary>
-    /// Capture state from a NetworkPlayer and NetworkBoardState.
+    /// Capture state from a NetworkPlayer and its linked PlayerController.
     /// Called on server when a player disconnects.
     /// </summary>
-    public static DisconnectedPlayerState Capture(KOA.Network.NetworkPlayer networkPlayer)
+    public static DisconnectedPlayerState Capture(NetworkPlayer networkPlayer)
     {
         if (networkPlayer == null)
         {
@@ -68,59 +64,80 @@ public class DisconnectedPlayerState
             disconnectTime = Time.time
         };
         
-        // Capture cards from NetworkBoardState (new system)
-        if (NetworkBoardState.Instance != null)
+        // Capture cards from LinkedPlayerController if available
+        var controller = networkPlayer.LinkedPlayerController;
+        if (controller != null)
         {
-            var boardState = NetworkBoardState.Instance.GetState();
-            var playerState = boardState.GetPlayer(state.playerId);
-            
-            if (playerState != null)
+            // Capture hand
+            var handController = networkPlayer.GetHandController();
+            if (handController != null)
             {
-                // Capture hand card IDs
-                foreach (var card in playerState.Hand)
+                var hand = handController.GetHand();
+                if (hand != null)
                 {
-                    state.handCardIds.Add(card.CardDataId);
+                    foreach (var card in hand)
+                    {
+                        if (card != null)
+                        {
+                            state.handCardIds.Add(card.cardName);
+                        }
+                    }
                 }
-                
-                // Capture board cards with full state
-                for (int slotIndex = 0; slotIndex < playerState.Board.Length; slotIndex++)
+            }
+            
+            // Capture board
+            if (controller.board != null)
+            {
+                for (int i = 0; i < controller.board.Count; i++)
                 {
-                    var card = playerState.Board[slotIndex];
+                    var card = controller.board[i];
                     if (card != null)
                     {
-                        // Get base stats from CardData for snapshot
-                        var cardData = CardLibrary.Instance?.GetCardById(card.CardDataId);
+                        string slotName = card.transform.parent != null ? card.transform.parent.name : "";
+                        
                         state.boardCards.Add(new BoardCardSnapshot
                         {
-                            slotIndex = slotIndex,
-                            slotName = $"Slot-{slotIndex}", // New system uses indices
-                            cardId = card.CardDataId,
-                            currentHealth = card.CurrentHealth,
-                            maxHealth = cardData?.health ?? card.CurrentHealth,
-                            currentAttack = cardData?.offensiveAbility?.damage ?? 0,
-                            hasAttacked = card.IsTapped,
-                            hasSummoningSickness = card.HasSummoningSickness,
-                            canAttack = card.CanAct
+                            slotIndex = i,
+                            slotName = slotName,
+                            cardId = card.cardName,
+                            currentHealth = card.health,
+                            maxHealth = card.health,
+                            currentAttack = card.manaCost,
+                            hasAttacked = card.isTapped,
+                            hasSummoningSickness = card.hasSummoningSickness,
+                            canAttack = !card.hasSummoningSickness && !card.isTapped
                         });
                     }
                 }
-                
-                // Capture deck card IDs
-                foreach (var cardId in playerState.Deck)
-                {
-                    state.deckCardIds.Add(cardId);
-                }
-                
-                // TODO: Capture graveyard when implemented in BoardState
             }
-            else
+            
+            // Capture deck (now CardData)
+            if (controller.deck != null)
             {
-                Debug.LogWarning($"[DisconnectedPlayerState] PlayerBoardState not found for player {state.playerId}");
+                foreach (var cardData in controller.deck)
+                {
+                    if (cardData != null)
+                    {
+                        state.deckCardIds.Add(cardData.id ?? cardData.displayName);
+                    }
+                }
+            }
+            
+            // Capture graveyard
+            if (controller.graveyard != null)
+            {
+                foreach (var card in controller.graveyard)
+                {
+                    if (card != null)
+                    {
+                        state.graveyardCardIds.Add(card.cardName);
+                    }
+                }
             }
         }
         else
         {
-            Debug.LogWarning($"[DisconnectedPlayerState] NetworkBoardState is null - card state not captured");
+            Debug.LogWarning($"[DisconnectedPlayerState] LinkedPlayerController is null for player {state.playerId}. Card state not captured.");
         }
         
         Debug.Log($"[DisconnectedPlayerState] Captured state for player {state.playerId} (ObjectId={state.oldObjectId}): " +
@@ -138,21 +155,4 @@ public class DisconnectedPlayerState
     {
         return (Time.time - disconnectTime) > gracePeriodSeconds;
     }
-}
-
-/// <summary>
-/// Snapshot of a card on the board for reconnection state.
-/// </summary>
-[Serializable]
-public class BoardCardSnapshot
-{
-    public int slotIndex;
-    public string slotName;
-    public string cardId;
-    public int currentHealth;
-    public int maxHealth;
-    public int currentAttack;
-    public bool hasAttacked;
-    public bool hasSummoningSickness;
-    public bool canAttack;
 }

@@ -377,6 +377,9 @@ namespace KOA.View
         
         private void Start()
         {
+            // Find local player ID from network
+            FindAndSetLocalPlayerId();
+            
             // Subscribe to NetworkBoardState events
             if (NetworkBoardState.Instance != null)
             {
@@ -388,6 +391,38 @@ namespace KOA.View
                 // Initial render
                 RenderBoard(NetworkBoardState.Instance.GetState());
             }
+        }
+        
+        /// <summary>
+        /// Find the local NetworkPlayer and set LocalPlayerId.
+        /// </summary>
+        private void FindAndSetLocalPlayerId()
+        {
+            // Find all NetworkPlayers and look for the one we own
+            var networkPlayers = FindObjectsOfType<KOA.Network.NetworkPlayer>();
+            foreach (var np in networkPlayers)
+            {
+                if (np.IsOwner)
+                {
+                    LocalPlayerId = np.PlayerId.Value;
+                    Debug.Log($"[BoardView] Found local NetworkPlayer with PlayerId {LocalPlayerId}");
+                    return;
+                }
+            }
+            
+            // Fallback: check NetworkGameManager
+            if (NetworkGameManager.Instance != null)
+            {
+                var localNp = NetworkGameManager.Instance.GetLocalPlayer();
+                if (localNp != null)
+                {
+                    LocalPlayerId = localNp.PlayerId.Value;
+                    Debug.Log($"[BoardView] Got LocalPlayerId {LocalPlayerId} from NetworkGameManager");
+                    return;
+                }
+            }
+            
+            Debug.LogWarning("[BoardView] Could not find local NetworkPlayer - defaulting to player 0");
         }
         
         private void OnDestroy()

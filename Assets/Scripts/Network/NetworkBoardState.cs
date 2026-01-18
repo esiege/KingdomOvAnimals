@@ -11,6 +11,7 @@ namespace KOA.Network
     /// <summary>
     /// Network-synchronized board state. This is the single source of truth for all game state.
     /// Server authoritative - only server modifies state, clients receive updates.
+    /// Phase 6 cleanup complete - January 18, 2026.
     /// </summary>
     public class NetworkBoardState : NetworkBehaviour
     {

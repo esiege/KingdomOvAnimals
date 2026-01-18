@@ -1,20 +1,30 @@
 using UnityEngine;
 
+/// <summary>
+/// UI button to end the current turn.
+/// Works with NetworkGameManager for turn management.
+/// Story 036: Simplified - no longer references deprecated EncounterController.
+/// </summary>
 public class EndTurnController : MonoBehaviour
 {
-    public EncounterController encounterController;  // Reference to the EncounterController
-
     // This is called when the mouse clicks on the sprite
     private void OnMouseDown()
     {
+        // Use NetworkGameManager for turn checks
+        if (NetworkGameManager.Instance == null)
+        {
+            Debug.LogWarning("[EndTurnController] NetworkGameManager not found!");
+            return;
+        }
+        
         // Check if it's the local player's turn before allowing end turn
-        if (encounterController != null && !encounterController.IsLocalPlayerTurn())
+        if (!NetworkGameManager.Instance.IsLocalPlayerTurn())
         {
             Debug.Log("[EndTurnController] Cannot end turn - not your turn!");
             return;
         }
         
-        // Call the endTurn method in the EncounterController
-        encounterController.EndTurn();
+        // Request end turn via network
+        NetworkGameManager.Instance.RequestEndTurn();
     }
 }
