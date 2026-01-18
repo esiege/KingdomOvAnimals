@@ -14,7 +14,7 @@ public class DataDrivenCardSetup : EditorWindow
     private List<CardData> cardDataAssets = new List<CardData>();
     private bool autoFindAssets = true;
     
-    [MenuItem("Tools/KingdomOvAnimals/Setup Data-Driven Cards")]
+    [MenuItem("KOA/Data/Setup Data-Driven Cards")]
     public static void ShowWindow()
     {
         var window = GetWindow<DataDrivenCardSetup>("Card Setup");

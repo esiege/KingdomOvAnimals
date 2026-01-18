@@ -10,7 +10,7 @@ using System.IO;
 /// </summary>
 public class NetworkSceneSetup : EditorWindow
 {
-    [MenuItem("Tools/KingdomOvAnimals/Setup Network Scene")]
+    [MenuItem("KOA/Scene Setup/Setup Network Scene")]
     public static void ShowWindow()
     {
         GetWindow<NetworkSceneSetup>("Network Scene Setup");

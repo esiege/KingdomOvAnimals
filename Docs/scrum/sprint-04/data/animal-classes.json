@@ -1,0 +1,1502 @@
+{
+  "version": "1.0.0",
+  "description": "107 animal classes for Kingdom Ov Animals adventure mode. Uses taxonomic Orders and colloquial groupings for player-friendly selection.",
+  "note": "Each 'class' represents a thematic animal grouping. Children are representative species/examples for card generation.",
+  "classes": [
+    {
+      "id": "canidae",
+      "scientificName": "Canidae",
+      "commonName": "Dogs & Wolves",
+      "category": "Mammals",
+      "description": "Pack hunters known for loyalty and teamwork",
+      "children": [
+        { "scientificName": "Canis lupus", "commonName": "Gray Wolf" },
+        { "scientificName": "Canis familiaris", "commonName": "Domestic Dog" },
+        { "scientificName": "Vulpes vulpes", "commonName": "Red Fox" },
+        { "scientificName": "Canis latrans", "commonName": "Coyote" },
+        { "scientificName": "Lycaon pictus", "commonName": "African Wild Dog" },
+        { "scientificName": "Vulpes zerda", "commonName": "Fennec Fox" }
+      ]
+    },
+    {
+      "id": "felidae",
+      "scientificName": "Felidae",
+      "commonName": "Cats",
+      "category": "Mammals",
+      "description": "Stealthy predators with keen senses",
+      "children": [
+        { "scientificName": "Panthera leo", "commonName": "Lion" },
+        { "scientificName": "Panthera tigris", "commonName": "Tiger" },
+        { "scientificName": "Panthera pardus", "commonName": "Leopard" },
+        { "scientificName": "Acinonyx jubatus", "commonName": "Cheetah" },
+        { "scientificName": "Panthera onca", "commonName": "Jaguar" },
+        { "scientificName": "Puma concolor", "commonName": "Mountain Lion" }
+      ]
+    },
+    {
+      "id": "ursidae",
+      "scientificName": "Ursidae",
+      "commonName": "Bears",
+      "category": "Mammals",
+      "description": "Powerful omnivores with great strength",
+      "children": [
+        { "scientificName": "Ursus arctos", "commonName": "Brown Bear" },
+        { "scientificName": "Ursus maritimus", "commonName": "Polar Bear" },
+        { "scientificName": "Ursus americanus", "commonName": "Black Bear" },
+        { "scientificName": "Ailuropoda melanoleuca", "commonName": "Giant Panda" },
+        { "scientificName": "Tremarctos ornatus", "commonName": "Spectacled Bear" },
+        { "scientificName": "Melursus ursinus", "commonName": "Sloth Bear" }
+      ]
+    },
+    {
+      "id": "mustelidae",
+      "scientificName": "Mustelidae",
+      "commonName": "Weasels & Otters",
+      "category": "Mammals",
+      "description": "Agile hunters with fierce determination",
+      "children": [
+        { "scientificName": "Mustela nivalis", "commonName": "Least Weasel" },
+        { "scientificName": "Enhydra lutris", "commonName": "Sea Otter" },
+        { "scientificName": "Gulo gulo", "commonName": "Wolverine" },
+        { "scientificName": "Meles meles", "commonName": "European Badger" },
+        { "scientificName": "Martes americana", "commonName": "American Marten" },
+        { "scientificName": "Lutra lutra", "commonName": "European Otter" }
+      ]
+    },
+    {
+      "id": "procyonidae",
+      "scientificName": "Procyonidae",
+      "commonName": "Raccoons",
+      "category": "Mammals",
+      "description": "Clever opportunists with dexterous paws",
+      "children": [
+        { "scientificName": "Procyon lotor", "commonName": "Raccoon" },
+        { "scientificName": "Nasua nasua", "commonName": "Coati" },
+        { "scientificName": "Potos flavus", "commonName": "Kinkajou" },
+        { "scientificName": "Bassariscus astutus", "commonName": "Ringtail" }
+      ]
+    },
+    {
+      "id": "hyaenidae",
+      "scientificName": "Hyaenidae",
+      "commonName": "Hyenas",
+      "category": "Mammals",
+      "description": "Social scavengers with powerful jaws",
+      "children": [
+        { "scientificName": "Crocuta crocuta", "commonName": "Spotted Hyena" },
+        { "scientificName": "Hyaena brunnea", "commonName": "Brown Hyena" },
+        { "scientificName": "Hyaena hyaena", "commonName": "Striped Hyena" },
+        { "scientificName": "Proteles cristata", "commonName": "Aardwolf" }
+      ]
+    },
+    {
+      "id": "elephantidae",
+      "scientificName": "Elephantidae",
+      "commonName": "Elephants",
+      "category": "Mammals",
+      "description": "Wise giants with unmatched memory",
+      "children": [
+        { "scientificName": "Loxodonta africana", "commonName": "African Bush Elephant" },
+        { "scientificName": "Loxodonta cyclotis", "commonName": "African Forest Elephant" },
+        { "scientificName": "Elephas maximus", "commonName": "Asian Elephant" }
+      ]
+    },
+    {
+      "id": "rhinocerotidae",
+      "scientificName": "Rhinocerotidae",
+      "commonName": "Rhinos",
+      "category": "Mammals",
+      "description": "Armored titans with devastating charges",
+      "children": [
+        { "scientificName": "Ceratotherium simum", "commonName": "White Rhinoceros" },
+        { "scientificName": "Diceros bicornis", "commonName": "Black Rhinoceros" },
+        { "scientificName": "Rhinoceros unicornis", "commonName": "Indian Rhinoceros" },
+        { "scientificName": "Dicerorhinus sumatrensis", "commonName": "Sumatran Rhinoceros" }
+      ]
+    },
+    {
+      "id": "hippopotamidae",
+      "scientificName": "Hippopotamidae",
+      "commonName": "Hippos",
+      "category": "Mammals",
+      "description": "Territorial river guardians",
+      "children": [
+        { "scientificName": "Hippopotamus amphibius", "commonName": "Common Hippopotamus" },
+        { "scientificName": "Choeropsis liberiensis", "commonName": "Pygmy Hippopotamus" }
+      ]
+    },
+    {
+      "id": "suidae",
+      "scientificName": "Suidae",
+      "commonName": "Pigs & Boars",
+      "category": "Mammals",
+      "description": "Resourceful foragers with tusks",
+      "children": [
+        { "scientificName": "Sus scrofa", "commonName": "Wild Boar" },
+        { "scientificName": "Phacochoerus africanus", "commonName": "Common Warthog" },
+        { "scientificName": "Potamochoerus porcus", "commonName": "Red River Hog" },
+        { "scientificName": "Babyrousa babyrussa", "commonName": "Babirusa" }
+      ]
+    },
+    {
+      "id": "cervidae",
+      "scientificName": "Cervidae",
+      "commonName": "Deer",
+      "category": "Mammals",
+      "description": "Swift runners with majestic antlers",
+      "children": [
+        { "scientificName": "Cervus elaphus", "commonName": "Red Deer" },
+        { "scientificName": "Odocoileus virginianus", "commonName": "White-tailed Deer" },
+        { "scientificName": "Alces alces", "commonName": "Moose" },
+        { "scientificName": "Rangifer tarandus", "commonName": "Reindeer" },
+        { "scientificName": "Dama dama", "commonName": "Fallow Deer" },
+        { "scientificName": "Muntiacus reevesi", "commonName": "Muntjac" }
+      ]
+    },
+    {
+      "id": "bovidae_cattle",
+      "scientificName": "Bovidae (Bovinae)",
+      "commonName": "Cattle & Bison",
+      "category": "Mammals",
+      "description": "Mighty herd animals with horns",
+      "children": [
+        { "scientificName": "Bos taurus", "commonName": "Domestic Cattle" },
+        { "scientificName": "Bison bison", "commonName": "American Bison" },
+        { "scientificName": "Bos grunniens", "commonName": "Yak" },
+        { "scientificName": "Syncerus caffer", "commonName": "African Buffalo" },
+        { "scientificName": "Bubalus bubalis", "commonName": "Water Buffalo" }
+      ]
+    },
+    {
+      "id": "bovidae_antelope",
+      "scientificName": "Bovidae (Antilopinae)",
+      "commonName": "Antelopes",
+      "category": "Mammals",
+      "description": "Graceful runners of the plains",
+      "children": [
+        { "scientificName": "Antilope cervicapra", "commonName": "Blackbuck" },
+        { "scientificName": "Oryx gazella", "commonName": "Gemsbok" },
+        { "scientificName": "Aepyceros melampus", "commonName": "Impala" },
+        { "scientificName": "Connochaetes taurinus", "commonName": "Blue Wildebeest" },
+        { "scientificName": "Gazella thomsonii", "commonName": "Thomson's Gazelle" },
+        { "scientificName": "Addax nasomaculatus", "commonName": "Addax" }
+      ]
+    },
+    {
+      "id": "bovidae_goat",
+      "scientificName": "Bovidae (Caprinae)",
+      "commonName": "Goats & Sheep",
+      "category": "Mammals",
+      "description": "Sure-footed mountain climbers",
+      "children": [
+        { "scientificName": "Capra aegagrus", "commonName": "Wild Goat" },
+        { "scientificName": "Ovis aries", "commonName": "Domestic Sheep" },
+        { "scientificName": "Capra ibex", "commonName": "Alpine Ibex" },
+        { "scientificName": "Ovis canadensis", "commonName": "Bighorn Sheep" },
+        { "scientificName": "Oreamnos americanus", "commonName": "Mountain Goat" },
+        { "scientificName": "Rupicapra rupicapra", "commonName": "Chamois" }
+      ]
+    },
+    {
+      "id": "giraffidae",
+      "scientificName": "Giraffidae",
+      "commonName": "Giraffes & Okapi",
+      "category": "Mammals",
+      "description": "Towering browsers with long necks",
+      "children": [
+        { "scientificName": "Giraffa camelopardalis", "commonName": "Giraffe" },
+        { "scientificName": "Okapia johnstoni", "commonName": "Okapi" }
+      ]
+    },
+    {
+      "id": "camelidae",
+      "scientificName": "Camelidae",
+      "commonName": "Camels & Llamas",
+      "category": "Mammals",
+      "description": "Desert and mountain survivors",
+      "children": [
+        { "scientificName": "Camelus dromedarius", "commonName": "Dromedary Camel" },
+        { "scientificName": "Camelus bactrianus", "commonName": "Bactrian Camel" },
+        { "scientificName": "Lama glama", "commonName": "Llama" },
+        { "scientificName": "Vicugna pacos", "commonName": "Alpaca" },
+        { "scientificName": "Vicugna vicugna", "commonName": "Vicuña" }
+      ]
+    },
+    {
+      "id": "equidae",
+      "scientificName": "Equidae",
+      "commonName": "Horses & Zebras",
+      "category": "Mammals",
+      "description": "Swift runners of the open plains",
+      "children": [
+        { "scientificName": "Equus caballus", "commonName": "Horse" },
+        { "scientificName": "Equus quagga", "commonName": "Plains Zebra" },
+        { "scientificName": "Equus africanus asinus", "commonName": "Donkey" },
+        { "scientificName": "Equus przewalskii", "commonName": "Przewalski's Horse" },
+        { "scientificName": "Equus grevyi", "commonName": "Grevy's Zebra" }
+      ]
+    },
+    {
+      "id": "tapiridae",
+      "scientificName": "Tapiridae",
+      "commonName": "Tapirs",
+      "category": "Mammals",
+      "description": "Gentle forest dwellers with prehensile snouts",
+      "children": [
+        { "scientificName": "Tapirus terrestris", "commonName": "South American Tapir" },
+        { "scientificName": "Tapirus indicus", "commonName": "Malayan Tapir" },
+        { "scientificName": "Tapirus bairdii", "commonName": "Baird's Tapir" },
+        { "scientificName": "Tapirus pinchaque", "commonName": "Mountain Tapir" }
+      ]
+    },
+    {
+      "id": "primates_great_apes",
+      "scientificName": "Hominidae",
+      "commonName": "Great Apes",
+      "category": "Mammals",
+      "description": "Intelligent primates with complex societies",
+      "children": [
+        { "scientificName": "Pan troglodytes", "commonName": "Chimpanzee" },
+        { "scientificName": "Pan paniscus", "commonName": "Bonobo" },
+        { "scientificName": "Gorilla gorilla", "commonName": "Western Gorilla" },
+        { "scientificName": "Pongo pygmaeus", "commonName": "Bornean Orangutan" },
+        { "scientificName": "Pongo abelii", "commonName": "Sumatran Orangutan" }
+      ]
+    },
+    {
+      "id": "primates_monkeys_old",
+      "scientificName": "Cercopithecidae",
+      "commonName": "Old World Monkeys",
+      "category": "Mammals",
+      "description": "Agile primates of Africa and Asia",
+      "children": [
+        { "scientificName": "Papio anubis", "commonName": "Olive Baboon" },
+        { "scientificName": "Macaca mulatta", "commonName": "Rhesus Macaque" },
+        { "scientificName": "Mandrillus sphinx", "commonName": "Mandrill" },
+        { "scientificName": "Nasalis larvatus", "commonName": "Proboscis Monkey" },
+        { "scientificName": "Colobus guereza", "commonName": "Colobus Monkey" }
+      ]
+    },
+    {
+      "id": "primates_monkeys_new",
+      "scientificName": "Cebidae",
+      "commonName": "New World Monkeys",
+      "category": "Mammals",
+      "description": "Acrobatic primates of the Americas",
+      "children": [
+        { "scientificName": "Cebus capucinus", "commonName": "White-faced Capuchin" },
+        { "scientificName": "Alouatta caraya", "commonName": "Howler Monkey" },
+        { "scientificName": "Ateles geoffroyi", "commonName": "Spider Monkey" },
+        { "scientificName": "Saimiri sciureus", "commonName": "Squirrel Monkey" },
+        { "scientificName": "Callithrix jacchus", "commonName": "Common Marmoset" }
+      ]
+    },
+    {
+      "id": "lemuridae",
+      "scientificName": "Lemuridae",
+      "commonName": "Lemurs",
+      "category": "Mammals",
+      "description": "Mystical primates of Madagascar",
+      "children": [
+        { "scientificName": "Lemur catta", "commonName": "Ring-tailed Lemur" },
+        { "scientificName": "Varecia variegata", "commonName": "Black-and-white Ruffed Lemur" },
+        { "scientificName": "Eulemur fulvus", "commonName": "Brown Lemur" },
+        { "scientificName": "Indri indri", "commonName": "Indri" },
+        { "scientificName": "Daubentonia madagascariensis", "commonName": "Aye-aye" }
+      ]
+    },
+    {
+      "id": "cetacea_dolphins",
+      "scientificName": "Delphinidae",
+      "commonName": "Dolphins",
+      "category": "Mammals",
+      "description": "Intelligent ocean acrobats",
+      "children": [
+        { "scientificName": "Tursiops truncatus", "commonName": "Bottlenose Dolphin" },
+        { "scientificName": "Orcinus orca", "commonName": "Orca" },
+        { "scientificName": "Delphinus delphis", "commonName": "Common Dolphin" },
+        { "scientificName": "Globicephala melas", "commonName": "Pilot Whale" },
+        { "scientificName": "Stenella longirostris", "commonName": "Spinner Dolphin" }
+      ]
+    },
+    {
+      "id": "cetacea_whales_baleen",
+      "scientificName": "Balaenopteridae",
+      "commonName": "Baleen Whales",
+      "category": "Mammals",
+      "description": "Ocean giants that filter the seas",
+      "children": [
+        { "scientificName": "Balaenoptera musculus", "commonName": "Blue Whale" },
+        { "scientificName": "Megaptera novaeangliae", "commonName": "Humpback Whale" },
+        { "scientificName": "Balaenoptera physalus", "commonName": "Fin Whale" },
+        { "scientificName": "Balaena mysticetus", "commonName": "Bowhead Whale" },
+        { "scientificName": "Eschrichtius robustus", "commonName": "Gray Whale" }
+      ]
+    },
+    {
+      "id": "cetacea_whales_toothed",
+      "scientificName": "Physeteridae",
+      "commonName": "Toothed Whales",
+      "category": "Mammals",
+      "description": "Deep-diving hunters of the abyss",
+      "children": [
+        { "scientificName": "Physeter macrocephalus", "commonName": "Sperm Whale" },
+        { "scientificName": "Monodon monoceros", "commonName": "Narwhal" },
+        { "scientificName": "Delphinapterus leucas", "commonName": "Beluga Whale" },
+        { "scientificName": "Ziphius cavirostris", "commonName": "Cuvier's Beaked Whale" }
+      ]
+    },
+    {
+      "id": "pinnipedia_seals",
+      "scientificName": "Phocidae",
+      "commonName": "True Seals",
+      "category": "Mammals",
+      "description": "Streamlined swimmers of cold waters",
+      "children": [
+        { "scientificName": "Phoca vitulina", "commonName": "Harbor Seal" },
+        { "scientificName": "Mirounga angustirostris", "commonName": "Northern Elephant Seal" },
+        { "scientificName": "Pagophilus groenlandicus", "commonName": "Harp Seal" },
+        { "scientificName": "Leptonychotes weddellii", "commonName": "Weddell Seal" },
+        { "scientificName": "Hydrurga leptonyx", "commonName": "Leopard Seal" }
+      ]
+    },
+    {
+      "id": "pinnipedia_sea_lions",
+      "scientificName": "Otariidae",
+      "commonName": "Sea Lions & Fur Seals",
+      "category": "Mammals",
+      "description": "Agile pinnipeds with external ears",
+      "children": [
+        { "scientificName": "Zalophus californianus", "commonName": "California Sea Lion" },
+        { "scientificName": "Eumetopias jubatus", "commonName": "Steller Sea Lion" },
+        { "scientificName": "Arctocephalus gazella", "commonName": "Antarctic Fur Seal" },
+        { "scientificName": "Otaria flavescens", "commonName": "South American Sea Lion" }
+      ]
+    },
+    {
+      "id": "odobenidae",
+      "scientificName": "Odobenidae",
+      "commonName": "Walruses",
+      "category": "Mammals",
+      "description": "Tusked giants of the Arctic",
+      "children": [
+        { "scientificName": "Odobenus rosmarus", "commonName": "Walrus" }
+      ]
+    },
+    {
+      "id": "sirenia",
+      "scientificName": "Trichechidae",
+      "commonName": "Manatees & Dugongs",
+      "category": "Mammals",
+      "description": "Gentle sea cows of warm waters",
+      "children": [
+        { "scientificName": "Trichechus manatus", "commonName": "West Indian Manatee" },
+        { "scientificName": "Trichechus inunguis", "commonName": "Amazonian Manatee" },
+        { "scientificName": "Dugong dugon", "commonName": "Dugong" }
+      ]
+    },
+    {
+      "id": "chiroptera_megabat",
+      "scientificName": "Pteropodidae",
+      "commonName": "Fruit Bats",
+      "category": "Mammals",
+      "description": "Nocturnal pollinators with keen sight",
+      "children": [
+        { "scientificName": "Pteropus vampyrus", "commonName": "Large Flying Fox" },
+        { "scientificName": "Rousettus aegyptiacus", "commonName": "Egyptian Fruit Bat" },
+        { "scientificName": "Eidolon helvum", "commonName": "Straw-coloured Fruit Bat" },
+        { "scientificName": "Pteropus giganteus", "commonName": "Indian Flying Fox" }
+      ]
+    },
+    {
+      "id": "chiroptera_microbat",
+      "scientificName": "Vespertilionidae",
+      "commonName": "Insect Bats",
+      "category": "Mammals",
+      "description": "Echolocating hunters of the night",
+      "children": [
+        { "scientificName": "Myotis lucifugus", "commonName": "Little Brown Bat" },
+        { "scientificName": "Desmodus rotundus", "commonName": "Common Vampire Bat" },
+        { "scientificName": "Tadarida brasiliensis", "commonName": "Mexican Free-tailed Bat" },
+        { "scientificName": "Pipistrellus pipistrellus", "commonName": "Common Pipistrelle" }
+      ]
+    },
+    {
+      "id": "rodentia_squirrels",
+      "scientificName": "Sciuridae",
+      "commonName": "Squirrels",
+      "category": "Mammals",
+      "description": "Nimble tree-dwellers and hoarders",
+      "children": [
+        { "scientificName": "Sciurus carolinensis", "commonName": "Eastern Gray Squirrel" },
+        { "scientificName": "Pteromys volans", "commonName": "Siberian Flying Squirrel" },
+        { "scientificName": "Marmota monax", "commonName": "Groundhog" },
+        { "scientificName": "Tamias striatus", "commonName": "Eastern Chipmunk" },
+        { "scientificName": "Cynomys ludovicianus", "commonName": "Prairie Dog" }
+      ]
+    },
+    {
+      "id": "rodentia_mice",
+      "scientificName": "Muridae",
+      "commonName": "Mice & Rats",
+      "category": "Mammals",
+      "description": "Resourceful survivors found everywhere",
+      "children": [
+        { "scientificName": "Mus musculus", "commonName": "House Mouse" },
+        { "scientificName": "Rattus norvegicus", "commonName": "Brown Rat" },
+        { "scientificName": "Peromyscus maniculatus", "commonName": "Deer Mouse" },
+        { "scientificName": "Apodemus sylvaticus", "commonName": "Wood Mouse" },
+        { "scientificName": "Arvicola amphibius", "commonName": "Water Vole" }
+      ]
+    },
+    {
+      "id": "rodentia_beavers",
+      "scientificName": "Castoridae",
+      "commonName": "Beavers",
+      "category": "Mammals",
+      "description": "Master builders of dams",
+      "children": [
+        { "scientificName": "Castor canadensis", "commonName": "North American Beaver" },
+        { "scientificName": "Castor fiber", "commonName": "Eurasian Beaver" }
+      ]
+    },
+    {
+      "id": "rodentia_porcupines",
+      "scientificName": "Erethizontidae",
+      "commonName": "Porcupines",
+      "category": "Mammals",
+      "description": "Quilled defenders of the forest",
+      "children": [
+        { "scientificName": "Erethizon dorsatum", "commonName": "North American Porcupine" },
+        { "scientificName": "Hystrix cristata", "commonName": "Crested Porcupine" },
+        { "scientificName": "Coendou prehensilis", "commonName": "Brazilian Porcupine" }
+      ]
+    },
+    {
+      "id": "hystricognathi_capybara",
+      "scientificName": "Caviidae",
+      "commonName": "Capybaras & Guinea Pigs",
+      "category": "Mammals",
+      "description": "Social rodents of South America",
+      "children": [
+        { "scientificName": "Hydrochoerus hydrochaeris", "commonName": "Capybara" },
+        { "scientificName": "Cavia porcellus", "commonName": "Guinea Pig" },
+        { "scientificName": "Dolichotis patagonum", "commonName": "Patagonian Mara" }
+      ]
+    },
+    {
+      "id": "lagomorpha",
+      "scientificName": "Leporidae",
+      "commonName": "Rabbits & Hares",
+      "category": "Mammals",
+      "description": "Swift, alert herbivores",
+      "children": [
+        { "scientificName": "Oryctolagus cuniculus", "commonName": "European Rabbit" },
+        { "scientificName": "Lepus americanus", "commonName": "Snowshoe Hare" },
+        { "scientificName": "Lepus californicus", "commonName": "Black-tailed Jackrabbit" },
+        { "scientificName": "Sylvilagus floridanus", "commonName": "Eastern Cottontail" },
+        { "scientificName": "Ochotona princeps", "commonName": "American Pika" }
+      ]
+    },
+    {
+      "id": "erinaceidae",
+      "scientificName": "Erinaceidae",
+      "commonName": "Hedgehogs",
+      "category": "Mammals",
+      "description": "Spiny insectivores that curl defensively",
+      "children": [
+        { "scientificName": "Erinaceus europaeus", "commonName": "European Hedgehog" },
+        { "scientificName": "Atelerix albiventris", "commonName": "African Pygmy Hedgehog" },
+        { "scientificName": "Hemiechinus auritus", "commonName": "Long-eared Hedgehog" }
+      ]
+    },
+    {
+      "id": "soricidae",
+      "scientificName": "Soricidae",
+      "commonName": "Shrews",
+      "category": "Mammals",
+      "description": "Tiny, fierce hunters with fast metabolisms",
+      "children": [
+        { "scientificName": "Sorex araneus", "commonName": "Common Shrew" },
+        { "scientificName": "Blarina brevicauda", "commonName": "Northern Short-tailed Shrew" },
+        { "scientificName": "Suncus etruscus", "commonName": "Etruscan Shrew" },
+        { "scientificName": "Crocidura suaveolens", "commonName": "Lesser White-toothed Shrew" }
+      ]
+    },
+    {
+      "id": "talpidae",
+      "scientificName": "Talpidae",
+      "commonName": "Moles",
+      "category": "Mammals",
+      "description": "Burrowing specialists of the underground",
+      "children": [
+        { "scientificName": "Talpa europaea", "commonName": "European Mole" },
+        { "scientificName": "Condylura cristata", "commonName": "Star-nosed Mole" },
+        { "scientificName": "Scalopus aquaticus", "commonName": "Eastern Mole" }
+      ]
+    },
+    {
+      "id": "xenarthra_armadillos",
+      "scientificName": "Dasypodidae",
+      "commonName": "Armadillos",
+      "category": "Mammals",
+      "description": "Armored diggers of the Americas",
+      "children": [
+        { "scientificName": "Dasypus novemcinctus", "commonName": "Nine-banded Armadillo" },
+        { "scientificName": "Priodontes maximus", "commonName": "Giant Armadillo" },
+        { "scientificName": "Tolypeutes matacus", "commonName": "Southern Three-banded Armadillo" },
+        { "scientificName": "Chlamyphorus truncatus", "commonName": "Pink Fairy Armadillo" }
+      ]
+    },
+    {
+      "id": "xenarthra_sloths",
+      "scientificName": "Bradypodidae",
+      "commonName": "Sloths",
+      "category": "Mammals",
+      "description": "Slow-moving masters of camouflage",
+      "children": [
+        { "scientificName": "Bradypus variegatus", "commonName": "Brown-throated Sloth" },
+        { "scientificName": "Choloepus hoffmanni", "commonName": "Hoffmann's Two-toed Sloth" },
+        { "scientificName": "Bradypus pygmaeus", "commonName": "Pygmy Three-toed Sloth" }
+      ]
+    },
+    {
+      "id": "xenarthra_anteaters",
+      "scientificName": "Myrmecophagidae",
+      "commonName": "Anteaters",
+      "category": "Mammals",
+      "description": "Long-tongued insect specialists",
+      "children": [
+        { "scientificName": "Myrmecophaga tridactyla", "commonName": "Giant Anteater" },
+        { "scientificName": "Tamandua tetradactyla", "commonName": "Southern Tamandua" },
+        { "scientificName": "Cyclopes didactylus", "commonName": "Silky Anteater" }
+      ]
+    },
+    {
+      "id": "monotremata",
+      "scientificName": "Ornithorhynchidae",
+      "commonName": "Platypuses & Echidnas",
+      "category": "Mammals",
+      "description": "Egg-laying mammals of Australia",
+      "children": [
+        { "scientificName": "Ornithorhynchus anatinus", "commonName": "Platypus" },
+        { "scientificName": "Tachyglossus aculeatus", "commonName": "Short-beaked Echidna" },
+        { "scientificName": "Zaglossus bruijni", "commonName": "Long-beaked Echidna" }
+      ]
+    },
+    {
+      "id": "marsupialia_kangaroos",
+      "scientificName": "Macropodidae",
+      "commonName": "Kangaroos & Wallabies",
+      "category": "Mammals",
+      "description": "Powerful hoppers of Australia",
+      "children": [
+        { "scientificName": "Macropus rufus", "commonName": "Red Kangaroo" },
+        { "scientificName": "Macropus giganteus", "commonName": "Eastern Grey Kangaroo" },
+        { "scientificName": "Wallabia bicolor", "commonName": "Swamp Wallaby" },
+        { "scientificName": "Dendrolagus goodfellowi", "commonName": "Goodfellow's Tree-kangaroo" },
+        { "scientificName": "Setonix brachyurus", "commonName": "Quokka" }
+      ]
+    },
+    {
+      "id": "marsupialia_possums",
+      "scientificName": "Phalangeridae",
+      "commonName": "Possums",
+      "category": "Mammals",
+      "description": "Nocturnal tree-dwellers of Australasia",
+      "children": [
+        { "scientificName": "Trichosurus vulpecula", "commonName": "Common Brushtail Possum" },
+        { "scientificName": "Phascolarctos cinereus", "commonName": "Koala" },
+        { "scientificName": "Petaurus breviceps", "commonName": "Sugar Glider" },
+        { "scientificName": "Didelphis virginiana", "commonName": "Virginia Opossum" }
+      ]
+    },
+    {
+      "id": "marsupialia_wombats",
+      "scientificName": "Vombatidae",
+      "commonName": "Wombats",
+      "category": "Mammals",
+      "description": "Sturdy burrowers with cube-shaped droppings",
+      "children": [
+        { "scientificName": "Vombatus ursinus", "commonName": "Common Wombat" },
+        { "scientificName": "Lasiorhinus latifrons", "commonName": "Southern Hairy-nosed Wombat" }
+      ]
+    },
+    {
+      "id": "marsupialia_devils",
+      "scientificName": "Dasyuridae",
+      "commonName": "Tasmanian Devils & Quolls",
+      "category": "Mammals",
+      "description": "Fierce carnivorous marsupials",
+      "children": [
+        { "scientificName": "Sarcophilus harrisii", "commonName": "Tasmanian Devil" },
+        { "scientificName": "Dasyurus maculatus", "commonName": "Tiger Quoll" },
+        { "scientificName": "Dasyurus viverrinus", "commonName": "Eastern Quoll" },
+        { "scientificName": "Antechinus stuartii", "commonName": "Brown Antechinus" }
+      ]
+    },
+    {
+      "id": "viverridae",
+      "scientificName": "Viverridae",
+      "commonName": "Civets & Genets",
+      "category": "Mammals",
+      "description": "Nocturnal hunters with musk glands",
+      "children": [
+        { "scientificName": "Civettictis civetta", "commonName": "African Civet" },
+        { "scientificName": "Genetta genetta", "commonName": "Common Genet" },
+        { "scientificName": "Paradoxurus hermaphroditus", "commonName": "Asian Palm Civet" },
+        { "scientificName": "Arctictis binturong", "commonName": "Binturong" }
+      ]
+    },
+    {
+      "id": "herpestidae",
+      "scientificName": "Herpestidae",
+      "commonName": "Mongooses",
+      "category": "Mammals",
+      "description": "Quick, fearless snake-fighters",
+      "children": [
+        { "scientificName": "Herpestes ichneumon", "commonName": "Egyptian Mongoose" },
+        { "scientificName": "Suricata suricatta", "commonName": "Meerkat" },
+        { "scientificName": "Herpestes javanicus", "commonName": "Small Indian Mongoose" },
+        { "scientificName": "Cynictis penicillata", "commonName": "Yellow Mongoose" }
+      ]
+    },
+    {
+      "id": "manidae",
+      "scientificName": "Manidae",
+      "commonName": "Pangolins",
+      "category": "Mammals",
+      "description": "Scale-covered ant specialists",
+      "children": [
+        { "scientificName": "Manis javanica", "commonName": "Sunda Pangolin" },
+        { "scientificName": "Manis tricuspis", "commonName": "Tree Pangolin" },
+        { "scientificName": "Smutsia gigantea", "commonName": "Giant Pangolin" },
+        { "scientificName": "Manis crassicaudata", "commonName": "Indian Pangolin" }
+      ]
+    },
+    {
+      "id": "orycteropodidae",
+      "scientificName": "Orycteropodidae",
+      "commonName": "Aardvarks",
+      "category": "Mammals",
+      "description": "Nocturnal burrowers with pig-like snouts",
+      "children": [
+        { "scientificName": "Orycteropus afer", "commonName": "Aardvark" }
+      ]
+    },
+    {
+      "id": "accipitridae",
+      "scientificName": "Accipitridae",
+      "commonName": "Eagles & Hawks",
+      "category": "Birds",
+      "description": "Raptors with keen eyesight and talons",
+      "children": [
+        { "scientificName": "Aquila chrysaetos", "commonName": "Golden Eagle" },
+        { "scientificName": "Haliaeetus leucocephalus", "commonName": "Bald Eagle" },
+        { "scientificName": "Buteo jamaicensis", "commonName": "Red-tailed Hawk" },
+        { "scientificName": "Accipiter gentilis", "commonName": "Northern Goshawk" },
+        { "scientificName": "Harpia harpyja", "commonName": "Harpy Eagle" },
+        { "scientificName": "Circus cyaneus", "commonName": "Northern Harrier" }
+      ]
+    },
+    {
+      "id": "falconidae",
+      "scientificName": "Falconidae",
+      "commonName": "Falcons",
+      "category": "Birds",
+      "description": "Swift aerial predators",
+      "children": [
+        { "scientificName": "Falco peregrinus", "commonName": "Peregrine Falcon" },
+        { "scientificName": "Falco rusticolus", "commonName": "Gyrfalcon" },
+        { "scientificName": "Falco sparverius", "commonName": "American Kestrel" },
+        { "scientificName": "Falco cherrug", "commonName": "Saker Falcon" }
+      ]
+    },
+    {
+      "id": "strigidae",
+      "scientificName": "Strigidae",
+      "commonName": "Owls",
+      "category": "Birds",
+      "description": "Silent nocturnal hunters",
+      "children": [
+        { "scientificName": "Bubo bubo", "commonName": "Eurasian Eagle-Owl" },
+        { "scientificName": "Strix aluco", "commonName": "Tawny Owl" },
+        { "scientificName": "Athene noctua", "commonName": "Little Owl" },
+        { "scientificName": "Tyto alba", "commonName": "Barn Owl" },
+        { "scientificName": "Bubo virginianus", "commonName": "Great Horned Owl" },
+        { "scientificName": "Bubo scandiacus", "commonName": "Snowy Owl" }
+      ]
+    },
+    {
+      "id": "cathartidae",
+      "scientificName": "Cathartidae",
+      "commonName": "Vultures (New World)",
+      "category": "Birds",
+      "description": "Scavengers of the Americas",
+      "children": [
+        { "scientificName": "Vultur gryphus", "commonName": "Andean Condor" },
+        { "scientificName": "Gymnogyps californianus", "commonName": "California Condor" },
+        { "scientificName": "Cathartes aura", "commonName": "Turkey Vulture" },
+        { "scientificName": "Coragyps atratus", "commonName": "Black Vulture" }
+      ]
+    },
+    {
+      "id": "corvidae",
+      "scientificName": "Corvidae",
+      "commonName": "Crows & Ravens",
+      "category": "Birds",
+      "description": "Intelligent problem-solvers",
+      "children": [
+        { "scientificName": "Corvus corax", "commonName": "Common Raven" },
+        { "scientificName": "Corvus brachyrhynchos", "commonName": "American Crow" },
+        { "scientificName": "Pica pica", "commonName": "Eurasian Magpie" },
+        { "scientificName": "Garrulus glandarius", "commonName": "Eurasian Jay" },
+        { "scientificName": "Cyanocitta cristata", "commonName": "Blue Jay" }
+      ]
+    },
+    {
+      "id": "psittacidae",
+      "scientificName": "Psittacidae",
+      "commonName": "Parrots",
+      "category": "Birds",
+      "description": "Colorful, intelligent mimics",
+      "children": [
+        { "scientificName": "Ara macao", "commonName": "Scarlet Macaw" },
+        { "scientificName": "Amazona aestiva", "commonName": "Blue-fronted Amazon" },
+        { "scientificName": "Cacatua galerita", "commonName": "Sulphur-crested Cockatoo" },
+        { "scientificName": "Melopsittacus undulatus", "commonName": "Budgerigar" },
+        { "scientificName": "Psittacus erithacus", "commonName": "African Grey Parrot" }
+      ]
+    },
+    {
+      "id": "trochilidae",
+      "scientificName": "Trochilidae",
+      "commonName": "Hummingbirds",
+      "category": "Birds",
+      "description": "Jewel-like nectar specialists",
+      "children": [
+        { "scientificName": "Archilochus colubris", "commonName": "Ruby-throated Hummingbird" },
+        { "scientificName": "Calypte anna", "commonName": "Anna's Hummingbird" },
+        { "scientificName": "Patagona gigas", "commonName": "Giant Hummingbird" },
+        { "scientificName": "Mellisuga helenae", "commonName": "Bee Hummingbird" }
+      ]
+    },
+    {
+      "id": "phasianidae",
+      "scientificName": "Phasianidae",
+      "commonName": "Pheasants & Chickens",
+      "category": "Birds",
+      "description": "Ground-dwelling fowl",
+      "children": [
+        { "scientificName": "Pavo cristatus", "commonName": "Indian Peafowl" },
+        { "scientificName": "Phasianus colchicus", "commonName": "Common Pheasant" },
+        { "scientificName": "Gallus gallus", "commonName": "Red Junglefowl" },
+        { "scientificName": "Meleagris gallopavo", "commonName": "Wild Turkey" },
+        { "scientificName": "Chrysolophus pictus", "commonName": "Golden Pheasant" }
+      ]
+    },
+    {
+      "id": "anatidae",
+      "scientificName": "Anatidae",
+      "commonName": "Ducks & Geese",
+      "category": "Birds",
+      "description": "Waterfowl of lakes and rivers",
+      "children": [
+        { "scientificName": "Anas platyrhynchos", "commonName": "Mallard" },
+        { "scientificName": "Branta canadensis", "commonName": "Canada Goose" },
+        { "scientificName": "Cygnus olor", "commonName": "Mute Swan" },
+        { "scientificName": "Aix sponsa", "commonName": "Wood Duck" },
+        { "scientificName": "Anser anser", "commonName": "Greylag Goose" }
+      ]
+    },
+    {
+      "id": "pelecanidae",
+      "scientificName": "Pelecanidae",
+      "commonName": "Pelicans",
+      "category": "Birds",
+      "description": "Fish-scooping giants",
+      "children": [
+        { "scientificName": "Pelecanus onocrotalus", "commonName": "Great White Pelican" },
+        { "scientificName": "Pelecanus occidentalis", "commonName": "Brown Pelican" },
+        { "scientificName": "Pelecanus crispus", "commonName": "Dalmatian Pelican" }
+      ]
+    },
+    {
+      "id": "ardeidae",
+      "scientificName": "Ardeidae",
+      "commonName": "Herons & Egrets",
+      "category": "Birds",
+      "description": "Patient wading fishers",
+      "children": [
+        { "scientificName": "Ardea herodias", "commonName": "Great Blue Heron" },
+        { "scientificName": "Ardea alba", "commonName": "Great Egret" },
+        { "scientificName": "Nycticorax nycticorax", "commonName": "Black-crowned Night Heron" },
+        { "scientificName": "Egretta garzetta", "commonName": "Little Egret" }
+      ]
+    },
+    {
+      "id": "ciconiidae",
+      "scientificName": "Ciconiidae",
+      "commonName": "Storks",
+      "category": "Birds",
+      "description": "Long-legged waders",
+      "children": [
+        { "scientificName": "Ciconia ciconia", "commonName": "White Stork" },
+        { "scientificName": "Mycteria americana", "commonName": "Wood Stork" },
+        { "scientificName": "Leptoptilos crumenifer", "commonName": "Marabou Stork" },
+        { "scientificName": "Jabiru mycteria", "commonName": "Jabiru" }
+      ]
+    },
+    {
+      "id": "phoenicopteridae",
+      "scientificName": "Phoenicopteridae",
+      "commonName": "Flamingos",
+      "category": "Birds",
+      "description": "Pink filter-feeders of salt lakes",
+      "children": [
+        { "scientificName": "Phoenicopterus roseus", "commonName": "Greater Flamingo" },
+        { "scientificName": "Phoenicopterus ruber", "commonName": "American Flamingo" },
+        { "scientificName": "Phoenicoparrus andinus", "commonName": "Andean Flamingo" }
+      ]
+    },
+    {
+      "id": "spheniscidae",
+      "scientificName": "Spheniscidae",
+      "commonName": "Penguins",
+      "category": "Birds",
+      "description": "Flightless swimmers of cold seas",
+      "children": [
+        { "scientificName": "Aptenodytes forsteri", "commonName": "Emperor Penguin" },
+        { "scientificName": "Pygoscelis adeliae", "commonName": "Adélie Penguin" },
+        { "scientificName": "Spheniscus demersus", "commonName": "African Penguin" },
+        { "scientificName": "Eudyptes chrysolophus", "commonName": "Macaroni Penguin" },
+        { "scientificName": "Eudyptula minor", "commonName": "Little Blue Penguin" }
+      ]
+    },
+    {
+      "id": "struthionidae",
+      "scientificName": "Struthionidae",
+      "commonName": "Ostriches & Emus",
+      "category": "Birds",
+      "description": "Giant flightless runners",
+      "children": [
+        { "scientificName": "Struthio camelus", "commonName": "Common Ostrich" },
+        { "scientificName": "Dromaius novaehollandiae", "commonName": "Emu" },
+        { "scientificName": "Casuarius casuarius", "commonName": "Southern Cassowary" },
+        { "scientificName": "Rhea americana", "commonName": "Greater Rhea" },
+        { "scientificName": "Apteryx australis", "commonName": "Southern Brown Kiwi" }
+      ]
+    },
+    {
+      "id": "gruidae",
+      "scientificName": "Gruidae",
+      "commonName": "Cranes",
+      "category": "Birds",
+      "description": "Elegant dancers of wetlands",
+      "children": [
+        { "scientificName": "Grus japonensis", "commonName": "Red-crowned Crane" },
+        { "scientificName": "Grus americana", "commonName": "Whooping Crane" },
+        { "scientificName": "Antigone antigone", "commonName": "Sarus Crane" },
+        { "scientificName": "Balearica regulorum", "commonName": "Grey Crowned Crane" }
+      ]
+    },
+    {
+      "id": "columbidae",
+      "scientificName": "Columbidae",
+      "commonName": "Pigeons & Doves",
+      "category": "Birds",
+      "description": "Gentle seed-eaters found worldwide",
+      "children": [
+        { "scientificName": "Columba livia", "commonName": "Rock Dove" },
+        { "scientificName": "Streptopelia decaocto", "commonName": "Eurasian Collared Dove" },
+        { "scientificName": "Goura victoria", "commonName": "Victoria Crowned Pigeon" },
+        { "scientificName": "Zenaida macroura", "commonName": "Mourning Dove" }
+      ]
+    },
+    {
+      "id": "picidae",
+      "scientificName": "Picidae",
+      "commonName": "Woodpeckers",
+      "category": "Birds",
+      "description": "Tree-drilling insect hunters",
+      "children": [
+        { "scientificName": "Dryocopus pileatus", "commonName": "Pileated Woodpecker" },
+        { "scientificName": "Melanerpes erythrocephalus", "commonName": "Red-headed Woodpecker" },
+        { "scientificName": "Dendrocopos major", "commonName": "Great Spotted Woodpecker" },
+        { "scientificName": "Colaptes auratus", "commonName": "Northern Flicker" }
+      ]
+    },
+    {
+      "id": "alcedinidae",
+      "scientificName": "Alcedinidae",
+      "commonName": "Kingfishers",
+      "category": "Birds",
+      "description": "Diving fishers with brilliant colors",
+      "children": [
+        { "scientificName": "Alcedo atthis", "commonName": "Common Kingfisher" },
+        { "scientificName": "Megaceryle alcyon", "commonName": "Belted Kingfisher" },
+        { "scientificName": "Dacelo novaeguineae", "commonName": "Laughing Kookaburra" },
+        { "scientificName": "Halcyon smyrnensis", "commonName": "White-throated Kingfisher" }
+      ]
+    },
+    {
+      "id": "crocodylidae",
+      "scientificName": "Crocodylidae",
+      "commonName": "Crocodiles",
+      "category": "Reptiles",
+      "description": "Ancient ambush predators",
+      "children": [
+        { "scientificName": "Crocodylus niloticus", "commonName": "Nile Crocodile" },
+        { "scientificName": "Crocodylus porosus", "commonName": "Saltwater Crocodile" },
+        { "scientificName": "Crocodylus acutus", "commonName": "American Crocodile" },
+        { "scientificName": "Gavialis gangeticus", "commonName": "Gharial" }
+      ]
+    },
+    {
+      "id": "alligatoridae",
+      "scientificName": "Alligatoridae",
+      "commonName": "Alligators & Caimans",
+      "category": "Reptiles",
+      "description": "Broad-snouted swamp dwellers",
+      "children": [
+        { "scientificName": "Alligator mississippiensis", "commonName": "American Alligator" },
+        { "scientificName": "Alligator sinensis", "commonName": "Chinese Alligator" },
+        { "scientificName": "Melanosuchus niger", "commonName": "Black Caiman" },
+        { "scientificName": "Caiman crocodilus", "commonName": "Spectacled Caiman" }
+      ]
+    },
+    {
+      "id": "testudinidae",
+      "scientificName": "Testudinidae",
+      "commonName": "Tortoises",
+      "category": "Reptiles",
+      "description": "Armored land-dwellers of great age",
+      "children": [
+        { "scientificName": "Chelonoidis niger", "commonName": "Galápagos Giant Tortoise" },
+        { "scientificName": "Aldabrachelys gigantea", "commonName": "Aldabra Giant Tortoise" },
+        { "scientificName": "Testudo graeca", "commonName": "Greek Tortoise" },
+        { "scientificName": "Gopherus polyphemus", "commonName": "Gopher Tortoise" }
+      ]
+    },
+    {
+      "id": "cheloniidae",
+      "scientificName": "Cheloniidae",
+      "commonName": "Sea Turtles",
+      "category": "Reptiles",
+      "description": "Ancient mariners of the ocean",
+      "children": [
+        { "scientificName": "Chelonia mydas", "commonName": "Green Sea Turtle" },
+        { "scientificName": "Caretta caretta", "commonName": "Loggerhead Sea Turtle" },
+        { "scientificName": "Dermochelys coriacea", "commonName": "Leatherback Sea Turtle" },
+        { "scientificName": "Eretmochelys imbricata", "commonName": "Hawksbill Sea Turtle" }
+      ]
+    },
+    {
+      "id": "emydidae",
+      "scientificName": "Emydidae",
+      "commonName": "Pond Turtles",
+      "category": "Reptiles",
+      "description": "Freshwater shell-bearers",
+      "children": [
+        { "scientificName": "Trachemys scripta", "commonName": "Red-eared Slider" },
+        { "scientificName": "Chrysemys picta", "commonName": "Painted Turtle" },
+        { "scientificName": "Terrapene carolina", "commonName": "Eastern Box Turtle" },
+        { "scientificName": "Chelydra serpentina", "commonName": "Common Snapping Turtle" }
+      ]
+    },
+    {
+      "id": "varanidae",
+      "scientificName": "Varanidae",
+      "commonName": "Monitor Lizards",
+      "category": "Reptiles",
+      "description": "Large, intelligent predatory lizards",
+      "children": [
+        { "scientificName": "Varanus komodoensis", "commonName": "Komodo Dragon" },
+        { "scientificName": "Varanus varius", "commonName": "Lace Monitor" },
+        { "scientificName": "Varanus niloticus", "commonName": "Nile Monitor" },
+        { "scientificName": "Varanus salvator", "commonName": "Water Monitor" }
+      ]
+    },
+    {
+      "id": "iguanidae",
+      "scientificName": "Iguanidae",
+      "commonName": "Iguanas",
+      "category": "Reptiles",
+      "description": "Herbivorous dragons of the Americas",
+      "children": [
+        { "scientificName": "Iguana iguana", "commonName": "Green Iguana" },
+        { "scientificName": "Amblyrhynchus cristatus", "commonName": "Marine Iguana" },
+        { "scientificName": "Cyclura cornuta", "commonName": "Rhinoceros Iguana" },
+        { "scientificName": "Conolophus subcristatus", "commonName": "Galápagos Land Iguana" }
+      ]
+    },
+    {
+      "id": "chamaeleonidae",
+      "scientificName": "Chamaeleonidae",
+      "commonName": "Chameleons",
+      "category": "Reptiles",
+      "description": "Color-shifting ambush hunters",
+      "children": [
+        { "scientificName": "Chamaeleo calyptratus", "commonName": "Veiled Chameleon" },
+        { "scientificName": "Furcifer pardalis", "commonName": "Panther Chameleon" },
+        { "scientificName": "Calumma parsonii", "commonName": "Parson's Chameleon" },
+        { "scientificName": "Brookesia micra", "commonName": "Minute Leaf Chameleon" }
+      ]
+    },
+    {
+      "id": "gekkonidae",
+      "scientificName": "Gekkonidae",
+      "commonName": "Geckos",
+      "category": "Reptiles",
+      "description": "Wall-climbing nocturnal hunters",
+      "children": [
+        { "scientificName": "Gekko gecko", "commonName": "Tokay Gecko" },
+        { "scientificName": "Eublepharis macularius", "commonName": "Leopard Gecko" },
+        { "scientificName": "Phelsuma grandis", "commonName": "Giant Day Gecko" },
+        { "scientificName": "Correlophus ciliatus", "commonName": "Crested Gecko" }
+      ]
+    },
+    {
+      "id": "agamidae",
+      "scientificName": "Agamidae",
+      "commonName": "Agamas & Dragons",
+      "category": "Reptiles",
+      "description": "Old World dragon lizards",
+      "children": [
+        { "scientificName": "Pogona vitticeps", "commonName": "Bearded Dragon" },
+        { "scientificName": "Chlamydosaurus kingii", "commonName": "Frilled Lizard" },
+        { "scientificName": "Draco volans", "commonName": "Flying Dragon" },
+        { "scientificName": "Uromastyx aegyptia", "commonName": "Egyptian Spiny-tailed Lizard" }
+      ]
+    },
+    {
+      "id": "pythonidae",
+      "scientificName": "Pythonidae",
+      "commonName": "Pythons",
+      "category": "Reptiles",
+      "description": "Constricting giants of the Old World",
+      "children": [
+        { "scientificName": "Python reticulatus", "commonName": "Reticulated Python" },
+        { "scientificName": "Python bivittatus", "commonName": "Burmese Python" },
+        { "scientificName": "Morelia spilota", "commonName": "Carpet Python" },
+        { "scientificName": "Python regius", "commonName": "Ball Python" }
+      ]
+    },
+    {
+      "id": "boidae",
+      "scientificName": "Boidae",
+      "commonName": "Boas",
+      "category": "Reptiles",
+      "description": "Powerful constrictors of the Americas",
+      "children": [
+        { "scientificName": "Boa constrictor", "commonName": "Common Boa" },
+        { "scientificName": "Eunectes murinus", "commonName": "Green Anaconda" },
+        { "scientificName": "Corallus caninus", "commonName": "Emerald Tree Boa" },
+        { "scientificName": "Epicrates cenchria", "commonName": "Rainbow Boa" }
+      ]
+    },
+    {
+      "id": "viperidae",
+      "scientificName": "Viperidae",
+      "commonName": "Vipers",
+      "category": "Reptiles",
+      "description": "Venomous ambush predators with hinged fangs",
+      "children": [
+        { "scientificName": "Crotalus atrox", "commonName": "Western Diamondback Rattlesnake" },
+        { "scientificName": "Bothrops asper", "commonName": "Fer-de-Lance" },
+        { "scientificName": "Vipera berus", "commonName": "Common European Adder" },
+        { "scientificName": "Bitis gabonica", "commonName": "Gaboon Viper" }
+      ]
+    },
+    {
+      "id": "elapidae",
+      "scientificName": "Elapidae",
+      "commonName": "Cobras & Mambas",
+      "category": "Reptiles",
+      "description": "Neurotoxic serpents with fixed fangs",
+      "children": [
+        { "scientificName": "Naja naja", "commonName": "Indian Cobra" },
+        { "scientificName": "Ophiophagus hannah", "commonName": "King Cobra" },
+        { "scientificName": "Dendroaspis polylepis", "commonName": "Black Mamba" },
+        { "scientificName": "Micrurus fulvius", "commonName": "Eastern Coral Snake" }
+      ]
+    },
+    {
+      "id": "colubridae",
+      "scientificName": "Colubridae",
+      "commonName": "Colubrids",
+      "category": "Reptiles",
+      "description": "Diverse family of common snakes",
+      "children": [
+        { "scientificName": "Pantherophis guttatus", "commonName": "Corn Snake" },
+        { "scientificName": "Thamnophis sirtalis", "commonName": "Common Garter Snake" },
+        { "scientificName": "Lampropeltis getula", "commonName": "Common Kingsnake" },
+        { "scientificName": "Pituophis catenifer", "commonName": "Gopher Snake" }
+      ]
+    },
+    {
+      "id": "bufonidae",
+      "scientificName": "Bufonidae",
+      "commonName": "True Toads",
+      "category": "Amphibians",
+      "description": "Warty hoppers with toxic skin",
+      "children": [
+        { "scientificName": "Bufo bufo", "commonName": "Common Toad" },
+        { "scientificName": "Rhinella marina", "commonName": "Cane Toad" },
+        { "scientificName": "Anaxyrus americanus", "commonName": "American Toad" },
+        { "scientificName": "Incilius alvarius", "commonName": "Colorado River Toad" }
+      ]
+    },
+    {
+      "id": "ranidae",
+      "scientificName": "Ranidae",
+      "commonName": "True Frogs",
+      "category": "Amphibians",
+      "description": "Leaping hunters of wetlands",
+      "children": [
+        { "scientificName": "Lithobates catesbeianus", "commonName": "American Bullfrog" },
+        { "scientificName": "Rana temporaria", "commonName": "Common Frog" },
+        { "scientificName": "Conraua goliath", "commonName": "Goliath Frog" },
+        { "scientificName": "Lithobates pipiens", "commonName": "Northern Leopard Frog" }
+      ]
+    },
+    {
+      "id": "hylidae",
+      "scientificName": "Hylidae",
+      "commonName": "Tree Frogs",
+      "category": "Amphibians",
+      "description": "Arboreal climbers with sticky toe pads",
+      "children": [
+        { "scientificName": "Hyla arborea", "commonName": "European Tree Frog" },
+        { "scientificName": "Agalychnis callidryas", "commonName": "Red-eyed Tree Frog" },
+        { "scientificName": "Litoria caerulea", "commonName": "White's Tree Frog" },
+        { "scientificName": "Pseudacris crucifer", "commonName": "Spring Peeper" }
+      ]
+    },
+    {
+      "id": "dendrobatidae",
+      "scientificName": "Dendrobatidae",
+      "commonName": "Poison Dart Frogs",
+      "category": "Amphibians",
+      "description": "Brilliantly colored toxic jewels",
+      "children": [
+        { "scientificName": "Dendrobates tinctorius", "commonName": "Dyeing Poison Dart Frog" },
+        { "scientificName": "Phyllobates terribilis", "commonName": "Golden Poison Frog" },
+        { "scientificName": "Oophaga pumilio", "commonName": "Strawberry Poison Frog" },
+        { "scientificName": "Ranitomeya imitator", "commonName": "Mimic Poison Frog" }
+      ]
+    },
+    {
+      "id": "salamandridae",
+      "scientificName": "Salamandridae",
+      "commonName": "Newts & Salamanders",
+      "category": "Amphibians",
+      "description": "Regenerating amphibians of moist habitats",
+      "children": [
+        { "scientificName": "Salamandra salamandra", "commonName": "Fire Salamander" },
+        { "scientificName": "Taricha torosa", "commonName": "California Newt" },
+        { "scientificName": "Triturus cristatus", "commonName": "Great Crested Newt" },
+        { "scientificName": "Notophthalmus viridescens", "commonName": "Eastern Newt" }
+      ]
+    },
+    {
+      "id": "ambystomatidae",
+      "scientificName": "Ambystomatidae",
+      "commonName": "Mole Salamanders",
+      "category": "Amphibians",
+      "description": "Burrowing amphibians including the axolotl",
+      "children": [
+        { "scientificName": "Ambystoma mexicanum", "commonName": "Axolotl" },
+        { "scientificName": "Ambystoma tigrinum", "commonName": "Tiger Salamander" },
+        { "scientificName": "Ambystoma maculatum", "commonName": "Spotted Salamander" }
+      ]
+    },
+    {
+      "id": "carcharhinidae",
+      "scientificName": "Carcharhinidae",
+      "commonName": "Requiem Sharks",
+      "category": "Fish",
+      "description": "Apex predators of coastal waters",
+      "children": [
+        { "scientificName": "Carcharhinus leucas", "commonName": "Bull Shark" },
+        { "scientificName": "Galeocerdo cuvier", "commonName": "Tiger Shark" },
+        { "scientificName": "Carcharhinus longimanus", "commonName": "Oceanic Whitetip Shark" },
+        { "scientificName": "Prionace glauca", "commonName": "Blue Shark" }
+      ]
+    },
+    {
+      "id": "lamnidae",
+      "scientificName": "Lamnidae",
+      "commonName": "Mackerel Sharks",
+      "category": "Fish",
+      "description": "Fast, powerful oceanic hunters",
+      "children": [
+        { "scientificName": "Carcharodon carcharias", "commonName": "Great White Shark" },
+        { "scientificName": "Isurus oxyrinchus", "commonName": "Shortfin Mako Shark" },
+        { "scientificName": "Lamna nasus", "commonName": "Porbeagle" }
+      ]
+    },
+    {
+      "id": "sphyrnidae",
+      "scientificName": "Sphyrnidae",
+      "commonName": "Hammerhead Sharks",
+      "category": "Fish",
+      "description": "Strangely-headed electroreceptive hunters",
+      "children": [
+        { "scientificName": "Sphyrna mokarran", "commonName": "Great Hammerhead" },
+        { "scientificName": "Sphyrna lewini", "commonName": "Scalloped Hammerhead" },
+        { "scientificName": "Sphyrna tiburo", "commonName": "Bonnethead" }
+      ]
+    },
+    {
+      "id": "rajidae",
+      "scientificName": "Rajidae",
+      "commonName": "Rays & Skates",
+      "category": "Fish",
+      "description": "Flat-bodied bottom dwellers",
+      "children": [
+        { "scientificName": "Mobula birostris", "commonName": "Giant Oceanic Manta Ray" },
+        { "scientificName": "Dasyatis pastinaca", "commonName": "Common Stingray" },
+        { "scientificName": "Aetobatus narinari", "commonName": "Spotted Eagle Ray" },
+        { "scientificName": "Torpedo torpedo", "commonName": "Common Torpedo" }
+      ]
+    },
+    {
+      "id": "scombridae",
+      "scientificName": "Scombridae",
+      "commonName": "Tuna & Mackerel",
+      "category": "Fish",
+      "description": "Swift pelagic speedsters",
+      "children": [
+        { "scientificName": "Thunnus thynnus", "commonName": "Atlantic Bluefin Tuna" },
+        { "scientificName": "Xiphias gladius", "commonName": "Swordfish" },
+        { "scientificName": "Istiophorus platypterus", "commonName": "Sailfish" },
+        { "scientificName": "Makaira nigricans", "commonName": "Blue Marlin" }
+      ]
+    },
+    {
+      "id": "salmonidae",
+      "scientificName": "Salmonidae",
+      "commonName": "Salmon & Trout",
+      "category": "Fish",
+      "description": "Migratory fish of cold waters",
+      "children": [
+        { "scientificName": "Oncorhynchus mykiss", "commonName": "Rainbow Trout" },
+        { "scientificName": "Salmo salar", "commonName": "Atlantic Salmon" },
+        { "scientificName": "Oncorhynchus tshawytscha", "commonName": "Chinook Salmon" },
+        { "scientificName": "Salvelinus fontinalis", "commonName": "Brook Trout" }
+      ]
+    },
+    {
+      "id": "cichlidae",
+      "scientificName": "Cichlidae",
+      "commonName": "Cichlids",
+      "category": "Fish",
+      "description": "Diverse, colorful freshwater fish",
+      "children": [
+        { "scientificName": "Astronotus ocellatus", "commonName": "Oscar" },
+        { "scientificName": "Cyphotilapia frontosa", "commonName": "Frontosa Cichlid" },
+        { "scientificName": "Pterophyllum scalare", "commonName": "Freshwater Angelfish" },
+        { "scientificName": "Symphysodon discus", "commonName": "Discus" }
+      ]
+    },
+    {
+      "id": "formicidae",
+      "scientificName": "Formicidae",
+      "commonName": "Ants",
+      "category": "Insects",
+      "description": "Social insects building empires",
+      "children": [
+        { "scientificName": "Atta cephalotes", "commonName": "Leafcutter Ant" },
+        { "scientificName": "Solenopsis invicta", "commonName": "Red Imported Fire Ant" },
+        { "scientificName": "Dorylus wilverthi", "commonName": "Driver Ant" },
+        { "scientificName": "Camponotus pennsylvanicus", "commonName": "Black Carpenter Ant" }
+      ]
+    },
+    {
+      "id": "apidae",
+      "scientificName": "Apidae",
+      "commonName": "Bees",
+      "category": "Insects",
+      "description": "Pollinating architects of the hive",
+      "children": [
+        { "scientificName": "Apis mellifera", "commonName": "Western Honey Bee" },
+        { "scientificName": "Bombus terrestris", "commonName": "Buff-tailed Bumblebee" },
+        { "scientificName": "Xylocopa violacea", "commonName": "Violet Carpenter Bee" },
+        { "scientificName": "Megachile pluto", "commonName": "Wallace's Giant Bee" }
+      ]
+    },
+    {
+      "id": "vespidae",
+      "scientificName": "Vespidae",
+      "commonName": "Wasps & Hornets",
+      "category": "Insects",
+      "description": "Aggressive stinging hunters",
+      "children": [
+        { "scientificName": "Vespa mandarinia", "commonName": "Asian Giant Hornet" },
+        { "scientificName": "Vespula vulgaris", "commonName": "Common Wasp" },
+        { "scientificName": "Polistes dominula", "commonName": "European Paper Wasp" },
+        { "scientificName": "Pepsis grossa", "commonName": "Tarantula Hawk" }
+      ]
+    },
+    {
+      "id": "nymphalidae",
+      "scientificName": "Nymphalidae",
+      "commonName": "Butterflies",
+      "category": "Insects",
+      "description": "Graceful winged pollinators",
+      "children": [
+        { "scientificName": "Danaus plexippus", "commonName": "Monarch Butterfly" },
+        { "scientificName": "Morpho peleides", "commonName": "Blue Morpho" },
+        { "scientificName": "Papilio machaon", "commonName": "Old World Swallowtail" },
+        { "scientificName": "Vanessa cardui", "commonName": "Painted Lady" }
+      ]
+    },
+    {
+      "id": "saturniidae",
+      "scientificName": "Saturniidae",
+      "commonName": "Giant Silk Moths",
+      "category": "Insects",
+      "description": "Magnificent nocturnal giants",
+      "children": [
+        { "scientificName": "Attacus atlas", "commonName": "Atlas Moth" },
+        { "scientificName": "Actias luna", "commonName": "Luna Moth" },
+        { "scientificName": "Samia cynthia", "commonName": "Ailanthus Silkmoth" },
+        { "scientificName": "Antheraea polyphemus", "commonName": "Polyphemus Moth" }
+      ]
+    },
+    {
+      "id": "scarabaeidae",
+      "scientificName": "Scarabaeidae",
+      "commonName": "Scarab Beetles",
+      "category": "Insects",
+      "description": "Ancient symbols of transformation",
+      "children": [
+        { "scientificName": "Dynastes hercules", "commonName": "Hercules Beetle" },
+        { "scientificName": "Scarabaeus sacer", "commonName": "Sacred Scarab" },
+        { "scientificName": "Lucanus cervus", "commonName": "Stag Beetle" },
+        { "scientificName": "Goliathus goliatus", "commonName": "Goliath Beetle" }
+      ]
+    },
+    {
+      "id": "mantidae",
+      "scientificName": "Mantidae",
+      "commonName": "Praying Mantises",
+      "category": "Insects",
+      "description": "Patient ambush predators",
+      "children": [
+        { "scientificName": "Mantis religiosa", "commonName": "European Mantis" },
+        { "scientificName": "Idolomantis diabolica", "commonName": "Giant Devil's Flower Mantis" },
+        { "scientificName": "Hymenopus coronatus", "commonName": "Orchid Mantis" },
+        { "scientificName": "Tenodera sinensis", "commonName": "Chinese Mantis" }
+      ]
+    },
+    {
+      "id": "odonata",
+      "scientificName": "Libellulidae",
+      "commonName": "Dragonflies",
+      "category": "Insects",
+      "description": "Ancient aerial acrobats",
+      "children": [
+        { "scientificName": "Anax junius", "commonName": "Common Green Darner" },
+        { "scientificName": "Sympetrum striolatum", "commonName": "Common Darter" },
+        { "scientificName": "Pantala flavescens", "commonName": "Globe Skimmer" },
+        { "scientificName": "Megaloprepus caerulatus", "commonName": "Forest Giant Damselfly" }
+      ]
+    },
+    {
+      "id": "theraphosidae",
+      "scientificName": "Theraphosidae",
+      "commonName": "Tarantulas",
+      "category": "Arachnids",
+      "description": "Large, hairy ambush spiders",
+      "children": [
+        { "scientificName": "Theraphosa blondi", "commonName": "Goliath Birdeater" },
+        { "scientificName": "Brachypelma hamorii", "commonName": "Mexican Redknee Tarantula" },
+        { "scientificName": "Poecilotheria metallica", "commonName": "Peacock Tarantula" },
+        { "scientificName": "Grammostola rosea", "commonName": "Chilean Rose Tarantula" }
+      ]
+    },
+    {
+      "id": "scorpionidae",
+      "scientificName": "Scorpionidae",
+      "commonName": "Scorpions",
+      "category": "Arachnids",
+      "description": "Venomous desert stalkers",
+      "children": [
+        { "scientificName": "Pandinus imperator", "commonName": "Emperor Scorpion" },
+        { "scientificName": "Centruroides sculpturatus", "commonName": "Arizona Bark Scorpion" },
+        { "scientificName": "Androctonus australis", "commonName": "Fat-tailed Scorpion" },
+        { "scientificName": "Heterometrus spinifer", "commonName": "Giant Forest Scorpion" }
+      ]
+    },
+    {
+      "id": "octopodidae",
+      "scientificName": "Octopodidae",
+      "commonName": "Octopuses",
+      "category": "Mollusks",
+      "description": "Intelligent masters of disguise",
+      "children": [
+        { "scientificName": "Enteroctopus dofleini", "commonName": "Giant Pacific Octopus" },
+        { "scientificName": "Octopus vulgaris", "commonName": "Common Octopus" },
+        { "scientificName": "Hapalochlaena lunulata", "commonName": "Blue-ringed Octopus" },
+        { "scientificName": "Thaumoctopus mimicus", "commonName": "Mimic Octopus" }
+      ]
+    },
+    {
+      "id": "decapoda_crabs",
+      "scientificName": "Brachyura",
+      "commonName": "Crabs",
+      "category": "Crustaceans",
+      "description": "Armored sideways-walkers",
+      "children": [
+        { "scientificName": "Cancer pagurus", "commonName": "Brown Crab" },
+        { "scientificName": "Macrocheira kaempferi", "commonName": "Japanese Spider Crab" },
+        { "scientificName": "Birgus latro", "commonName": "Coconut Crab" },
+        { "scientificName": "Gecarcinus lateralis", "commonName": "Blackback Land Crab" }
+      ]
+    },
+    {
+      "id": "decapoda_lobsters",
+      "scientificName": "Nephropidae",
+      "commonName": "Lobsters",
+      "category": "Crustaceans",
+      "description": "Clawed titans of the seafloor",
+      "children": [
+        { "scientificName": "Homarus americanus", "commonName": "American Lobster" },
+        { "scientificName": "Homarus gammarus", "commonName": "European Lobster" },
+        { "scientificName": "Panulirus argus", "commonName": "Caribbean Spiny Lobster" },
+        { "scientificName": "Palinurus elephas", "commonName": "European Spiny Lobster" }
+      ]
+    },
+    {
+      "id": "medusozoa",
+      "scientificName": "Scyphozoa",
+      "commonName": "Jellyfish",
+      "category": "Cnidarians",
+      "description": "Drifting stingers of the deep",
+      "children": [
+        { "scientificName": "Aurelia aurita", "commonName": "Moon Jellyfish" },
+        { "scientificName": "Chironex fleckeri", "commonName": "Box Jellyfish" },
+        { "scientificName": "Cyanea capillata", "commonName": "Lion's Mane Jellyfish" },
+        { "scientificName": "Physalia physalis", "commonName": "Portuguese Man o' War" }
+      ]
+    }
+  ],
+  "metadata": {
+    "totalClasses": 107,
+    "categories": {
+      "Mammals": 55,
+      "Birds": 21,
+      "Reptiles": 17,
+      "Amphibians": 6,
+      "Fish": 7,
+      "Insects": 10,
+      "Arachnids": 2,
+      "Mollusks": 1,
+      "Crustaceans": 2,
+      "Cnidarians": 1
+    },
+    "usageNotes": "Each 'class' is a player-selectable starting faction. Children represent potential card variants within that class."
+  }
+}

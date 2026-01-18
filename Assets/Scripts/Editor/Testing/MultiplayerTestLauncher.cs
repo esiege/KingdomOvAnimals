@@ -12,7 +12,7 @@ public static class MultiplayerTestLauncher
 {
     private const string BUILD_PATH = "Build/KingdomOvAnimals.exe";
     
-    [MenuItem("Tools/Multiplayer Test/Build + Run Both (Host in Editor) %&b")]
+    [MenuItem("KOA/Testing/Build + Run Both (Host in Editor) %&b")]
     public static void BuildAndRunBoth()
     {
         // Build first
@@ -31,7 +31,7 @@ public static class MultiplayerTestLauncher
         UnityEngine.Debug.Log("[MultiplayerTest] Build launched as Client. Editor entering Play mode as Host.");
     }
     
-    [MenuItem("Tools/Multiplayer Test/Run Build Only (No Play Mode)")]
+    [MenuItem("KOA/Testing/Run Build Only (No Play Mode)")]
     public static void RunBuildOnly()
     {
         string fullPath = Path.Combine(Directory.GetCurrentDirectory(), BUILD_PATH);
@@ -46,7 +46,7 @@ public static class MultiplayerTestLauncher
         UnityEngine.Debug.Log("[MultiplayerTest] Build launched. Start Play mode manually to host.");
     }
     
-    [MenuItem("Tools/Multiplayer Test/Build Game")]
+    [MenuItem("KOA/Testing/Build Game")]
     public static bool BuildGame()
     {
         UnityEngine.Debug.Log("[MultiplayerTest] Building game...");
@@ -83,7 +83,7 @@ public static class MultiplayerTestLauncher
         }
     }
     
-    [MenuItem("Tools/Multiplayer Test/Open Build Folder")]
+    [MenuItem("KOA/Testing/Open Build Folder")]
     public static void OpenBuildFolder()
     {
         string buildDir = Path.Combine(Directory.GetCurrentDirectory(), "Build");
@@ -97,7 +97,7 @@ public static class MultiplayerTestLauncher
         }
     }
     
-    [MenuItem("Tools/Multiplayer Test/Clean FishNet Cache (Requires Restart)")]
+    [MenuItem("KOA/Testing/Clean FishNet Cache (Requires Restart)")]
     public static void CleanFishNetCache()
     {
         UnityEngine.Debug.Log("[MultiplayerTest] Cleaning FishNet cache to fix SyncType mismatches...");
@@ -142,7 +142,7 @@ public static class MultiplayerTestLauncher
         }
     }
     
-    [MenuItem("Tools/Multiplayer Test/Rebuild SceneIds + Build + Run %&r")]
+    [MenuItem("KOA/Testing/Rebuild SceneIds + Build + Run %&r")]
     public static void RebuildAndRun()
     {
         // Rebuild FishNet SceneIds to ensure sync between editor and build

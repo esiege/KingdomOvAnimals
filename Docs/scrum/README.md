@@ -22,10 +22,10 @@ scrum/
 
 ## Current Sprint
 
-**Sprint 01** - Foundation & Core Gameplay Polish
-- Start Date: January 3, 2026
-- End Date: January 17, 2026 (2 weeks)
-- Goal: Solidify core card gameplay mechanics and targeting system
+**Sprint 04** - Adventure Mode Foundation
+- Start Date: January 17, 2026
+- End Date: January 31, 2026 (2 weeks)
+- Goal: Establish the core loop for Adventure Mode with class selection and story branches
 
 ## Quick Links
 
@@ -38,7 +38,10 @@ scrum/
 
 | Sprint | Dates | Goal | Status |
 |--------|-------|------|--------|
-| Sprint 01 | Jan 3-17, 2026 | Foundation & Core Gameplay Polish | 🟡 In Progress |
+| Sprint 01 | Jan 3-17, 2026 | Networking Foundation | ✅ Complete |
+| Sprint 02 | Jan 6-20, 2026 | Card Management System | ✅ Complete |
+| Sprint 03 | Jan 10-24, 2026 | Runtime Integration | 🟡 In Progress |
+| Sprint 04 | Jan 17-31, 2026 | Adventure Mode Foundation | 🟡 Planned |
 
 ## How to Use This Documentation
 

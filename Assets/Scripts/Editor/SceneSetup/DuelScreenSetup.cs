@@ -10,7 +10,7 @@ using TMPro;
 /// </summary>
 public class DuelScreenSetup : EditorWindow
 {
-    [MenuItem("Tools/KingdomOvAnimals/Setup Disconnect UI")]
+    [MenuItem("KOA/Scene Setup/Setup Disconnect UI")]
     public static void ShowWindow()
     {
         GetWindow<DuelScreenSetup>("Disconnect UI Setup");

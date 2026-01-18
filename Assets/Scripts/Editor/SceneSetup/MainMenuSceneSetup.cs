@@ -12,7 +12,7 @@ using System.IO;
 /// </summary>
 public class MainMenuSceneSetup : EditorWindow
 {
-    [MenuItem("Tools/KingdomOvAnimals/Create Main Menu Scene")]
+    [MenuItem("KOA/Scene Setup/Create Main Menu Scene")]
     public static void ShowWindow()
     {
         GetWindow<MainMenuSceneSetup>("Main Menu Setup");

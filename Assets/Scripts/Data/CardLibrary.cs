@@ -191,6 +191,11 @@ public class CardLibrary : MonoBehaviour
     }
     
     /// <summary>
+    /// Alias for GetCardDataById - used by new Model/View system.
+    /// </summary>
+    public CardData GetCardById(string id) => GetCardDataById(id);
+    
+    /// <summary>
     /// Get an AbilityData asset by its unique ID.
     /// </summary>
     public AbilityData GetAbilityDataById(string id)

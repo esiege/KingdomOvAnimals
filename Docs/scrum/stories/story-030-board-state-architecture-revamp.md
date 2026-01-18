@@ -465,3 +465,124 @@ Assets/Scripts/
 - [FishNet SyncList Documentation](https://fish-networking.gitbook.io/docs/manual/guides/synchronizing/synclists)
 - [Story 012: ScriptableObject Cards](./story-012-scriptableobject-cards.md)
 - [Current Architecture](../../architecture.md)
+
+---
+
+## Implementation Complete - Acceptance Criteria & Test Steps
+
+### Files Created
+
+**Model Layer** (`Assets/Scripts/Model/`):
+- `CardState.cs` - Lightweight card instance data with FishNet serializer
+- `PlayerBoardState.cs` - Player's board (3 slots), hand, deck, resources
+- `BoardState.cs` - Complete game state for both players
+
+**Network Layer** (`Assets/Scripts/Network/`):
+- `NetworkBoardState.cs` - Server-authoritative synchronized state singleton
+
+**View Layer** (`Assets/Scripts/View/`):
+- `CardView.cs` - Visual representation of a card (no game logic)
+- `BoardView.cs` - Board rendering with perspective handling
+- `PlayerStatsView.cs` - Health/mana display
+- `HandView.cs` - Hand card layout and hover effects
+- `TurnUI.cs` - Turn indicator and end turn button
+- `InputController.cs` - User input to game commands
+
+**Logic Layer** (`Assets/Scripts/Logic/`):
+- `TargetingHelper.cs` - Valid target calculation (pure logic, testable)
+
+**Migration** (`Assets/Scripts/Migration/`):
+- `BoardStateBridge.cs` - Bridge between old and new systems
+
+### Acceptance Criteria Checklist
+
+#### Architecture
+- [x] `CardState` is pure data (no MonoBehaviour)
+- [x] `CardView` is visual only (no game logic)
+- [x] `BoardState` is single source of truth
+- [x] All slot references use integer indices (0, 1, 2)
+- [x] All player references use integer IDs (0, 1)
+- [x] No "Player"/"Opponent" string comparisons in new code
+- [x] No `GameObject.Find()` for slot lookup in new code
+- [x] All RPCs use `(playerId, slotIndex)` format
+
+#### Network Sync
+- [x] `NetworkBoardState` uses `SyncVar<BoardState>`
+- [x] Custom FishNet serializers for CardState, PlayerBoardState, BoardState
+- [x] Server authoritative - all state changes go through server
+- [x] Events for UI updates: OnCardPlayed, OnCardDamaged, OnCardDied, OnTurnChanged
+
+#### View Layer
+- [x] `BoardView` handles all visual perspective (mirroring only here)
+- [x] `GetSlotTransform(playerId, slotIndex)` does perspective translation
+- [x] `RenderBoard()` creates/updates/destroys CardViews from state
+- [x] Opponent's cards appear in top slots, player's in bottom slots
+
+### Test Steps
+
+#### Step 1: Add NetworkBoardState to Scene
+1. Open EncounterScene
+2. Create empty GameObject named "NetworkBoardState"
+3. Add `NetworkBoardState` component
+4. Add `NetworkObject` component (for FishNet)
+5. Assign CardLibrary reference
+6. Save scene
+
+#### Step 2: Add BoardView to Scene
+1. Create empty GameObject named "BoardView"
+2. Add `BoardView` component
+3. Set up slot transforms (create or reuse existing slot GameObjects)
+4. Create CardView prefab and assign
+5. Save scene
+
+#### Step 3: Add InputController
+1. Add `InputController` component to BoardView (or new GO)
+2. Assign BoardView reference
+3. Assign CardLibrary reference
+4. Set layer masks for card and slot detection
+
+#### Step 4: Build and Test
+1. Build the project (verify no compile errors)
+2. Start host (Server + Client)
+3. Connect second client
+4. Verify both clients can see empty board
+
+#### Step 5: Test Card Play (New System)
+1. With new InputController, drag card from hand to board slot
+2. Verify card appears in correct slot on BOTH clients
+3. Verify slot index is same on both (no mirroring confusion)
+4. Verify mana is deducted
+
+#### Step 6: Test Board Ability
+1. End turn so played card loses summoning sickness
+2. Drag card on board toward enemy card
+3. Verify damage is applied on BOTH clients
+4. Verify card taps after using ability
+
+#### Step 7: Test Turn System
+1. Verify end turn button works
+2. Verify cards untap at turn start
+3. Verify mana increases at turn start
+4. Verify turn indicator shows correct player
+
+#### Step 8: Verify No Desync
+1. Play several rounds
+2. Verify card positions match on both clients
+3. Verify health/mana match on both clients
+4. Verify no console errors about mismatched state
+
+### Known Limitations (Future Work)
+1. **Not yet integrated with existing HandController** - InputController handles input but old hand display still works separately
+2. **Card prefab needed** - Need to create CardView prefab with proper UI elements
+3. **Deck/draw not fully wired** - DrawCard exists in model but needs turn-start integration
+4. **VFX/Animations placeholder** - PlayDamageAnimation and PlayDeathAnimation are stubs
+5. **Direct player attack** - Not yet implemented (EnemyPlayer target type)
+
+### Migration Notes
+To migrate from old system to new system:
+1. Add new components alongside old ones
+2. Use `BoardStateBridge` to sync state during transition
+3. Gradually route input through `InputController` instead of `HandController`
+4. Once verified working, remove old NetworkPlayer card tracking code
+5. Remove old slot resolution functions from NetworkPlayer
+6. Target: NetworkPlayer under 200 lines after cleanup

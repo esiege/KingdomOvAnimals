@@ -9,7 +9,7 @@ using UnityEditor.SceneManagement;
 /// </summary>
 public class DuelSceneNetworkSetup : EditorWindow
 {
-    [MenuItem("Tools/KingdomOvAnimals/Setup DuelScreen Networking")]
+    [MenuItem("KOA/Scene Setup/Setup DuelScreen Networking")]
     public static void ShowWindow()
     {
         GetWindow<DuelSceneNetworkSetup>("DuelScreen Network Setup");

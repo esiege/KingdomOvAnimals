@@ -11,7 +11,7 @@ namespace KOA.Editor
     /// </summary>
     public static class InitialDataCreator
     {
-        [MenuItem("Tools/KingdomOvAnimals/Create Initial Data")]
+        [MenuItem("KOA/Data/Create Initial Data")]
         public static void CreateInitialData()
         {
             // Ensure directories exist

@@ -267,9 +267,65 @@ Acceptance Criteria:
 
 ---
 
+## Sprint 04 - Adventure Mode Foundation
+
+### Epic: Adventure Mode Core Loop
+
+The primary single-player/multiplayer progression mode where players build decks through narrative choices.
+
+| Story | Title | Points | Status | Dependencies |
+|-------|-------|--------|--------|--------------|
+| 027 | Animal Classification Data System | 5 | Planned | None |
+| 028 | Class Selection UI | 3 | Planned | 027 |
+| 029 | Story Branch Data Structure | 5 | Planned | 027 |
+| 030 | Story Presentation UI | 5 | Planned | 029 |
+| 031 | Card Pack Reward System | 3 | Planned | 029, 020 |
+| 032 | Card Specialization/Upgrade System | 5 | Planned | 031 |
+| 033 | Adventure Progress Tracker | 3 | Planned | 029, 031 |
+| 034 | Board Map UI | 5 | Planned | 033, 030 |
+| 035 | AI Story Generation Integration | 8 | Planned | 029, 027 |
+
+### Story Summaries
+
+#### 027 - Animal Classification Data System
+Load 107 animal classes from JSON for class selection and card theming.
+
+#### 028 - Class Selection UI
+Browse and select an animal class to start adventure mode.
+
+#### 029 - Story Branch Data Structure
+Flexible data model for branching narratives with card rewards.
+
+#### 030 - Story Presentation UI
+Display story scenarios and let players make choices.
+
+#### 031 - Card Pack Reward System
+Add cards to adventure deck based on story choices.
+
+#### 032 - Card Specialization/Upgrade System
+Transform cards through specialization choices (Wolf → Wolf Mage).
+
+#### 033 - Adventure Progress Tracker
+Save/load adventure state between sessions.
+
+#### 034 - Board Map UI
+Visual representation of adventure progress through boards.
+
+#### 035 - AI Story Generation Integration
+Generate contextual story branches using AI.
+
+---
+
 ## Future Backlog
 
 *(Stories to be prioritized in future sprints)*
+
+### Adventure Mode - Planned
+- 036 - Duel Queue for Adventure Mode (match with other adventurers)
+- 037 - Second Class Selection (Board 2 entry)
+- 038 - Endgame Challenges (post-12-win content)
+- 039 - Adventure Rewards/Unlocks
+- 040 - Leaderboard Integration
 
 ---
 

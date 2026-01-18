@@ -8,7 +8,7 @@ public static class ConsoleLogToFileEditor
 {
     private const string OBJECT_NAME = "LogCapture";
     
-    [MenuItem("Tools/Log Capture/Add to Scene")]
+    [MenuItem("KOA/Debug/Log Capture/Add to Scene")]
     public static void AddToScene()
     {
         // Check if already exists
@@ -31,7 +31,7 @@ public static class ConsoleLogToFileEditor
         Debug.Log("[LogCapture] Added to scene. Log will save to Docs/log.txt on play.");
     }
     
-    [MenuItem("Tools/Log Capture/Open Editor Log")]
+    [MenuItem("KOA/Debug/Log Capture/Open Editor Log")]
     public static void OpenLogFile()
     {
         string path = System.IO.Path.Combine(Application.dataPath, "..", "Logs/GameLogs/log_editor.txt");
@@ -45,7 +45,7 @@ public static class ConsoleLogToFileEditor
         }
     }
     
-    [MenuItem("Tools/Log Capture/Open Build Log")]
+    [MenuItem("KOA/Debug/Log Capture/Open Build Log")]
     public static void OpenClientLogFile()
     {
         string path = System.IO.Path.Combine(Application.dataPath, "..", "Logs/GameLogs/log_build.txt");
@@ -59,7 +59,7 @@ public static class ConsoleLogToFileEditor
         }
     }
     
-    [MenuItem("Tools/Log Capture/Open Logs Folder")]
+    [MenuItem("KOA/Debug/Log Capture/Open Logs Folder")]
     public static void OpenLogsFolder()
     {
         string logsDir = System.IO.Path.Combine(Application.dataPath, "..", "Logs/GameLogs");
@@ -73,7 +73,7 @@ public static class ConsoleLogToFileEditor
         }
     }
     
-    [MenuItem("Tools/Log Capture/Clear Editor Log")]
+    [MenuItem("KOA/Debug/Log Capture/Clear Editor Log")]
     public static void ClearLogFile()
     {
         string path = System.IO.Path.Combine(Application.dataPath, "..", "Logs/GameLogs/log_editor.txt");

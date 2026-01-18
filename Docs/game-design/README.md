@@ -7,6 +7,7 @@ Documentation for Kingdom Ov Animals game rules, mechanics, and design decisions
 | Document | Description |
 |----------|-------------|
 | [abilities.md](abilities.md) | Ability system, effect types, and composable effects |
+| [adventure-mode.md](adventure-mode.md) | Adventure Mode design - deck building through narrative |
 | [cards.md](cards.md) | Card properties, stats, state flags, and visual elements |
 | [game-flow.md](game-flow.md) | Match initialization, turn structure, and player actions |
 | [targeting.md](targeting.md) | Unique drag-to-target system that defines gameplay |

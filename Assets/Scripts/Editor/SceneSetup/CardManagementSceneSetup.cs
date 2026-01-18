@@ -13,7 +13,7 @@ namespace KOA.Editor
     /// </summary>
     public static class CardManagementSceneSetup
     {
-        [MenuItem("Tools/KingdomOvAnimals/Create Card Management Scene")]
+        [MenuItem("KOA/Scene Setup/Create Card Management Scene")]
         public static void CreateCardManagementScene()
         {
             // Prevent running in play mode
