@@ -462,22 +462,27 @@ public class HandController : MonoBehaviour
             return;
         }
 
-        // Check if we're in a network game
+        // Network play - use old system (NetworkPlayer) which handles validation
+        // The old system broadcasts via RpcExecuteCardPlay and hooks into BoardStateBridge
         if (owningPlayer.networkPlayer != null)
         {
-            // Network play - send request to server
-            int cardIndex = playerHand.IndexOf(card);
+            int handIndex = playerHand.IndexOf(card);
             int slotIndex = GetSlotIndex(hitObject);
             
-            if (cardIndex >= 0 && slotIndex >= 0)
+            if (handIndex < 0)
             {
-                Debug.Log($"[HandController] Sending network card play: card {cardIndex}, slot {slotIndex}");
-                owningPlayer.networkPlayer.CmdPlayCard(cardIndex, slotIndex);
+                Debug.LogError($"[HandController] Card '{card.cardName}' not found in hand!");
+                return;
             }
-            else
+            
+            if (slotIndex < 0)
             {
-                Debug.LogError($"[HandController] Invalid card index {cardIndex} or slot index {slotIndex}");
+                Debug.LogError($"[HandController] Invalid slot from '{hitObject.name}'!");
+                return;
             }
+            
+            Debug.Log($"[HandController] Sending card play via NetworkPlayer: hand={handIndex}, slot={slotIndex}");
+            owningPlayer.networkPlayer.CmdPlayCard(handIndex, slotIndex);
             return;
         }
 
@@ -563,7 +568,7 @@ public class HandController : MonoBehaviour
     {
         if (!ValidateAbilityTarget(targetCard)) return;
 
-        // Check if we're in a network game
+        // Network play - use old system (NetworkPlayer) with slot names
         if (owningPlayer.networkPlayer != null)
         {
             if (activeCard.isInPlay)
@@ -615,7 +620,7 @@ public class HandController : MonoBehaviour
     {
         if (!ValidateAbilityTarget(targetPlayer)) return;
 
-        // Check if we're in a network game
+        // Network play - use old system (NetworkPlayer) with slot names
         if (owningPlayer.networkPlayer != null)
         {
             if (activeCard.isInPlay)
@@ -624,27 +629,33 @@ public class HandController : MonoBehaviour
                 string attackerSlotName = GetCardSlotName(activeCard);
                 int targetPlayerId = targetPlayer.networkPlayer?.PlayerId.Value ?? -1;
                 
-                Debug.Log($"[HandController] DEBUG: targetPlayer={targetPlayer.gameObject.name}, targetPlayer.networkPlayer={(targetPlayer.networkPlayer != null ? targetPlayer.networkPlayer.PlayerName.Value : "null")}, targetPlayerId={targetPlayerId}");
-                
                 if (attackerSlotName != null && targetPlayerId >= 0)
                 {
-                    Debug.Log($"[HandController] Sending network ability use on player: {activeCard.cardName} ({attackerSlotName}) -> Player {targetPlayerId}");
+                    Debug.Log($"[HandController] Sending network ability on player: {activeCard.cardName} ({attackerSlotName}) -> player {targetPlayerId}");
                     owningPlayer.networkPlayer.CmdUseAbilityOnPlayer(attackerSlotName, targetPlayerId, true);
+                    return;
+                }
+                else
+                {
+                    Debug.LogError($"[HandController] Could not find slot for attacker card or target player ID");
                     return;
                 }
             }
             else
             {
-                // Card is in hand (flip ability) - use hand index
+                // Card is in hand (flip ability on player)
                 int handIndex = playerHand.IndexOf(activeCard);
                 int targetPlayerId = targetPlayer.networkPlayer?.PlayerId.Value ?? -1;
                 
-                Debug.Log($"[HandController] DEBUG: targetPlayer={targetPlayer.gameObject.name}, targetPlayer.networkPlayer={(targetPlayer.networkPlayer != null ? targetPlayer.networkPlayer.PlayerName.Value : "null")}, targetPlayerId={targetPlayerId}");
-                
                 if (handIndex >= 0 && targetPlayerId >= 0)
                 {
-                    Debug.Log($"[HandController] Sending network flip ability on player: {activeCard.cardName} (hand index {handIndex}) -> Player {targetPlayerId}");
+                    Debug.Log($"[HandController] Sending network flip ability on player: {activeCard.cardName} (hand index {handIndex}) -> player {targetPlayerId}");
                     owningPlayer.networkPlayer.CmdUseFlipAbilityOnPlayer(handIndex, targetPlayerId, true);
+                    return;
+                }
+                else
+                {
+                    Debug.LogError($"[HandController] Could not find hand index or target player ID for flip ability");
                     return;
                 }
             }
@@ -671,6 +682,59 @@ public class HandController : MonoBehaviour
         }
         
         return null;
+    }
+    
+    /// <summary>
+    /// Gets the board position (playerId, slotIndex) for a card that is in play.
+    /// Uses integer IDs instead of magic strings.
+    /// </summary>
+    /// <returns>A tuple of (playerId, slotIndex), or (-1, -1) if card not on board</returns>
+    private (int playerId, int slotIndex) GetCardBoardPosition(CardController card)
+    {
+        if (card == null || !card.isInPlay) return (-1, -1);
+        
+        // The card's parent should be the slot
+        Transform parent = card.transform.parent;
+        if (parent == null || !parent.name.Contains("Slot"))
+        {
+            return (-1, -1);
+        }
+        
+        string slotName = parent.name;
+        
+        // Determine player ID: "PlayerSlot" = local player, "OpponentSlot" = opponent
+        // From local player's perspective, "PlayerSlot" is always their card
+        int localPlayerId = owningPlayer?.networkPlayer?.PlayerId.Value ?? 0;
+        int playerId;
+        
+        if (slotName.StartsWith("PlayerSlot"))
+        {
+            // Card is on "my" side of the board
+            playerId = localPlayerId;
+        }
+        else if (slotName.StartsWith("OpponentSlot"))
+        {
+            // Card is on opponent's side
+            playerId = 1 - localPlayerId;
+        }
+        else
+        {
+            return (-1, -1);
+        }
+        
+        // Extract slot index (1-based in name, convert to 0-based)
+        int slotIndex = GetSlotIndex(parent.gameObject);
+        
+        // For opponent cards, we need to un-mirror the visual slot back to logical slot
+        // Visual slot 0 (front) = logical slot 2, visual slot 2 (back) = logical slot 0
+        if (playerId != localPlayerId)
+        {
+            if (slotIndex == 0) slotIndex = 2;
+            else if (slotIndex == 2) slotIndex = 0;
+            // slot 1 (middle) stays the same
+        }
+        
+        return (playerId, slotIndex);
     }
 
     // Helper method to validate ability target (without applying effects)

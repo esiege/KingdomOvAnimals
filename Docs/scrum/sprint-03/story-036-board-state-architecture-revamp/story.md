@@ -1,4 +1,4 @@
-# Story 030: Board State Architecture Revamp
+# Story 036: Board State Architecture Revamp
 
 ## User Story
 **As a** developer  
@@ -264,13 +264,14 @@ The current implementation has accumulated technical debt making multiplayer car
 - B) Refactor incrementally
 - C) Wrap with adapter layer
 
-**Decision: B - Refactor incrementally**
+**Decision: A - Delete and rewrite (REPLACEMENT)**
 
 **Rationale:**
-- Less risk than full rewrite
-- Can test at each step
-- Preserve working input/targeting logic where possible
-- Goal: migrate state tracking, keep UI wiring
+- Old system is fundamentally broken (magic strings, multiple sources of truth)
+- "Migrating" leads to two parallel systems and confusion
+- BoardState IS the source of truth - old controllers are DEPRECATED
+- Clean break prevents half-measures and bridge code
+- Old CardController/HandController/PlayerController will be REMOVED, not adapted
 
 ---
 
@@ -317,33 +318,49 @@ The current implementation has accumulated technical debt making multiplayer car
 
 **Acceptance:** Empty board renders correctly for both players
 
-### Phase 4: Card Play Flow (First integration) 🔴 IN PROGRESS
-1. Wire input to `NetworkBoardState.RequestPlayCard()`
-2. Implement server-side card play logic
-3. Update SyncList, notify clients
-4. BoardView creates/positions CardView
+### Phase 4: Card Play Flow (REPLACEMENT) 🔴 IN PROGRESS
+
+**CRITICAL: BoardState is the ONLY source of truth. No bridging to old system.**
+
+1. Card dealing populates `BoardState.Players[].Hand` directly
+2. HandController reads from BoardState, sends commands to NetworkBoardState
+3. NetworkBoardState validates against BoardState (its own data)
+4. Server updates BoardState, broadcasts RPC with integer IDs
+5. Clients update visuals from BoardState changes
 
 **Status:** HandController still calls old NetworkPlayer.CmdPlayCard. BoardState.Hand is not populated when cards are dealt.
 
-**Acceptance:** Can play card, appears on both clients in correct position
+**Blockers to fix:**
+- Card spawning must add CardState to BoardState.Hand, not just create CardController
+- HandController must call NetworkBoardState.CmdPlayCard, not NetworkPlayer
+- NetworkBoardState validates against its own BoardState data
 
-### Phase 5: Ability Targeting (Core combat) ❌ TODO
-1. Implement `RequestUseAbility(attackerSlot, targetPlayerId, targetSlot)`
-2. Server validates and applies damage
-3. Update CardState.CurrentHealth in SyncList
-4. CardView updates health display
-5. Handle card death (remove from board)
+**Acceptance:** Can play card, appears on both clients in correct position. Old NetworkPlayer.CmdPlayCard is NOT called.
 
-**Acceptance:** Can attack cards, damage syncs, death removes card
+### Phase 5: Ability Targeting (REPLACEMENT) ❌ TODO
 
-### Phase 6: Migration & Cleanup ❌ TODO
-1. Remove old slot resolution code from NetworkPlayer
-2. Remove string-based slot lookups
-3. Slim down NetworkPlayer to identity only
-4. Update EncounterController to use new system
-5. Remove redundant PlayerController.cardsOnBoard tracking
+**CRITICAL: All combat goes through NetworkBoardState with integer IDs. Old NetworkPlayer ability RPCs are DEAD CODE.**
 
-**Acceptance:** All old perspective code removed, tests pass
+1. HandController sends `NetworkBoardState.CmdUseBoardAbility(attackerPlayerId, attackerSlot, targetPlayerId, targetSlot)`
+2. Server validates attacker/target exist in BoardState
+3. Server calculates damage, updates CardState.CurrentHealth
+4. Server determines death (health <= 0) - SERVER AUTHORITATIVE
+5. Server broadcasts `RpcCardDamaged` and `RpcCardDied` with integer IDs
+6. Clients update visuals based on RPC data, NOT local calculation
+
+**Acceptance:** Can attack cards, damage syncs, death removes card on ALL clients. Old NetworkPlayer.CmdUseAbilityOnCard is NOT called.
+
+### Phase 6: Delete Old Code ❌ TODO
+
+**This phase REMOVES deprecated code. If Phase 4-5 are done correctly, this is just deletion.**
+
+1. Delete NetworkPlayer card play/ability methods (CmdPlayCard, CmdUseAbilityOnCard, etc.)
+2. Delete NetworkPlayer slot resolution functions (ResolveSlotNameForPlayer, TranslateClientSlotToServer, etc.)
+3. Delete PlayerController.cardsOnBoard tracking
+4. Delete HandController.playerHand (reads from BoardState instead)
+5. NetworkPlayer becomes identity-only (~100 lines: PlayerId, PlayerName, connection)
+
+**Acceptance:** NetworkPlayer under 150 lines. No magic strings in codebase. No GameObject.Find for slots.
 
 ### Phase 7: Polish & Edge Cases ❌ TODO
 1. Hand management integration
@@ -574,17 +591,22 @@ Assets/Scripts/
 4. Verify no console errors about mismatched state
 
 ### Known Limitations (Future Work)
-1. **Not yet integrated with existing HandController** - InputController handles input but old hand display still works separately
-2. **Card prefab needed** - Need to create CardView prefab with proper UI elements
-3. **Deck/draw not fully wired** - DrawCard exists in model but needs turn-start integration
-4. **VFX/Animations placeholder** - PlayDamageAnimation and PlayDeathAnimation are stubs
-5. **Direct player attack** - Not yet implemented (EnemyPlayer target type)
+1. **Card prefab needed** - Need to create CardView prefab with proper UI elements
+2. **Deck/draw not fully wired** - DrawCard exists in model but needs turn-start integration
+3. **VFX/Animations placeholder** - PlayDamageAnimation and PlayDeathAnimation are stubs
+4. **Direct player attack** - Not yet implemented (EnemyPlayer target type)
 
-### Migration Notes
-To migrate from old system to new system:
-1. Add new components alongside old ones
-2. Use `BoardStateBridge` to sync state during transition
-3. Gradually route input through `InputController` instead of `HandController`
-4. Once verified working, remove old NetworkPlayer card tracking code
-5. Remove old slot resolution functions from NetworkPlayer
-6. Target: NetworkPlayer under 200 lines after cleanup
+### Implementation Rules
+
+**DO:**
+- BoardState is the ONLY source of truth for game state
+- All commands go through NetworkBoardState with integer IDs (playerId, slotIndex)
+- Server validates against BoardState, server determines outcomes (damage, death)
+- Clients render based on RPC broadcasts, never calculate game logic locally
+
+**DO NOT:**
+- Call old NetworkPlayer card methods (they are deprecated)
+- Use magic strings ("PlayerSlot-1", "OpponentSlot-2")
+- Calculate card death on client (server authoritative)
+- Create "bridge" or "sync" code between old and new systems
+- Keep old system "working" alongside new system

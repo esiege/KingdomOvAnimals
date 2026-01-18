@@ -157,8 +157,9 @@ namespace KOA.Editor
             
             // Check CardLibrary
             var cardLibrary = FindObjectOfType<CardLibrary>();
-            DrawValidationItem("CardLibrary", cardLibrary != null, 
-                cardLibrary != null ? "Found in scene" : "Missing! Required for card data lookup.");
+            DrawValidationItemWithFix("CardLibrary", cardLibrary != null, 
+                cardLibrary != null ? "Found in scene" : "Missing! Required for card data lookup.",
+                cardLibrary == null ? CreateCardLibrary : (System.Action)null);
             
             // Check NetworkBoardState references
             var networkBoardState = FindObjectOfType<NetworkBoardState>();
@@ -167,8 +168,9 @@ namespace KOA.Editor
                 var so = new SerializedObject(networkBoardState);
                 var cardLibRef = so.FindProperty("_cardLibrary");
                 bool hasCardLib = cardLibRef != null && cardLibRef.objectReferenceValue != null;
-                DrawValidationItem("NetworkBoardState.CardLibrary", hasCardLib,
-                    hasCardLib ? "Assigned" : "Not assigned! Drag CardLibrary reference.");
+                DrawValidationItemWithFix("NetworkBoardState.CardLibrary", hasCardLib,
+                    hasCardLib ? "Assigned" : "Not assigned!",
+                    !hasCardLib ? () => AutoAssignCardLibrary(networkBoardState) : (System.Action)null);
             }
             
             // Check BoardView references
@@ -176,25 +178,31 @@ namespace KOA.Editor
             if (boardView != null)
             {
                 var so = new SerializedObject(boardView);
-                var slotsRef = so.FindProperty("_playerSlots");
-                bool hasSlots = slotsRef != null && slotsRef.arraySize >= 3;
-                DrawValidationItem("BoardView.PlayerSlots", hasSlots,
-                    hasSlots ? $"{slotsRef.arraySize} slots configured" : "Need 3 slot transforms!");
+                var slotsRef = so.FindProperty("_player0Slots");
+                bool hasSlots = slotsRef != null && slotsRef.arraySize >= 3 && slotsRef.GetArrayElementAtIndex(0).objectReferenceValue != null;
+                DrawValidationItemWithFix("BoardView.PlayerSlots", hasSlots,
+                    hasSlots ? $"{slotsRef.arraySize} slots configured" : "Need 3 slot transforms!",
+                    !hasSlots ? () => AutoFindAndAssignSlots(boardView) : (System.Action)null);
             }
             
             // Check for NetworkObject on NetworkBoardState
             if (networkBoardState != null)
             {
                 var networkObj = networkBoardState.GetComponent<NetworkObject>();
-                DrawValidationItem("NetworkBoardState.NetworkObject", networkObj != null,
-                    networkObj != null ? "Has NetworkObject" : "Missing NetworkObject component!");
+                DrawValidationItemWithFix("NetworkBoardState.NetworkObject", networkObj != null,
+                    networkObj != null ? "Has NetworkObject" : "Missing NetworkObject component!",
+                    networkObj == null ? () => networkBoardState.gameObject.AddComponent<NetworkObject>() : (System.Action)null);
             }
             
             EditorGUILayout.Space(5);
             
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Refresh Validation", GUILayout.Width(150)))
+            if (GUILayout.Button("Auto-Fix All", GUILayout.Width(100)))
+            {
+                AutoFixAll();
+            }
+            if (GUILayout.Button("Refresh", GUILayout.Width(80)))
             {
                 Repaint();
             }
@@ -204,7 +212,7 @@ namespace KOA.Editor
             EditorGUI.indentLevel--;
         }
         
-        private void DrawValidationItem(string name, bool isValid, string message)
+        private void DrawValidationItemWithFix(string name, bool isValid, string message, System.Action fixAction)
         {
             EditorGUILayout.BeginHorizontal();
             
@@ -216,7 +224,203 @@ namespace KOA.Editor
             EditorGUILayout.LabelField(name, GUILayout.Width(180));
             EditorGUILayout.LabelField(message, isValid ? EditorStyles.miniLabel : EditorStyles.miniBoldLabel);
             
+            if (fixAction != null)
+            {
+                if (GUILayout.Button("Fix", GUILayout.Width(40)))
+                {
+                    fixAction();
+                    Repaint();
+                }
+            }
+            
             EditorGUILayout.EndHorizontal();
+        }
+        
+        private void DrawValidationItem(string name, bool isValid, string message)
+        {
+            DrawValidationItemWithFix(name, isValid, message, null);
+        }
+        
+        private void AutoFixAll()
+        {
+            // Fix CardLibrary
+            var cardLibrary = FindObjectOfType<CardLibrary>();
+            if (cardLibrary == null)
+            {
+                CreateCardLibrary();
+                cardLibrary = FindObjectOfType<CardLibrary>();
+            }
+            
+            // Fix NetworkBoardState.CardLibrary
+            var networkBoardState = FindObjectOfType<NetworkBoardState>();
+            if (networkBoardState != null && cardLibrary != null)
+            {
+                AutoAssignCardLibrary(networkBoardState);
+            }
+            
+            // Fix BoardView slots
+            var boardView = FindObjectOfType<BoardView>();
+            if (boardView != null)
+            {
+                AutoFindAndAssignSlots(boardView);
+            }
+            
+            // Fix NetworkObject
+            if (networkBoardState != null && networkBoardState.GetComponent<NetworkObject>() == null)
+            {
+                networkBoardState.gameObject.AddComponent<NetworkObject>();
+            }
+            
+            Debug.Log("[BoardStateSetup] Auto-fix complete!");
+            Repaint();
+        }
+        
+        private void CreateCardLibrary()
+        {
+            var go = new GameObject("CardLibrary");
+            go.AddComponent<CardLibrary>();
+            Undo.RegisterCreatedObjectUndo(go, "Create CardLibrary");
+            Debug.Log("[BoardStateSetup] Created CardLibrary - populate card prefabs in Inspector");
+        }
+        
+        private void AutoAssignCardLibrary(NetworkBoardState networkBoardState)
+        {
+            var cardLibrary = FindObjectOfType<CardLibrary>();
+            if (cardLibrary == null)
+            {
+                Debug.LogWarning("[BoardStateSetup] No CardLibrary found in scene");
+                return;
+            }
+            
+            var so = new SerializedObject(networkBoardState);
+            var prop = so.FindProperty("_cardLibrary");
+            if (prop != null)
+            {
+                prop.objectReferenceValue = cardLibrary;
+                so.ApplyModifiedProperties();
+                Debug.Log("[BoardStateSetup] Assigned CardLibrary to NetworkBoardState");
+            }
+        }
+        
+        private void AutoFindAndAssignSlots(BoardView boardView)
+        {
+            var so = new SerializedObject(boardView);
+            
+            // First check if BoardView already has a parent with slot children we can use
+            // Look for Board object in scene which typically has slot children
+            var boardObj = GameObject.Find("Board");
+            
+            Transform[] playerSlots = null;
+            Transform[] opponentSlots = null;
+            
+            if (boardObj != null)
+            {
+                // Try to find slots as children of Board
+                playerSlots = FindSlotsUnderParent(boardObj.transform, "Player", "Bottom", "P1", "Local", "1");
+                opponentSlots = FindSlotsUnderParent(boardObj.transform, "Opponent", "Top", "P2", "Enemy", "Remote", "2");
+                
+                Debug.Log($"[BoardStateSetup] Found Board object. Player slots: {playerSlots?.Length ?? 0}, Opponent slots: {opponentSlots?.Length ?? 0}");
+            }
+            
+            // If we still don't have slots, create them
+            if (playerSlots == null || playerSlots.Length < 3)
+            {
+                Debug.Log("[BoardStateSetup] Creating new player slots");
+                playerSlots = CreateSlotsForBoardView(boardView, "Player", -2f);
+            }
+            
+            if (opponentSlots == null || opponentSlots.Length < 3)
+            {
+                Debug.Log("[BoardStateSetup] Creating new opponent slots");
+                opponentSlots = CreateSlotsForBoardView(boardView, "Opponent", 2f);
+            }
+            
+            // Assign player slots
+            var playerSlotsProp = so.FindProperty("_player0Slots");
+            if (playerSlotsProp != null && playerSlots.Length >= 3)
+            {
+                playerSlotsProp.arraySize = 3;
+                for (int i = 0; i < 3; i++)
+                {
+                    playerSlotsProp.GetArrayElementAtIndex(i).objectReferenceValue = playerSlots[i];
+                }
+                Debug.Log($"[BoardStateSetup] Assigned {playerSlots.Length} player slots");
+            }
+            
+            // Assign opponent slots
+            var opponentSlotsProp = so.FindProperty("_player1Slots");
+            if (opponentSlotsProp != null && opponentSlots.Length >= 3)
+            {
+                opponentSlotsProp.arraySize = 3;
+                for (int i = 0; i < 3; i++)
+                {
+                    opponentSlotsProp.GetArrayElementAtIndex(i).objectReferenceValue = opponentSlots[i];
+                }
+                Debug.Log($"[BoardStateSetup] Assigned {opponentSlots.Length} opponent slots");
+            }
+            
+            so.ApplyModifiedProperties();
+            EditorUtility.SetDirty(boardView);
+            Debug.Log("[BoardStateSetup] Slots setup complete!");
+        }
+        
+        private Transform[] FindSlotsUnderParent(Transform parent, params string[] keywords)
+        {
+            var slots = new System.Collections.Generic.List<Transform>();
+            
+            // Search recursively under parent
+            SearchForSlots(parent, keywords, slots);
+            
+            // Sort by name to get consistent ordering
+            slots.Sort((a, b) => a.name.CompareTo(b.name));
+            
+            // Return first 3 if we have them
+            if (slots.Count >= 3)
+            {
+                return new Transform[] { slots[0], slots[1], slots[2] };
+            }
+            
+            return slots.ToArray();
+        }
+        
+        private void SearchForSlots(Transform parent, string[] keywords, System.Collections.Generic.List<Transform> results)
+        {
+            foreach (Transform child in parent)
+            {
+                string name = child.name.ToLower();
+                
+                // Check if name contains any keyword
+                foreach (var keyword in keywords)
+                {
+                    if (name.Contains(keyword.ToLower()))
+                    {
+                        results.Add(child);
+                        break;
+                    }
+                }
+                
+                // Also search children
+                SearchForSlots(child, keywords, results);
+            }
+        }
+        
+        private Transform[] CreateSlotsForBoardView(BoardView boardView, string prefix, float yPos)
+        {
+            var parent = new GameObject($"{prefix}Slots");
+            parent.transform.SetParent(boardView.transform);
+            parent.transform.localPosition = new Vector3(0, yPos, 0);
+            
+            var slots = new Transform[3];
+            for (int i = 0; i < 3; i++)
+            {
+                var slot = new GameObject($"{prefix}Slot_{i}");
+                slot.transform.SetParent(parent.transform);
+                slot.transform.localPosition = new Vector3((i - 1) * 2.5f, 0, 0);
+                slots[i] = slot.transform;
+            }
+            
+            Undo.RegisterCreatedObjectUndo(parent, $"Create {prefix} Slots");
+            return slots;
         }
         
         #endregion
@@ -458,6 +662,7 @@ namespace KOA.Editor
             if (!HasBoardView()) CreateBoardView();
             if (!HasInputController()) CreateInputController();
             if (!HasTurnUI()) CreateTurnUI();
+            if (!HasBoardStateBridge()) CreateBoardStateBridge();
             
             Debug.Log("[BoardStateSetup] Created all missing components");
         }

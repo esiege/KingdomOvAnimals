@@ -818,10 +818,15 @@ public class NetworkPlayer : NetworkBehaviour
         // Get damage amount from CardData (new system) or legacy DamageAbility
         int damageAmount = GetAbilityDamage(attacker, isOffensive);
         
-        Debug.Log($"[Server] {attacker.cardName} uses ability on {target.cardName} for {damageAmount} damage");
+        // Check if target will die from this damage (server authoritative check)
+        int newHealth = target.health - damageAmount;
+        bool targetWillDie = newHealth <= 0;
+        
+        Debug.Log($"[Server] {attacker.cardName} uses ability on {target.cardName} for {damageAmount} damage (health {target.health} -> {newHealth}, willDie={targetWillDie})");
         
         // Broadcast ability use to all clients with owner IDs for correct perspective
-        RpcExecuteAbilityOnCard(attackerOwnerId, attackerSlotIndex, targetOwnerId, targetSlotIndex, isOffensive, damageAmount);
+        // Also include whether the target dies so clients know not to calculate independently
+        RpcExecuteAbilityOnCard(attackerOwnerId, attackerSlotIndex, targetOwnerId, targetSlotIndex, isOffensive, damageAmount, targetWillDie);
     }
     
     /// <summary>
@@ -920,13 +925,17 @@ public class NetworkPlayer : NetworkBehaviour
         // Get damage amount from CardData (new system) or legacy DamageAbility
         int damageAmount = GetAbilityDamage(attacker, isOffensive);
         
+        // Check if target will die from this damage (server authoritative check)
+        int newHealth = target.health - damageAmount;
+        bool targetWillDie = newHealth <= 0;
+        
         // Deduct mana
         CurrentMana.Value -= attacker.manaCost;
         
-        Debug.Log($"[Server] {attacker.cardName} (flip) uses ability on {target.cardName} for {damageAmount} damage");
+        Debug.Log($"[Server] {attacker.cardName} (flip) uses ability on {target.cardName} for {damageAmount} damage (health {target.health} -> {newHealth}, willDie={targetWillDie})");
         
         // Broadcast flip ability use to all clients with owner ID for correct perspective
-        RpcExecuteFlipAbilityOnCard(handIndex, targetOwnerId, targetSlotIndex, isOffensive, damageAmount);
+        RpcExecuteFlipAbilityOnCard(handIndex, targetOwnerId, targetSlotIndex, isOffensive, damageAmount, targetWillDie);
     }
     
     /// <summary>
@@ -1063,10 +1072,11 @@ public class NetworkPlayer : NetworkBehaviour
     /// Broadcast to all clients to execute an ability on a card target.
     /// Uses owner IDs + slot indices so each client resolves to correct perspective.
     /// </summary>
+    /// <param name="targetWillDie">Server-authoritative flag indicating if target dies from this damage</param>
     [ObserversRpc]
-    private void RpcExecuteAbilityOnCard(int attackerOwnerId, int attackerSlotIndex, int targetOwnerId, int targetSlotIndex, bool isOffensive, int damageAmount)
+    private void RpcExecuteAbilityOnCard(int attackerOwnerId, int attackerSlotIndex, int targetOwnerId, int targetSlotIndex, bool isOffensive, int damageAmount, bool targetWillDie)
     {
-        Debug.Log($"[Client] Executing ability: attackerOwner={attackerOwnerId}, attackerSlot={attackerSlotIndex}, targetOwner={targetOwnerId}, targetSlot={targetSlotIndex}, damage={damageAmount}");
+        Debug.Log($"[Client] Executing ability: attackerOwner={attackerOwnerId}, attackerSlot={attackerSlotIndex}, targetOwner={targetOwnerId}, targetSlot={targetSlotIndex}, damage={damageAmount}, willDie={targetWillDie}");
         
         // Resolve slot names based on local perspective
         string attackerSlotName = ResolveSlotNameForPlayer(attackerOwnerId, attackerSlotIndex);
@@ -1084,10 +1094,10 @@ public class NetworkPlayer : NetworkBehaviour
         // Tap the attacker
         attacker.TapCard();
         
-        // Apply damage to target
+        // Apply damage to target - use server-authoritative death check
         if (damageAmount > 0)
         {
-            target.TakeDamage(damageAmount);
+            target.TakeDamageNetworked(damageAmount, targetWillDie);
         }
         else
         {
@@ -1128,8 +1138,9 @@ public class NetworkPlayer : NetworkBehaviour
     /// Broadcast to all clients to execute a flip ability (card from hand) on a card target.
     /// Uses target owner ID + slot index so each client resolves to correct perspective.
     /// </summary>
+    /// <param name="targetWillDie">Server-authoritative flag indicating if target dies from this damage</param>
     [ObserversRpc]
-    private void RpcExecuteFlipAbilityOnCard(int handIndex, int targetOwnerId, int targetSlotIndex, bool isOffensive, int damageAmount)
+    private void RpcExecuteFlipAbilityOnCard(int handIndex, int targetOwnerId, int targetSlotIndex, bool isOffensive, int damageAmount, bool targetWillDie)
     {
         // Get local player info for debug
         NetworkPlayer localPlayer = null;
@@ -1143,7 +1154,7 @@ public class NetworkPlayer : NetworkBehaviour
         }
         int localPlayerId = localPlayer != null ? localPlayer.PlayerId.Value : -1;
         
-        Debug.Log($"[Client PlayerId={localPlayerId}] Executing flip ability: hand index={handIndex}, targetOwner={targetOwnerId}, slotIndex={targetSlotIndex}, damage={damageAmount}");
+        Debug.Log($"[Client PlayerId={localPlayerId}] Executing flip ability: hand index={handIndex}, targetOwner={targetOwnerId}, slotIndex={targetSlotIndex}, damage={damageAmount}, willDie={targetWillDie}");
         
         // Get the hand controller and card
         var handController = GetHandController();
@@ -1179,10 +1190,10 @@ public class NetworkPlayer : NetworkBehaviour
         // Flip the attacker card
         attacker.FlipCard();
         
-        // Apply damage to target
+        // Apply damage to target - use server-authoritative death check
         if (damageAmount > 0)
         {
-            target.TakeDamage(damageAmount);
+            target.TakeDamageNetworked(damageAmount, targetWillDie);
         }
         else
         {

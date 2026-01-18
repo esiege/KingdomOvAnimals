@@ -223,7 +223,7 @@ public class CardController : MonoBehaviour
     }
 
 
-    // Method to manage health
+    // Method to manage health (local/single-player)
     public void TakeDamage(int damage)
     {
         Debug.Log($"{cardName} takes {damage} damage. Current health: {health} -> {health - damage}");
@@ -236,6 +236,30 @@ public class CardController : MonoBehaviour
         }
         else
         {
+            UpdateCardUI();
+        }
+    }
+    
+    /// <summary>
+    /// Takes damage with server-authoritative death determination.
+    /// Used in networked games to ensure all clients agree on card death.
+    /// </summary>
+    /// <param name="damage">Amount of damage to take</param>
+    /// <param name="willDie">Server-determined flag indicating if this card should die</param>
+    public void TakeDamageNetworked(int damage, bool willDie)
+    {
+        Debug.Log($"[Networked] {cardName} takes {damage} damage. Current health: {health} -> {health - damage}. Server says willDie={willDie}");
+
+        health -= damage;
+        
+        if (willDie)
+        {
+            // Server says this card dies - remove it
+            owningPlayer.RemoveCardFromBoard(this);
+        }
+        else
+        {
+            // Server says card survives - just update UI
             UpdateCardUI();
         }
     }

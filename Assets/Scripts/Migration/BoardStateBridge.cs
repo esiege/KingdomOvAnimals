@@ -44,6 +44,7 @@ namespace KOA.Migration
             {
                 NetworkBoardState.Instance.OnStateChanged += OnNewStateChanged;
                 NetworkBoardState.Instance.OnCardPlayed += OnNewCardPlayed;
+                NetworkBoardState.Instance.OnCardDamaged += OnNewCardDamaged;
                 NetworkBoardState.Instance.OnCardDied += OnNewCardDied;
                 NetworkBoardState.Instance.OnTurnChanged += OnNewTurnChanged;
             }
@@ -55,6 +56,7 @@ namespace KOA.Migration
             {
                 NetworkBoardState.Instance.OnStateChanged -= OnNewStateChanged;
                 NetworkBoardState.Instance.OnCardPlayed -= OnNewCardPlayed;
+                NetworkBoardState.Instance.OnCardDamaged -= OnNewCardDamaged;
                 NetworkBoardState.Instance.OnCardDied -= OnNewCardDied;
                 NetworkBoardState.Instance.OnTurnChanged -= OnNewTurnChanged;
             }
@@ -76,20 +78,22 @@ namespace KOA.Migration
                 }
             }
             
-            // Find PlayerControllers
-            var controllers = FindObjectsOfType<PlayerController>();
-            foreach (var controller in controllers)
+            // Find PlayerControllers by name (they're always named "Player" and "Opponent" in the scene)
+            var playerObj = GameObject.Find("Player");
+            var opponentObj = GameObject.Find("Opponent");
+            
+            if (playerObj != null)
             {
-                if (_localNetworkPlayer != null && controller == _localNetworkPlayer.LinkedPlayerController)
-                {
-                    _localPlayerController = controller;
-                }
-                else if (_localPlayerController == null)
-                {
-                    // Fallback: first controller without a linked network player
-                    _localPlayerController = controller;
-                }
+                _localPlayerController = playerObj.GetComponent<PlayerController>();
             }
+            if (opponentObj != null)
+            {
+                _opponentPlayerController = opponentObj.GetComponent<PlayerController>();
+            }
+            
+            Debug.Log($"[BoardStateBridge] Found references: LocalNetworkPlayer={((_localNetworkPlayer != null) ? _localNetworkPlayer.PlayerName.Value : "null")}, " +
+                      $"LocalPlayerController={_localPlayerController?.gameObject.name ?? "null"}, " +
+                      $"OpponentPlayerController={_opponentPlayerController?.gameObject.name ?? "null"}");
         }
         
         #region New System Events
@@ -112,11 +116,127 @@ namespace KOA.Migration
             // For now, the new system handles this independently
         }
         
+        private void OnNewCardDamaged(int playerId, int slotIndex, int damage, int newHealth)
+        {
+            if (!_syncToOldSystem) return;
+            
+            Debug.Log($"[BoardStateBridge] Card damaged in new system: Player {playerId}, Slot {slotIndex}, Damage={damage}, NewHealth={newHealth}");
+            
+            // Find and update the card's health in the visual system
+            UpdateCardHealthVisual(playerId, slotIndex, damage, newHealth);
+        }
+        
+        /// <summary>
+        /// Updates a card's health display in the old CardController system.
+        /// </summary>
+        private void UpdateCardHealthVisual(int playerId, int slotIndex, int damage, int newHealth)
+        {
+            // Find the card using the same logic as removal
+            int localPlayerId = _localNetworkPlayer?.PlayerId.Value ?? 0;
+            bool isLocalPlayerCard = (playerId == localPlayerId);
+            
+            // Mirror the slot index for opponent cards
+            int visualSlotIndex = slotIndex;
+            if (!isLocalPlayerCard)
+            {
+                if (slotIndex == 0) visualSlotIndex = 2;
+                else if (slotIndex == 2) visualSlotIndex = 0;
+            }
+            
+            string slotName = isLocalPlayerCard 
+                ? $"PlayerSlot-{visualSlotIndex + 1}" 
+                : $"OpponentSlot-{visualSlotIndex + 1}";
+            
+            var slotObj = GameObject.Find(slotName);
+            if (slotObj == null)
+            {
+                Debug.LogWarning($"[BoardStateBridge] Could not find slot '{slotName}' for damage update");
+                return;
+            }
+            
+            var cardController = slotObj.GetComponentInChildren<CardController>();
+            if (cardController == null)
+            {
+                Debug.LogWarning($"[BoardStateBridge] No CardController found in slot '{slotName}' for damage update");
+                return;
+            }
+            
+            // Update health directly without triggering TakeDamage (which would cause recursive removal)
+            int oldHealth = cardController.health;
+            cardController.health = newHealth;
+            cardController.UpdateCardUI();
+            
+            Debug.Log($"[BoardStateBridge] Updated '{cardController.cardName}' health: {oldHealth} -> {newHealth}");
+        }
+        
         private void OnNewCardDied(int playerId, int slotIndex, CardState card)
         {
             if (!_syncToOldSystem) return;
             
-            Debug.Log($"[BoardStateBridge] Card died in new system: Player {playerId}, Slot {slotIndex}");
+            Debug.Log($"[BoardStateBridge] Card died in new system: Player {playerId}, Slot {slotIndex}, Card={card?.CardDataId}");
+            
+            // Find and remove the card from the visual board
+            RemoveCardFromVisualBoard(playerId, slotIndex);
+        }
+        
+        /// <summary>
+        /// Removes a card from the visual board using the old CardController system.
+        /// Handles perspective conversion from player ID to local slot names.
+        /// </summary>
+        private void RemoveCardFromVisualBoard(int playerId, int slotIndex)
+        {
+            // Determine local player ID
+            int localPlayerId = _localNetworkPlayer?.PlayerId.Value ?? 0;
+            
+            // Determine if this is on the local player's side or opponent's side
+            bool isLocalPlayerCard = (playerId == localPlayerId);
+            
+            // Mirror the slot index for opponent cards (visual perspective)
+            int visualSlotIndex = slotIndex;
+            if (!isLocalPlayerCard)
+            {
+                // Mirror: 0 <-> 2, 1 stays
+                if (slotIndex == 0) visualSlotIndex = 2;
+                else if (slotIndex == 2) visualSlotIndex = 0;
+            }
+            
+            // Build the slot name
+            string slotName = isLocalPlayerCard 
+                ? $"PlayerSlot-{visualSlotIndex + 1}" 
+                : $"OpponentSlot-{visualSlotIndex + 1}";
+            
+            Debug.Log($"[BoardStateBridge] Looking for card in slot: {slotName} (playerId={playerId}, slotIndex={slotIndex}, localPlayerId={localPlayerId})");
+            
+            // Find the slot
+            var slotObj = GameObject.Find(slotName);
+            if (slotObj == null)
+            {
+                Debug.LogWarning($"[BoardStateBridge] Could not find slot '{slotName}'");
+                return;
+            }
+            
+            // Find the card in the slot
+            var cardController = slotObj.GetComponentInChildren<CardController>();
+            if (cardController == null)
+            {
+                Debug.LogWarning($"[BoardStateBridge] No CardController found in slot '{slotName}'");
+                return;
+            }
+            
+            Debug.Log($"[BoardStateBridge] Removing card '{cardController.cardName}' from slot '{slotName}'");
+            
+            // Get the player controller and remove the card
+            var playerController = isLocalPlayerCard ? _localPlayerController : _opponentPlayerController;
+            if (playerController != null)
+            {
+                playerController.RemoveCardFromBoard(cardController);
+            }
+            else
+            {
+                // Fallback - just destroy the card
+                Debug.LogWarning($"[BoardStateBridge] No PlayerController found, destroying card directly");
+                Object.Destroy(cardController.gameObject);
+            }
         }
         
         private void OnNewTurnChanged(int previousPlayerId, int newActivePlayerId)

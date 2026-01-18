@@ -178,8 +178,11 @@ namespace KOA.Network
         
         /// <summary>
         /// Request to play a card from hand to a board slot.
-        /// Called by client, validated and executed on server.
+        /// Server validates all inputs against BoardState - no external dependencies.
         /// </summary>
+        /// <param name="playerId">Player ID (0 or 1)</param>
+        /// <param name="handIndex">Index in hand</param>
+        /// <param name="slotIndex">Board slot (0, 1, 2)</param>
         [ServerRpc(RequireOwnership = false)]
         public void CmdPlayCard(int playerId, int handIndex, int slotIndex, NetworkConnection conn = null)
         {
@@ -200,32 +203,36 @@ namespace KOA.Network
             var card = player.GetHandCard(handIndex);
             if (card == null)
             {
-                Debug.LogWarning($"[NetworkBoardState] Invalid hand index {handIndex}");
+                Debug.LogWarning($"[NetworkBoardState] Invalid hand index {handIndex} for player {playerId}");
                 return;
             }
             
-            // Validate slot
+            // Validate slot is empty
             if (!player.IsSlotEmpty(slotIndex))
             {
-                Debug.LogWarning($"[NetworkBoardState] Slot {slotIndex} is not empty");
+                Debug.LogWarning($"[NetworkBoardState] Slot {slotIndex} is occupied");
                 return;
             }
             
             // Validate mana
             var cardData = _cardLibrary.GetCardById(card.CardDataId);
-            if (cardData == null || !player.CanAfford(cardData.manaCost))
+            if (cardData == null)
             {
-                Debug.LogWarning($"[NetworkBoardState] Cannot afford card");
+                Debug.LogWarning($"[NetworkBoardState] Unknown card: {card.CardDataId}");
                 return;
             }
             
-            // Execute play
-            player.SpendMana(cardData.manaCost);
+            if (!player.CanAfford(cardData.manaCost))
+            {
+                Debug.LogWarning($"[NetworkBoardState] Cannot afford {cardData.manaCost} mana");
+                return;
+            }
+            
+            // Execute: remove from hand, place on board, spend mana
             player.RemoveHandCard(handIndex);
             card.HasSummoningSickness = true;
             player.PlaceCard(slotIndex, card);
-            
-            // Update synced state
+            player.SpendMana(cardData.manaCost);
             State.Value = state;
             
             Debug.Log($"[NetworkBoardState] Card played: {card.CardDataId} to slot {slotIndex}");

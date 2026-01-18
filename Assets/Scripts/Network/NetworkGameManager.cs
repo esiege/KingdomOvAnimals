@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
+using KOA.Network;
+using KOA.Data;
 
 // FishNet code regeneration trigger - do not remove
 // Last regenerated: 2026-01-04
