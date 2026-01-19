@@ -24,7 +24,7 @@ namespace KOA.Network
         
         // BUILD STAMP - Change this every time we rebuild to confirm which code is running
         // Format: YYYYMMDD_HHMM
-        public const string BUILD_STAMP = "20260119_0001";
+        public const string BUILD_STAMP = "20260119_0004";
         
         #endregion
         
@@ -45,8 +45,11 @@ namespace KOA.Network
 
         /// <summary>
         /// Is this player ready to start the game?
+        /// Stored as int: -1 = unset (sentinel), 0 = not ready, 1 = ready.
+        /// This is int instead of bool because FishNet's WriteFull skips SyncVars where
+        /// value equals initial value, causing serialization count mismatches.
         /// </summary>
-        public readonly SyncVar<bool> IsReady = new SyncVar<bool>();
+        public readonly SyncVar<int> IsReady = new SyncVar<int>(-1);
         
         #endregion
         
@@ -96,15 +99,45 @@ namespace KOA.Network
             Debug.Log($"[NetworkPlayer] Instance: {GetInstanceID()}");
             Debug.Log($"[NetworkPlayer] GameObject: {gameObject.name}");
             
-            // Log initial SyncVar values BEFORE any changes
-            Debug.Log($"[NetworkPlayer] Initial SyncVar values (before any assignment):");
-            Debug.Log($"[NetworkPlayer]   PlayerId.Value = {PlayerId.Value}");
-            Debug.Log($"[NetworkPlayer]   PlayerName.Value = '{PlayerName.Value}'");
-            Debug.Log($"[NetworkPlayer]   IsReady.Value = {IsReady.Value}");
-            Debug.Log($"[NetworkPlayer]   CurrentHealth.Value = {CurrentHealth.Value}");
-            Debug.Log($"[NetworkPlayer]   MaxHealth.Value = {MaxHealth.Value}");
-            Debug.Log($"[NetworkPlayer]   CurrentMana.Value = {CurrentMana.Value}");
-            Debug.Log($"[NetworkPlayer]   MaxMana.Value = {MaxMana.Value}");
+            // Log COMPLETE SyncVar inventory with indices and initial values
+            // This is the authoritative list - do not assume counts!
+            Debug.Log($"[NetworkPlayer] === SYNCVAR INVENTORY (Awake) ===");
+            Debug.Log($"[NetworkPlayer] SyncVar #1: PlayerId");
+            Debug.Log($"[NetworkPlayer]   - SyncIndex: {PlayerId.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   - InitialValue: {PlayerId.Value}");
+            Debug.Log($"[NetworkPlayer]   - Type: SyncVar<int>");
+            
+            Debug.Log($"[NetworkPlayer] SyncVar #2: PlayerName");
+            Debug.Log($"[NetworkPlayer]   - SyncIndex: {PlayerName.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   - InitialValue: '{PlayerName.Value}'");
+            Debug.Log($"[NetworkPlayer]   - Type: SyncVar<string>");
+            
+            Debug.Log($"[NetworkPlayer] SyncVar #3: IsReady");
+            Debug.Log($"[NetworkPlayer]   - SyncIndex: {IsReady.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   - InitialValue: {IsReady.Value}");
+            Debug.Log($"[NetworkPlayer]   - Type: SyncVar<int> (sentinel: -1=unset, 0=false, 1=true)");
+            
+            Debug.Log($"[NetworkPlayer] SyncVar #4: CurrentHealth");
+            Debug.Log($"[NetworkPlayer]   - SyncIndex: {CurrentHealth.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   - InitialValue: {CurrentHealth.Value}");
+            Debug.Log($"[NetworkPlayer]   - Type: SyncVar<int>");
+            
+            Debug.Log($"[NetworkPlayer] SyncVar #5: MaxHealth");
+            Debug.Log($"[NetworkPlayer]   - SyncIndex: {MaxHealth.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   - InitialValue: {MaxHealth.Value}");
+            Debug.Log($"[NetworkPlayer]   - Type: SyncVar<int>");
+            
+            Debug.Log($"[NetworkPlayer] SyncVar #6: CurrentMana");
+            Debug.Log($"[NetworkPlayer]   - SyncIndex: {CurrentMana.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   - InitialValue: {CurrentMana.Value}");
+            Debug.Log($"[NetworkPlayer]   - Type: SyncVar<int>");
+            
+            Debug.Log($"[NetworkPlayer] SyncVar #7: MaxMana");
+            Debug.Log($"[NetworkPlayer]   - SyncIndex: {MaxMana.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   - InitialValue: {MaxMana.Value}");
+            Debug.Log($"[NetworkPlayer]   - Type: SyncVar<int>");
+            
+            Debug.Log($"[NetworkPlayer] === TOTAL SYNCVARS: 7 (indices should be 0-6) ===");
             
             // Subscribe to sync callbacks
             PlayerId.OnChange += OnPlayerIdChanged;
@@ -115,7 +148,7 @@ namespace KOA.Network
             CurrentMana.OnChange += OnManaChanged;
             MaxMana.OnChange += OnMaxManaChanged;
             
-            Debug.Log($"[NetworkPlayer] Subscribed to all 7 SyncVar OnChange callbacks");
+            Debug.Log($"[NetworkPlayer] Subscribed to OnChange callbacks for all 7 SyncVars");
             Debug.Log($"[NetworkPlayer] ========== AWAKE COMPLETE ==========");
         }
 
@@ -197,9 +230,20 @@ namespace KOA.Network
             Debug.Log($"[NetworkPlayer] _pendingPlayerId: {_pendingPlayerId}");
             Debug.Log($"[NetworkPlayer] _pendingState: {(_pendingState != null ? "SET" : "NULL")}");
             
+            // CRITICAL: Dump SyncVar indices to verify they match between build and editor
+            Debug.Log($"[NetworkPlayer] SyncVar SyncIndex values (from IL weaver):");
+            Debug.Log($"[NetworkPlayer]   PlayerId.SyncIndex = {PlayerId.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   PlayerName.SyncIndex = {PlayerName.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   IsReady.SyncIndex = {IsReady.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   CurrentHealth.SyncIndex = {CurrentHealth.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   MaxHealth.SyncIndex = {MaxHealth.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   CurrentMana.SyncIndex = {CurrentMana.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   MaxMana.SyncIndex = {MaxMana.SyncIndex}");
+            
             Debug.Log($"[NetworkPlayer] SyncVar values BEFORE assignment:");
             Debug.Log($"[NetworkPlayer]   PlayerId.Value = {PlayerId.Value}");
             Debug.Log($"[NetworkPlayer]   PlayerName.Value = '{PlayerName.Value}'");
+            Debug.Log($"[NetworkPlayer]   IsReady.Value = {IsReady.Value}");
             Debug.Log($"[NetworkPlayer]   CurrentHealth.Value = {CurrentHealth.Value}");
             Debug.Log($"[NetworkPlayer]   MaxHealth.Value = {MaxHealth.Value}");
             Debug.Log($"[NetworkPlayer]   CurrentMana.Value = {CurrentMana.Value}");
@@ -212,6 +256,7 @@ namespace KOA.Network
                 // Reconnection - restore ALL state from pending state
                 PlayerId.Value = _pendingState.playerId;
                 PlayerName.Value = _pendingState.playerName;
+                IsReady.Value = 0; // Reset to not ready on reconnect (ensure differs from sentinel -1)
                 CurrentHealth.Value = _pendingState.health;
                 MaxHealth.Value = _pendingState.maxHealth;
                 CurrentMana.Value = _pendingState.mana;
@@ -230,6 +275,7 @@ namespace KOA.Network
                 PlayerId.Value = _pendingPlayerId;
                 PlayerName.Value = $"Player {_pendingPlayerId}";
                 // Set default game state values
+                IsReady.Value = 0; // Not ready (ensure differs from sentinel -1)
                 CurrentHealth.Value = 20;
                 MaxHealth.Value = 20;
                 CurrentMana.Value = 1;
@@ -244,6 +290,7 @@ namespace KOA.Network
                 PlayerId.Value = Owner.ClientId;
                 PlayerName.Value = $"Player {Owner.ClientId}";
                 // Set default game state values
+                IsReady.Value = 0; // Not ready (ensure it differs from sentinel -1)
                 CurrentHealth.Value = 20;
                 MaxHealth.Value = 20;
                 CurrentMana.Value = 1;
@@ -254,6 +301,7 @@ namespace KOA.Network
             Debug.Log($"[NetworkPlayer] SyncVar values AFTER assignment:");
             Debug.Log($"[NetworkPlayer]   PlayerId.Value = {PlayerId.Value}");
             Debug.Log($"[NetworkPlayer]   PlayerName.Value = '{PlayerName.Value}'");
+            Debug.Log($"[NetworkPlayer]   IsReady.Value = {IsReady.Value}");
             Debug.Log($"[NetworkPlayer]   CurrentHealth.Value = {CurrentHealth.Value}");
             Debug.Log($"[NetworkPlayer]   MaxHealth.Value = {MaxHealth.Value}");
             Debug.Log($"[NetworkPlayer]   CurrentMana.Value = {CurrentMana.Value}");
@@ -272,6 +320,16 @@ namespace KOA.Network
             Debug.Log($"[NetworkPlayer] IsOwner: {IsOwner}");
             Debug.Log($"[NetworkPlayer] IsServer: {IsServer}");
             Debug.Log($"[NetworkPlayer] IsHost: {IsHost}");
+            
+            // CRITICAL: Dump SyncVar indices to verify they match between build and editor
+            Debug.Log($"[NetworkPlayer] SyncVar SyncIndex values (from IL weaver):");
+            Debug.Log($"[NetworkPlayer]   PlayerId.SyncIndex = {PlayerId.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   PlayerName.SyncIndex = {PlayerName.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   IsReady.SyncIndex = {IsReady.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   CurrentHealth.SyncIndex = {CurrentHealth.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   MaxHealth.SyncIndex = {MaxHealth.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   CurrentMana.SyncIndex = {CurrentMana.SyncIndex}");
+            Debug.Log($"[NetworkPlayer]   MaxMana.SyncIndex = {MaxMana.SyncIndex}");
             
             Debug.Log($"[NetworkPlayer] SyncVar values received from server:");
             Debug.Log($"[NetworkPlayer]   PlayerId.Value = {PlayerId.Value}");
@@ -328,8 +386,8 @@ namespace KOA.Network
         [ServerRpc]
         public void SetReady(bool ready)
         {
-            IsReady.Value = ready;
-            Debug.Log($"[NetworkPlayer] {PlayerName.Value} ready: {IsReady.Value}");
+            IsReady.Value = ready ? 1 : 0;
+            Debug.Log($"[NetworkPlayer] {PlayerName.Value} ready: {IsReady.Value == 1}");
         }
         
         #region SyncVar Callbacks
@@ -344,7 +402,7 @@ namespace KOA.Network
             Debug.Log($"[NetworkPlayer] SYNCVAR CHANGE: PlayerName '{prev}' -> '{next}' (asServer: {asServer}, IsOwner: {IsOwner}, ObjectId: {ObjectId})");
         }
         
-        private void OnIsReadyChanged(bool prev, bool next, bool asServer)
+        private void OnIsReadyChanged(int prev, int next, bool asServer)
         {
             Debug.Log($"[NetworkPlayer] SYNCVAR CHANGE: IsReady {prev} -> {next} (asServer: {asServer}, IsOwner: {IsOwner}, ObjectId: {ObjectId})");
         }

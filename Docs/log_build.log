@@ -1,207 +1,291 @@
-=== Log started: 2026-01-18 23:46:27 (BUILD/CLIENT) ===
+=== Log started: 2026-01-19 00:05:22 (BUILD/CLIENT) ===
 === Log file: D:/Google Drive/Unity/KingdomOvAnimals/KingdomOvAnimals/Build/KingdomOvAnimals_Data\..\..\Docs\log_build.log ===
 
 [0.04s] [ERROR] No cloud project ID was found by the Analytics SDK. This means Analytics events will not be sent. Please make sure to link your cloud project in the Unity editor to fix this problem.
-[2.54s] [MainMenu] Finding match...
-[2.54s] [MainMenu] Attempting to join existing game...
-[5.55s] [MainMenu] No existing game found, becoming host...
-[5.60s] [MainMenu] Server started - hosting game!
-[5.74s] [MainMenu] Player joined: 0
-[5.82s] [MainMenu] Player joined: 1
-[5.82s] [MainMenu] Loading scene: DuelScreen
-[5.82s] [MainMenu] Moving 0 NetworkObjects to DuelScreen
-[5.83s] [MainMenu] Connected to server!
-[5.91s] [NetworkPlayer] ========== AWAKE ==========
-[5.91s] [NetworkPlayer] BUILD_STAMP: 20260119_0001
-[5.91s] [NetworkPlayer] Environment: BUILD
-[5.91s] [NetworkPlayer] Instance: -300
-[5.91s] [NetworkPlayer] GameObject: NetworkPlayer(Clone)
-[5.91s] [NetworkPlayer] Initial SyncVar values (before any assignment):
-[5.91s] [NetworkPlayer]   PlayerId.Value = -1
-[5.91s] [NetworkPlayer]   PlayerName.Value = '__UNSET__'
-[5.91s] [NetworkPlayer]   IsReady.Value = False
-[5.91s] [NetworkPlayer]   CurrentHealth.Value = -1
-[5.91s] [NetworkPlayer]   MaxHealth.Value = -1
-[5.91s] [NetworkPlayer]   CurrentMana.Value = -1
-[5.91s] [NetworkPlayer]   MaxMana.Value = -1
-[5.91s] [NetworkPlayer] Subscribed to all 7 SyncVar OnChange callbacks
-[5.91s] [NetworkPlayer] ========== AWAKE COMPLETE ==========
-[5.92s] [NetworkPlayer] ========== OnStartServer ==========
-[5.92s] [NetworkPlayer] BUILD_STAMP: 20260119_0001
-[5.92s] [NetworkPlayer] ObjectId: 60113
-[5.92s] [NetworkPlayer] Owner.ClientId: 0
-[5.92s] [NetworkPlayer] _pendingPlayerId: -1
-[5.92s] [NetworkPlayer] _pendingState: NULL
-[5.92s] [NetworkPlayer] SyncVar values BEFORE assignment:
-[5.92s] [NetworkPlayer]   PlayerId.Value = -1
-[5.92s] [NetworkPlayer]   PlayerName.Value = '__UNSET__'
-[5.92s] [NetworkPlayer]   CurrentHealth.Value = -1
-[5.92s] [NetworkPlayer]   MaxHealth.Value = -1
-[5.92s] [NetworkPlayer]   CurrentMana.Value = -1
-[5.92s] [NetworkPlayer]   MaxMana.Value = -1
-[5.92s] [NetworkPlayer] === NEW PLAYER PATH ===
-[5.92s] [NetworkPlayer] SYNCVAR CHANGE: PlayerId -1 -> 0 (asServer: True, IsOwner: False, ObjectId: 60113)
-[5.92s] [NetworkPlayer] SYNCVAR CHANGE: PlayerName '__UNSET__' -> 'Player 0' (asServer: True, IsOwner: False, ObjectId: 60113)
-[5.92s] [NetworkPlayer] SYNCVAR CHANGE: CurrentHealth -1 -> 20 (asServer: True, IsOwner: False, ObjectId: 60113)
-[5.92s] [NetworkPlayer] SYNCVAR CHANGE: MaxHealth -1 -> 20 (asServer: True, IsOwner: False, ObjectId: 60113)
-[5.92s] [NetworkPlayer] SYNCVAR CHANGE: CurrentMana -1 -> 1 (asServer: True, IsOwner: False, ObjectId: 60113)
-[5.92s] [NetworkPlayer] SYNCVAR CHANGE: MaxMana -1 -> 1 (asServer: True, IsOwner: False, ObjectId: 60113)
-[5.92s] [NetworkPlayer] Server: PlayerId set to Owner.ClientId=0
-[5.92s] [NetworkPlayer] SyncVar values AFTER assignment:
-[5.92s] [NetworkPlayer]   PlayerId.Value = 0
-[5.92s] [NetworkPlayer]   PlayerName.Value = 'Player 0'
-[5.92s] [NetworkPlayer]   CurrentHealth.Value = 20
-[5.92s] [NetworkPlayer]   MaxHealth.Value = 20
-[5.92s] [NetworkPlayer]   CurrentMana.Value = 1
-[5.92s] [NetworkPlayer]   MaxMana.Value = 1
-[5.92s] [NetworkPlayer] ========== OnStartServer COMPLETE ==========
-[6.33s] [NetworkBoardState] ========== AWAKE ==========
-[6.33s] [NetworkBoardState] BUILD_STAMP: 20260119_0001
-[6.33s] [NetworkBoardState] Environment: BUILD
-[6.33s] [NetworkBoardState] Instance: 12454
-[6.33s] [NetworkBoardState] Initial State.Value: [BoardState Turn=1, CurrentPlayer=0, Active=False]
-[6.33s] [NetworkBoardState] ========== AWAKE COMPLETE ==========
-[6.33s] [CardLibrary] Loaded 5 CardData assets from Resources/Cards
-[6.33s] [CardLibrary] Loaded 10 AbilityData assets from Resources/Abilities
-[6.33s] [NetworkGameManager] ========== AWAKE ==========
-[6.33s] [NetworkGameManager] BUILD_STAMP: 20260119_0001
-[6.33s] [NetworkGameManager] Environment: BUILD
-[6.33s] [NetworkGameManager] Instance: 12538
-[6.33s] [NetworkGameManager] Initial SyncVar values:
-[6.33s] [NetworkGameManager]   CurrentTurnObjectId.Value = -1
-[6.33s] [NetworkGameManager]   TurnNumber.Value = 0
-[6.33s] [NetworkGameManager]   GameStarted.Value = False
-[6.33s] [NetworkGameManager]   ShuffleSeed.Value = 0
-[6.33s] [NetworkGameManager]   OpponentDisconnected.Value = False
-[6.33s] [NetworkGameManager] Subscribed to all 5 SyncVar OnChange callbacks
-[6.33s] [NetworkGameManager] ========== AWAKE COMPLETE ==========
-[6.33s] [WARN] [BoardView] Could not find local NetworkPlayer - defaulting to player 0
-[6.33s] [BoardView] RenderBoard: Turn 1, Current player 0
-[6.37s] [NetworkBoardState] ========== OnStartServer ==========
-[6.37s] [NetworkBoardState] BUILD_STAMP: 20260119_0001
-[6.37s] [NetworkBoardState] ObjectId: 13463
-[6.37s] [NetworkBoardState] State.Value: [BoardState Turn=1, CurrentPlayer=0, Active=False]
-[6.37s] [NetworkBoardState] ========== OnStartServer COMPLETE ==========
-[6.56s] [NetworkPlayer] ========== AWAKE ==========
-[6.56s] [NetworkPlayer] BUILD_STAMP: 20260119_0001
-[6.56s] [NetworkPlayer] Environment: BUILD
-[6.56s] [NetworkPlayer] Instance: -410
-[6.56s] [NetworkPlayer] GameObject: NetworkPlayer(Clone)
-[6.56s] [NetworkPlayer] Initial SyncVar values (before any assignment):
-[6.56s] [NetworkPlayer]   PlayerId.Value = -1
-[6.56s] [NetworkPlayer]   PlayerName.Value = '__UNSET__'
-[6.56s] [NetworkPlayer]   IsReady.Value = False
-[6.56s] [NetworkPlayer]   CurrentHealth.Value = -1
-[6.56s] [NetworkPlayer]   MaxHealth.Value = -1
-[6.56s] [NetworkPlayer]   CurrentMana.Value = -1
-[6.56s] [NetworkPlayer]   MaxMana.Value = -1
-[6.56s] [NetworkPlayer] Subscribed to all 7 SyncVar OnChange callbacks
-[6.56s] [NetworkPlayer] ========== AWAKE COMPLETE ==========
-[6.56s] [NetworkPlayer] ========== OnStartServer ==========
-[6.56s] [NetworkPlayer] BUILD_STAMP: 20260119_0001
-[6.56s] [NetworkPlayer] ObjectId: 54111
-[6.56s] [NetworkPlayer] Owner.ClientId: 1
-[6.56s] [NetworkPlayer] _pendingPlayerId: -1
-[6.56s] [NetworkPlayer] _pendingState: NULL
-[6.56s] [NetworkPlayer] SyncVar values BEFORE assignment:
-[6.56s] [NetworkPlayer]   PlayerId.Value = -1
-[6.56s] [NetworkPlayer]   PlayerName.Value = '__UNSET__'
-[6.56s] [NetworkPlayer]   CurrentHealth.Value = -1
-[6.56s] [NetworkPlayer]   MaxHealth.Value = -1
-[6.56s] [NetworkPlayer]   CurrentMana.Value = -1
-[6.56s] [NetworkPlayer]   MaxMana.Value = -1
-[6.56s] [NetworkPlayer] === NEW PLAYER PATH ===
-[6.56s] [NetworkPlayer] SYNCVAR CHANGE: PlayerId -1 -> 1 (asServer: True, IsOwner: False, ObjectId: 54111)
-[6.56s] [NetworkPlayer] SYNCVAR CHANGE: PlayerName '__UNSET__' -> 'Player 1' (asServer: True, IsOwner: False, ObjectId: 54111)
-[6.56s] [NetworkPlayer] SYNCVAR CHANGE: CurrentHealth -1 -> 20 (asServer: True, IsOwner: False, ObjectId: 54111)
-[6.56s] [NetworkPlayer] SYNCVAR CHANGE: MaxHealth -1 -> 20 (asServer: True, IsOwner: False, ObjectId: 54111)
-[6.56s] [NetworkPlayer] SYNCVAR CHANGE: CurrentMana -1 -> 1 (asServer: True, IsOwner: False, ObjectId: 54111)
-[6.56s] [NetworkPlayer] SYNCVAR CHANGE: MaxMana -1 -> 1 (asServer: True, IsOwner: False, ObjectId: 54111)
-[6.56s] [NetworkPlayer] Server: PlayerId set to Owner.ClientId=1
-[6.56s] [NetworkPlayer] SyncVar values AFTER assignment:
-[6.56s] [NetworkPlayer]   PlayerId.Value = 1
-[6.56s] [NetworkPlayer]   PlayerName.Value = 'Player 1'
-[6.56s] [NetworkPlayer]   CurrentHealth.Value = 20
-[6.56s] [NetworkPlayer]   MaxHealth.Value = 20
-[6.56s] [NetworkPlayer]   CurrentMana.Value = 1
-[6.56s] [NetworkPlayer]   MaxMana.Value = 1
-[6.56s] [NetworkPlayer] ========== OnStartServer COMPLETE ==========
-[6.63s] [NetworkPlayer] ========== OnStartClient ==========
-[6.63s] [NetworkPlayer] BUILD_STAMP: 20260119_0001
-[6.63s] [NetworkPlayer] ObjectId: 60113
-[6.63s] [NetworkPlayer] IsOwner: False
-[6.63s] [NetworkPlayer] IsServer: True
-[6.63s] [NetworkPlayer] IsHost: True
-[6.63s] [NetworkPlayer] SyncVar values received from server:
-[6.63s] [NetworkPlayer]   PlayerId.Value = 0
-[6.63s] [NetworkPlayer]   PlayerName.Value = 'Player 0'
-[6.63s] [NetworkPlayer]   IsReady.Value = False
-[6.63s] [NetworkPlayer]   CurrentHealth.Value = 20
-[6.63s] [NetworkPlayer]   MaxHealth.Value = 20
-[6.63s] [NetworkPlayer]   CurrentMana.Value = 1
-[6.63s] [NetworkPlayer]   MaxMana.Value = 1
-[6.63s] [NetworkPlayer] OTHER PLAYER: Player 0 (ID: 0)
-[6.63s] [NetworkPlayer] ========== OnStartClient COMPLETE ==========
-[6.63s] [NetworkBoardState] ========== OnStartClient ==========
-[6.63s] [NetworkBoardState] BUILD_STAMP: 20260119_0001
-[6.63s] [NetworkBoardState] ObjectId: 13463
-[6.63s] [NetworkBoardState] IsServer: True
-[6.63s] [NetworkBoardState] IsHost: True
-[6.63s] [NetworkBoardState] State.Value: [BoardState Turn=1, CurrentPlayer=0, Active=False]
-[6.63s] [NetworkBoardState] Subscribed to State.OnChange
-[6.63s] [NetworkBoardState] ========== OnStartClient COMPLETE ==========
-[6.63s] [NetworkGameManager] ========== OnStartClient ==========
-[6.63s] [NetworkGameManager] BUILD_STAMP: 20260119_0001
-[6.63s] [NetworkGameManager] ObjectId: 11494
-[6.63s] [NetworkGameManager] IsServer: True
-[6.63s] [NetworkGameManager] IsHost: True
-[6.63s] [NetworkGameManager] SyncVar values received:
-[6.63s] [NetworkGameManager]   CurrentTurnObjectId.Value = -1
-[6.63s] [NetworkGameManager]   TurnNumber.Value = 0
-[6.63s] [NetworkGameManager]   GameStarted.Value = False
-[6.63s] [NetworkGameManager]   ShuffleSeed.Value = 0
-[6.63s] [NetworkGameManager]   OpponentDisconnected.Value = False
-[6.63s] [NetworkGameManager] Found 2 existing NetworkPlayers
-[6.63s] [NetworkGameManager] Registered NetworkPlayer: Player 1 (ObjectId: 54111, PlayerId: 1, IsOwner: False)
-[6.63s] [NetworkGameManager] Opponent identified: Player 1 (ObjectId: 54111)
-[6.63s] [NetworkGameManager] Registered NetworkPlayer: Player 0 (ObjectId: 60113, PlayerId: 0, IsOwner: False)
-[6.63s] [NetworkGameManager] ========== OnStartClient COMPLETE ==========
-[6.63s] [WARN] SyncType not found for index 7 on NetworkPlayer(Clone), component KOA.Network.NetworkPlayer. Remainder of packet may become corrupt.
-[6.63s] [NetworkPlayer] ========== OnStartClient ==========
-[6.63s] [NetworkPlayer] BUILD_STAMP: 20260119_0001
-[6.63s] [NetworkPlayer] ObjectId: 54111
-[6.63s] [NetworkPlayer] IsOwner: True
-[6.63s] [NetworkPlayer] IsServer: True
-[6.63s] [NetworkPlayer] IsHost: True
-[6.63s] [NetworkPlayer] SyncVar values received from server:
-[6.63s] [NetworkPlayer]   PlayerId.Value = 1
-[6.63s] [NetworkPlayer]   PlayerName.Value = 'Player 1'
-[6.63s] [NetworkPlayer]   IsReady.Value = False
-[6.63s] [NetworkPlayer]   CurrentHealth.Value = 20
-[6.63s] [NetworkPlayer]   MaxHealth.Value = 20
-[6.63s] [NetworkPlayer]   CurrentMana.Value = 1
-[6.63s] [NetworkPlayer]   MaxMana.Value = 1
-[6.63s] [NetworkPlayer] YOU ARE THIS PLAYER: Player 1 (ID: 1)
-[6.63s] [NetworkPlayer] ========== OnStartClient COMPLETE ==========
-[6.63s] [NetworkPlayer] Ownership gained! You are now: Player 1 (ID: 1)
-[6.63s] [NetworkGameManager] Local player identified: Player 1 (ObjectId: 54111)
-[6.63s] [Server] Starting game!
-[6.63s] [NetworkGameManager] SYNCVAR CHANGE: ShuffleSeed 0 -> -1295439049 (asServer: True, ObjectId: 11494)
-[6.63s] [Server] Initializing NetworkBoardState with 10 cards per player
-[6.63s] [NetworkBoardState] Initializing game
-[6.63s] [NetworkBoardState] Player 0 drew lion
-[6.63s] [NetworkBoardState] Player 1 drew bear
-[6.63s] [NetworkBoardState] Player 0 drew bear
-[6.63s] [NetworkBoardState] Player 1 drew snake
-[6.63s] [NetworkBoardState] Player 0 drew elephant
-[6.63s] [NetworkBoardState] Player 1 drew elephant
-[6.63s] [NetworkBoardState] Player 0 drew snake
-[6.63s] [NetworkBoardState] Player 1 drew lion
-[6.63s] [NetworkBoardState] SYNCVAR CHANGE: State (asServer=True, ObjectId: 13463)
-[6.63s] [NetworkBoardState]   prev: [BoardState Turn=1, CurrentPlayer=0, Active=False]
-[6.63s] [NetworkBoardState]   next: [BoardState Turn=1, CurrentPlayer=0, Active=True]
-[6.63s] [BoardView] RenderBoard: Turn 1, Current player 0
-[6.63s] [ERROR] Client encountered an error while parsing data for packetId SyncType. Message: The Object you want to instantiate is null..
-[6.69s] [NetworkGameManager] SYNCVAR CHANGE: ShuffleSeed 0 -> -1295439049 (asServer: False, ObjectId: 11494)
+[23.44s] [MainMenu] Finding match...
+[23.44s] [MainMenu] Attempting to join existing game...
+[26.45s] [MainMenu] No existing game found, becoming host...
+[26.51s] [MainMenu] Server started - hosting game!
+[26.54s] [MainMenu] Player joined: 0
+[26.68s] [NetworkPlayer] ========== AWAKE ==========
+[26.68s] [NetworkPlayer] BUILD_STAMP: 20260119_0004
+[26.68s] [NetworkPlayer] Environment: BUILD
+[26.68s] [NetworkPlayer] Instance: -288
+[26.68s] [NetworkPlayer] GameObject: NetworkPlayer(Clone)
+[26.68s] [NetworkPlayer] === SYNCVAR INVENTORY (Awake) ===
+[26.68s] [NetworkPlayer] SyncVar #1: PlayerId
+[26.68s] [NetworkPlayer]   - SyncIndex: 0
+[26.68s] [NetworkPlayer]   - InitialValue: -1
+[26.68s] [NetworkPlayer]   - Type: SyncVar<int>
+[26.68s] [NetworkPlayer] SyncVar #2: PlayerName
+[26.68s] [NetworkPlayer]   - SyncIndex: 1
+[26.68s] [NetworkPlayer]   - InitialValue: '__UNSET__'
+[26.68s] [NetworkPlayer]   - Type: SyncVar<string>
+[26.68s] [NetworkPlayer] SyncVar #3: IsReady
+[26.68s] [NetworkPlayer]   - SyncIndex: 2
+[26.68s] [NetworkPlayer]   - InitialValue: -1
+[26.68s] [NetworkPlayer]   - Type: SyncVar<int> (sentinel: -1=unset, 0=false, 1=true)
+[26.68s] [NetworkPlayer] SyncVar #4: CurrentHealth
+[26.68s] [NetworkPlayer]   - SyncIndex: 3
+[26.68s] [NetworkPlayer]   - InitialValue: -1
+[26.68s] [NetworkPlayer]   - Type: SyncVar<int>
+[26.68s] [NetworkPlayer] SyncVar #5: MaxHealth
+[26.68s] [NetworkPlayer]   - SyncIndex: 4
+[26.68s] [NetworkPlayer]   - InitialValue: -1
+[26.68s] [NetworkPlayer]   - Type: SyncVar<int>
+[26.68s] [NetworkPlayer] SyncVar #6: CurrentMana
+[26.68s] [NetworkPlayer]   - SyncIndex: 5
+[26.68s] [NetworkPlayer]   - InitialValue: -1
+[26.68s] [NetworkPlayer]   - Type: SyncVar<int>
+[26.68s] [NetworkPlayer] SyncVar #7: MaxMana
+[26.68s] [NetworkPlayer]   - SyncIndex: 6
+[26.68s] [NetworkPlayer]   - InitialValue: -1
+[26.68s] [NetworkPlayer]   - Type: SyncVar<int>
+[26.68s] [NetworkPlayer] === TOTAL SYNCVARS: 7 (indices should be 0-6) ===
+[26.68s] [NetworkPlayer] Subscribed to OnChange callbacks for all 7 SyncVars
+[26.68s] [NetworkPlayer] ========== AWAKE COMPLETE ==========
+[26.69s] [NetworkPlayer] ========== OnStartServer ==========
+[26.69s] [NetworkPlayer] BUILD_STAMP: 20260119_0004
+[26.69s] [NetworkPlayer] ObjectId: 22689
+[26.69s] [NetworkPlayer] Owner.ClientId: 0
+[26.69s] [NetworkPlayer] _pendingPlayerId: -1
+[26.69s] [NetworkPlayer] _pendingState: NULL
+[26.69s] [NetworkPlayer] SyncVar SyncIndex values (from IL weaver):
+[26.69s] [NetworkPlayer]   PlayerId.SyncIndex = 0
+[26.69s] [NetworkPlayer]   PlayerName.SyncIndex = 1
+[26.69s] [NetworkPlayer]   IsReady.SyncIndex = 2
+[26.69s] [NetworkPlayer]   CurrentHealth.SyncIndex = 3
+[26.69s] [NetworkPlayer]   MaxHealth.SyncIndex = 4
+[26.69s] [NetworkPlayer]   CurrentMana.SyncIndex = 5
+[26.69s] [NetworkPlayer]   MaxMana.SyncIndex = 6
+[26.69s] [NetworkPlayer] SyncVar values BEFORE assignment:
+[26.69s] [NetworkPlayer]   PlayerId.Value = -1
+[26.69s] [NetworkPlayer]   PlayerName.Value = '__UNSET__'
+[26.69s] [NetworkPlayer]   IsReady.Value = -1
+[26.69s] [NetworkPlayer]   CurrentHealth.Value = -1
+[26.69s] [NetworkPlayer]   MaxHealth.Value = -1
+[26.69s] [NetworkPlayer]   CurrentMana.Value = -1
+[26.69s] [NetworkPlayer]   MaxMana.Value = -1
+[26.69s] [NetworkPlayer] === NEW PLAYER PATH ===
+[26.69s] [NetworkPlayer] SYNCVAR CHANGE: PlayerId -1 -> 0 (asServer: True, IsOwner: False, ObjectId: 22689)
+[26.69s] [NetworkPlayer] SYNCVAR CHANGE: PlayerName '__UNSET__' -> 'Player 0' (asServer: True, IsOwner: False, ObjectId: 22689)
+[26.69s] [NetworkPlayer] SYNCVAR CHANGE: IsReady -1 -> 0 (asServer: True, IsOwner: False, ObjectId: 22689)
+[26.69s] [NetworkPlayer] SYNCVAR CHANGE: CurrentHealth -1 -> 20 (asServer: True, IsOwner: False, ObjectId: 22689)
+[26.69s] [NetworkPlayer] SYNCVAR CHANGE: MaxHealth -1 -> 20 (asServer: True, IsOwner: False, ObjectId: 22689)
+[26.69s] [NetworkPlayer] SYNCVAR CHANGE: CurrentMana -1 -> 1 (asServer: True, IsOwner: False, ObjectId: 22689)
+[26.69s] [NetworkPlayer] SYNCVAR CHANGE: MaxMana -1 -> 1 (asServer: True, IsOwner: False, ObjectId: 22689)
+[26.69s] [NetworkPlayer] Server: PlayerId set to Owner.ClientId=0
+[26.69s] [NetworkPlayer] SyncVar values AFTER assignment:
+[26.69s] [NetworkPlayer]   PlayerId.Value = 0
+[26.69s] [NetworkPlayer]   PlayerName.Value = 'Player 0'
+[26.69s] [NetworkPlayer]   IsReady.Value = 0
+[26.69s] [NetworkPlayer]   CurrentHealth.Value = 20
+[26.69s] [NetworkPlayer]   MaxHealth.Value = 20
+[26.69s] [NetworkPlayer]   CurrentMana.Value = 1
+[26.69s] [NetworkPlayer]   MaxMana.Value = 1
+[26.69s] [NetworkPlayer] ========== OnStartServer COMPLETE ==========
+[26.70s] [MainMenu] Player joined: 1
+[26.70s] [MainMenu] Loading scene: DuelScreen
+[26.70s] [MainMenu] Moving NetworkObject: NetworkPlayer(Clone) (Owner: 0)
+[26.70s] [MainMenu] Moving 1 NetworkObjects to DuelScreen
+[26.71s] [MainMenu] Connected to server!
+[27.18s] [NetworkBoardState] ========== AWAKE ==========
+[27.18s] [NetworkBoardState] BUILD_STAMP: 20260119_0001
+[27.18s] [NetworkBoardState] Environment: BUILD
+[27.18s] [NetworkBoardState] Instance: 12454
+[27.18s] [NetworkBoardState] Initial State.Value: [BoardState Turn=1, CurrentPlayer=0, Active=False]
+[27.18s] [NetworkBoardState] ========== AWAKE COMPLETE ==========
+[27.18s] [CardLibrary] Loaded 5 CardData assets from Resources/Cards
+[27.18s] [CardLibrary] Loaded 10 AbilityData assets from Resources/Abilities
+[27.18s] [NetworkGameManager] ========== AWAKE ==========
+[27.18s] [NetworkGameManager] BUILD_STAMP: 20260119_0001
+[27.18s] [NetworkGameManager] Environment: BUILD
+[27.18s] [NetworkGameManager] Instance: 12538
+[27.18s] [NetworkGameManager] Initial SyncVar values:
+[27.18s] [NetworkGameManager]   CurrentTurnObjectId.Value = -1
+[27.18s] [NetworkGameManager]   TurnNumber.Value = 0
+[27.18s] [NetworkGameManager]   GameStarted.Value = False
+[27.18s] [NetworkGameManager]   ShuffleSeed.Value = 0
+[27.18s] [NetworkGameManager]   OpponentDisconnected.Value = False
+[27.18s] [NetworkGameManager] Subscribed to all 5 SyncVar OnChange callbacks
+[27.18s] [NetworkGameManager] ========== AWAKE COMPLETE ==========
+[27.18s] [WARN] [BoardView] Could not find local NetworkPlayer - defaulting to player 0
+[27.18s] [BoardView] RenderBoard: Turn 1, Current player 0
+[27.22s] [NetworkBoardState] ========== OnStartServer ==========
+[27.22s] [NetworkBoardState] BUILD_STAMP: 20260119_0001
+[27.22s] [NetworkBoardState] ObjectId: 46138
+[27.22s] [NetworkBoardState] State.Value: [BoardState Turn=1, CurrentPlayer=0, Active=False]
+[27.22s] [NetworkBoardState] ========== OnStartServer COMPLETE ==========
+[27.40s] [NetworkPlayer] ========== AWAKE ==========
+[27.40s] [NetworkPlayer] BUILD_STAMP: 20260119_0004
+[27.40s] [NetworkPlayer] Environment: BUILD
+[27.40s] [NetworkPlayer] Instance: -410
+[27.40s] [NetworkPlayer] GameObject: NetworkPlayer(Clone)
+[27.40s] [NetworkPlayer] === SYNCVAR INVENTORY (Awake) ===
+[27.40s] [NetworkPlayer] SyncVar #1: PlayerId
+[27.40s] [NetworkPlayer]   - SyncIndex: 0
+[27.40s] [NetworkPlayer]   - InitialValue: -1
+[27.40s] [NetworkPlayer]   - Type: SyncVar<int>
+[27.40s] [NetworkPlayer] SyncVar #2: PlayerName
+[27.40s] [NetworkPlayer]   - SyncIndex: 1
+[27.40s] [NetworkPlayer]   - InitialValue: '__UNSET__'
+[27.40s] [NetworkPlayer]   - Type: SyncVar<string>
+[27.40s] [NetworkPlayer] SyncVar #3: IsReady
+[27.40s] [NetworkPlayer]   - SyncIndex: 2
+[27.40s] [NetworkPlayer]   - InitialValue: -1
+[27.40s] [NetworkPlayer]   - Type: SyncVar<int> (sentinel: -1=unset, 0=false, 1=true)
+[27.40s] [NetworkPlayer] SyncVar #4: CurrentHealth
+[27.40s] [NetworkPlayer]   - SyncIndex: 3
+[27.40s] [NetworkPlayer]   - InitialValue: -1
+[27.40s] [NetworkPlayer]   - Type: SyncVar<int>
+[27.40s] [NetworkPlayer] SyncVar #5: MaxHealth
+[27.40s] [NetworkPlayer]   - SyncIndex: 4
+[27.40s] [NetworkPlayer]   - InitialValue: -1
+[27.40s] [NetworkPlayer]   - Type: SyncVar<int>
+[27.40s] [NetworkPlayer] SyncVar #6: CurrentMana
+[27.40s] [NetworkPlayer]   - SyncIndex: 5
+[27.40s] [NetworkPlayer]   - InitialValue: -1
+[27.40s] [NetworkPlayer]   - Type: SyncVar<int>
+[27.40s] [NetworkPlayer] SyncVar #7: MaxMana
+[27.40s] [NetworkPlayer]   - SyncIndex: 6
+[27.40s] [NetworkPlayer]   - InitialValue: -1
+[27.40s] [NetworkPlayer]   - Type: SyncVar<int>
+[27.40s] [NetworkPlayer] === TOTAL SYNCVARS: 7 (indices should be 0-6) ===
+[27.40s] [NetworkPlayer] Subscribed to OnChange callbacks for all 7 SyncVars
+[27.40s] [NetworkPlayer] ========== AWAKE COMPLETE ==========
+[27.40s] [NetworkPlayer] ========== OnStartServer ==========
+[27.40s] [NetworkPlayer] BUILD_STAMP: 20260119_0004
+[27.40s] [NetworkPlayer] ObjectId: 42837
+[27.40s] [NetworkPlayer] Owner.ClientId: 1
+[27.40s] [NetworkPlayer] _pendingPlayerId: -1
+[27.40s] [NetworkPlayer] _pendingState: NULL
+[27.40s] [NetworkPlayer] SyncVar SyncIndex values (from IL weaver):
+[27.40s] [NetworkPlayer]   PlayerId.SyncIndex = 0
+[27.40s] [NetworkPlayer]   PlayerName.SyncIndex = 1
+[27.40s] [NetworkPlayer]   IsReady.SyncIndex = 2
+[27.40s] [NetworkPlayer]   CurrentHealth.SyncIndex = 3
+[27.40s] [NetworkPlayer]   MaxHealth.SyncIndex = 4
+[27.40s] [NetworkPlayer]   CurrentMana.SyncIndex = 5
+[27.40s] [NetworkPlayer]   MaxMana.SyncIndex = 6
+[27.40s] [NetworkPlayer] SyncVar values BEFORE assignment:
+[27.40s] [NetworkPlayer]   PlayerId.Value = -1
+[27.40s] [NetworkPlayer]   PlayerName.Value = '__UNSET__'
+[27.40s] [NetworkPlayer]   IsReady.Value = -1
+[27.40s] [NetworkPlayer]   CurrentHealth.Value = -1
+[27.40s] [NetworkPlayer]   MaxHealth.Value = -1
+[27.40s] [NetworkPlayer]   CurrentMana.Value = -1
+[27.40s] [NetworkPlayer]   MaxMana.Value = -1
+[27.40s] [NetworkPlayer] === NEW PLAYER PATH ===
+[27.40s] [NetworkPlayer] SYNCVAR CHANGE: PlayerId -1 -> 1 (asServer: True, IsOwner: False, ObjectId: 42837)
+[27.40s] [NetworkPlayer] SYNCVAR CHANGE: PlayerName '__UNSET__' -> 'Player 1' (asServer: True, IsOwner: False, ObjectId: 42837)
+[27.40s] [NetworkPlayer] SYNCVAR CHANGE: IsReady -1 -> 0 (asServer: True, IsOwner: False, ObjectId: 42837)
+[27.40s] [NetworkPlayer] SYNCVAR CHANGE: CurrentHealth -1 -> 20 (asServer: True, IsOwner: False, ObjectId: 42837)
+[27.40s] [NetworkPlayer] SYNCVAR CHANGE: MaxHealth -1 -> 20 (asServer: True, IsOwner: False, ObjectId: 42837)
+[27.40s] [NetworkPlayer] SYNCVAR CHANGE: CurrentMana -1 -> 1 (asServer: True, IsOwner: False, ObjectId: 42837)
+[27.40s] [NetworkPlayer] SYNCVAR CHANGE: MaxMana -1 -> 1 (asServer: True, IsOwner: False, ObjectId: 42837)
+[27.40s] [NetworkPlayer] Server: PlayerId set to Owner.ClientId=1
+[27.40s] [NetworkPlayer] SyncVar values AFTER assignment:
+[27.40s] [NetworkPlayer]   PlayerId.Value = 1
+[27.40s] [NetworkPlayer]   PlayerName.Value = 'Player 1'
+[27.40s] [NetworkPlayer]   IsReady.Value = 0
+[27.40s] [NetworkPlayer]   CurrentHealth.Value = 20
+[27.40s] [NetworkPlayer]   MaxHealth.Value = 20
+[27.40s] [NetworkPlayer]   CurrentMana.Value = 1
+[27.40s] [NetworkPlayer]   MaxMana.Value = 1
+[27.40s] [NetworkPlayer] ========== OnStartServer COMPLETE ==========
+[27.47s] [NetworkPlayer] ========== OnStartClient ==========
+[27.47s] [NetworkPlayer] BUILD_STAMP: 20260119_0004
+[27.47s] [NetworkPlayer] ObjectId: 22689
+[27.47s] [NetworkPlayer] IsOwner: False
+[27.47s] [NetworkPlayer] IsServer: True
+[27.47s] [NetworkPlayer] IsHost: True
+[27.47s] [NetworkPlayer] SyncVar SyncIndex values (from IL weaver):
+[27.47s] [NetworkPlayer]   PlayerId.SyncIndex = 0
+[27.47s] [NetworkPlayer]   PlayerName.SyncIndex = 1
+[27.47s] [NetworkPlayer]   IsReady.SyncIndex = 2
+[27.47s] [NetworkPlayer]   CurrentHealth.SyncIndex = 3
+[27.47s] [NetworkPlayer]   MaxHealth.SyncIndex = 4
+[27.47s] [NetworkPlayer]   CurrentMana.SyncIndex = 5
+[27.47s] [NetworkPlayer]   MaxMana.SyncIndex = 6
+[27.47s] [NetworkPlayer] SyncVar values received from server:
+[27.47s] [NetworkPlayer]   PlayerId.Value = 0
+[27.47s] [NetworkPlayer]   PlayerName.Value = 'Player 0'
+[27.47s] [NetworkPlayer]   IsReady.Value = 0
+[27.47s] [NetworkPlayer]   CurrentHealth.Value = 20
+[27.47s] [NetworkPlayer]   MaxHealth.Value = 20
+[27.47s] [NetworkPlayer]   CurrentMana.Value = 1
+[27.47s] [NetworkPlayer]   MaxMana.Value = 1
+[27.47s] [NetworkPlayer] OTHER PLAYER: Player 0 (ID: 0)
+[27.47s] [NetworkPlayer] ========== OnStartClient COMPLETE ==========
+[27.47s] [NetworkBoardState] ========== OnStartClient ==========
+[27.47s] [NetworkBoardState] BUILD_STAMP: 20260119_0001
+[27.47s] [NetworkBoardState] ObjectId: 46138
+[27.47s] [NetworkBoardState] IsServer: True
+[27.47s] [NetworkBoardState] IsHost: True
+[27.47s] [NetworkBoardState] State.Value: [BoardState Turn=1, CurrentPlayer=0, Active=False]
+[27.47s] [NetworkBoardState] Subscribed to State.OnChange
+[27.47s] [NetworkBoardState] ========== OnStartClient COMPLETE ==========
+[27.48s] [NetworkGameManager] ========== OnStartClient ==========
+[27.48s] [NetworkGameManager] BUILD_STAMP: 20260119_0001
+[27.48s] [NetworkGameManager] ObjectId: 50757
+[27.48s] [NetworkGameManager] IsServer: True
+[27.48s] [NetworkGameManager] IsHost: True
+[27.48s] [NetworkGameManager] SyncVar values received:
+[27.48s] [NetworkGameManager]   CurrentTurnObjectId.Value = -1
+[27.48s] [NetworkGameManager]   TurnNumber.Value = 0
+[27.48s] [NetworkGameManager]   GameStarted.Value = False
+[27.48s] [NetworkGameManager]   ShuffleSeed.Value = 0
+[27.48s] [NetworkGameManager]   OpponentDisconnected.Value = False
+[27.48s] [NetworkGameManager] Found 2 existing NetworkPlayers
+[27.48s] [NetworkGameManager] Registered NetworkPlayer: Player 1 (ObjectId: 42837, PlayerId: 1, IsOwner: False)
+[27.48s] [NetworkGameManager] Opponent identified: Player 1 (ObjectId: 42837)
+[27.48s] [NetworkGameManager] Registered NetworkPlayer: Player 0 (ObjectId: 22689, PlayerId: 0, IsOwner: False)
+[27.48s] [NetworkGameManager] ========== OnStartClient COMPLETE ==========
+[27.48s] [NetworkPlayer] ========== OnStartClient ==========
+[27.48s] [NetworkPlayer] BUILD_STAMP: 20260119_0004
+[27.48s] [NetworkPlayer] ObjectId: 42837
+[27.48s] [NetworkPlayer] IsOwner: True
+[27.48s] [NetworkPlayer] IsServer: True
+[27.48s] [NetworkPlayer] IsHost: True
+[27.48s] [NetworkPlayer] SyncVar SyncIndex values (from IL weaver):
+[27.48s] [NetworkPlayer]   PlayerId.SyncIndex = 0
+[27.48s] [NetworkPlayer]   PlayerName.SyncIndex = 1
+[27.48s] [NetworkPlayer]   IsReady.SyncIndex = 2
+[27.48s] [NetworkPlayer]   CurrentHealth.SyncIndex = 3
+[27.48s] [NetworkPlayer]   MaxHealth.SyncIndex = 4
+[27.48s] [NetworkPlayer]   CurrentMana.SyncIndex = 5
+[27.48s] [NetworkPlayer]   MaxMana.SyncIndex = 6
+[27.48s] [NetworkPlayer] SyncVar values received from server:
+[27.48s] [NetworkPlayer]   PlayerId.Value = 1
+[27.48s] [NetworkPlayer]   PlayerName.Value = 'Player 1'
+[27.48s] [NetworkPlayer]   IsReady.Value = 0
+[27.48s] [NetworkPlayer]   CurrentHealth.Value = 20
+[27.48s] [NetworkPlayer]   MaxHealth.Value = 20
+[27.48s] [NetworkPlayer]   CurrentMana.Value = 1
+[27.48s] [NetworkPlayer]   MaxMana.Value = 1
+[27.48s] [NetworkPlayer] YOU ARE THIS PLAYER: Player 1 (ID: 1)
+[27.48s] [NetworkPlayer] ========== OnStartClient COMPLETE ==========
+[27.48s] [NetworkPlayer] Ownership gained! You are now: Player 1 (ID: 1)
+[27.48s] [NetworkGameManager] Local player identified: Player 1 (ObjectId: 42837)
+[27.48s] [Server] Starting game!
+[27.48s] [NetworkGameManager] SYNCVAR CHANGE: ShuffleSeed 0 -> 1824378521 (asServer: True, ObjectId: 50757)
+[27.48s] [Server] Initializing NetworkBoardState with 10 cards per player
+[27.48s] [NetworkBoardState] Initializing game
+[27.48s] [NetworkBoardState] Player 0 drew lion
+[27.48s] [NetworkBoardState] Player 1 drew elephant
+[27.48s] [NetworkBoardState] Player 0 drew elephant
+[27.48s] [NetworkBoardState] Player 1 drew eagle
+[27.48s] [NetworkBoardState] Player 0 drew bear
+[27.48s] [NetworkBoardState] Player 1 drew lion
+[27.48s] [NetworkBoardState] Player 0 drew bear
+[27.48s] [NetworkBoardState] Player 1 drew lion
+[27.48s] [NetworkBoardState] SYNCVAR CHANGE: State (asServer=True, ObjectId: 46138)
+[27.48s] [NetworkBoardState]   prev: [BoardState Turn=1, CurrentPlayer=0, Active=False]
+[27.48s] [NetworkBoardState]   next: [BoardState Turn=1, CurrentPlayer=0, Active=True]
+[27.48s] [BoardView] RenderBoard: Turn 1, Current player 0
+[27.48s] [ERROR] Client encountered an error while parsing data for packetId SyncType. Message: The Object you want to instantiate is null..
+[27.54s] [NetworkGameManager] SYNCVAR CHANGE: ShuffleSeed 0 -> 1824378521 (asServer: False, ObjectId: 50757)
+[30.87s] [EndTurnController] Cannot end turn - not your turn!
+[34.39s] [EndTurnController] Cannot end turn - not your turn!
 
-=== Log ended: 2026-01-18 23:46:37 ===
+=== Log ended: 2026-01-19 00:06:01 ===
