@@ -176,9 +176,15 @@ namespace FishNet.Object
         internal void ReadSyncType(PooledReader reader, int writtenLength, bool asServer = false)
         {
             int endPosition = (reader.Position + writtenLength);
+            // DIAGNOSTIC: Log what we're about to read
+            UnityEngine.Debug.Log($"[SyncType READ] {GetType().Name} on {transform.name}: writtenLength={writtenLength}, startPos={reader.Position}, endPos={endPosition}, registered indices: {string.Join(",", _syncTypes.Keys)}");
+            
             while (reader.Position < endPosition)
             {
+                int posBeforeRead = reader.Position;
                 byte syncTypeId = reader.ReadUInt8Unpacked();
+                UnityEngine.Debug.Log($"[SyncType READ] {GetType().Name}: Read syncTypeId={syncTypeId} at position {posBeforeRead}, remaining={endPosition - reader.Position}");
+                
                 if (_syncTypes.TryGetValueIL2CPP(syncTypeId, out SyncBase sb))
                     sb.Read(reader, asServer);
                 else
@@ -464,6 +470,9 @@ namespace FishNet.Object
 
             byte written = 0;
 
+            // DIAGNOSTIC: Log spawn write start
+            UnityEngine.Debug.Log($"[SyncType SPAWN WRITE] {GetType().Name}: Starting spawn write at position {positionAfterReserve}, registered indices: {string.Join(",", _syncTypes.Keys)}");
+
             foreach (SyncBase sb in _syncTypes.Values)
             {
                 ReadPermission rp = sb.Settings.ReadPermission;
@@ -475,8 +484,11 @@ namespace FishNet.Object
                     continue;
 
                 written++;
-
+                int posBeforeWrite = writer.Position;
                 sb.WriteFull(writer);
+                int bytesWritten = writer.Position - posBeforeWrite;
+                // DIAGNOSTIC: Log each SyncType written
+                UnityEngine.Debug.Log($"[SyncType SPAWN WRITE] {GetType().Name}: Wrote SyncIndex={sb.SyncIndex} ({bytesWritten} bytes) at position {posBeforeWrite}");
             }
 
             //If any where written.
@@ -485,6 +497,8 @@ namespace FishNet.Object
                 int insertPosition = (positionAfterReserve - reservedBytes);
                 writer.InsertUInt8Unpacked(ComponentIndex, insertPosition++);
                 writer.InsertUInt8Unpacked(written, insertPosition);
+                // DIAGNOSTIC: Log final count
+                UnityEngine.Debug.Log($"[SyncType SPAWN WRITE] {GetType().Name}: Finished, wrote {written} SyncTypes total");
             }
             else
             {
@@ -499,9 +513,15 @@ namespace FishNet.Object
         internal void ReadSyncTypesForSpawn(PooledReader reader)
         {
             byte written = reader.ReadUInt8Unpacked();
+            // DIAGNOSTIC: Log spawn read details
+            UnityEngine.Debug.Log($"[SyncType SPAWN READ] {GetType().Name} on {transform.name}: written={written}, registered indices: {string.Join(",", _syncTypes.Keys)}");
+            
             for (int i = 0; i < written; i++)
             {
+                int posBeforeRead = reader.Position;
                 byte syncTypeId = reader.ReadUInt8Unpacked();
+                UnityEngine.Debug.Log($"[SyncType SPAWN READ] {GetType().Name}: Read syncTypeId={syncTypeId} at position {posBeforeRead}");
+                
                 if (_syncTypes.TryGetValueIL2CPP(syncTypeId, out SyncBase sb))
                     sb.Read(reader, asServer: true);
                 else

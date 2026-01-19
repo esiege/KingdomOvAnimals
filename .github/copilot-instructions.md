@@ -55,3 +55,11 @@ KingdomOvAnimals is a multiplayer card game built with Unity and FishNet network
 ## Testing
 - Use the Editor window: **KOA → Board State Setup** for setup validation
 - Test with two clients (host + client build) for multiplayer verification
+
+## Debugging & Logs
+- **Always check both log files** when diagnosing multiplayer issues:
+  - `Docs/log_editor.log` - Unity Editor logs (usually the client that joins)
+  - `Docs/log_build.log` - Build executable logs (usually the host)
+- **SyncType errors** like `SyncType not found for index X` indicate build/editor version mismatch - rebuild required
+- **Look for "Opponent identified"** and **"Local player identified"** to verify player registration
+- **Check timestamps** - logs have dates, ensure you're looking at recent logs (not old `.txt` files)

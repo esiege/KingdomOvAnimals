@@ -15,8 +15,15 @@ public static class MultiplayerTestLauncher
     [MenuItem("KOA/Testing/Build + Run Both (Host in Editor) %&b")]
     public static void BuildAndRunBoth()
     {
-        // Build first
-        if (!BuildGame())
+        // Rebuild FishNet SceneIds first to ensure sync between editor and build
+        UnityEngine.Debug.Log("[MultiplayerTest] Rebuilding FishNet SceneIds...");
+        EditorApplication.ExecuteMenuItem("Tools/Fish-Networking/Rebuild SceneIds");
+        
+        // Save all scenes after rebuilding SceneIds
+        UnityEditor.SceneManagement.EditorSceneManager.SaveOpenScenes();
+        
+        // Clean build to avoid SyncType mismatches between editor and build
+        if (!BuildGame(cleanBuild: true))
         {
             UnityEngine.Debug.LogError("[MultiplayerTest] Build failed! Aborting.");
             return;
@@ -49,7 +56,34 @@ public static class MultiplayerTestLauncher
     [MenuItem("KOA/Testing/Build Game")]
     public static bool BuildGame()
     {
+        return BuildGame(cleanBuild: false);
+    }
+    
+    /// <summary>
+    /// Builds the game. Set cleanBuild=true to delete the existing build folder first.
+    /// </summary>
+    public static bool BuildGame(bool cleanBuild)
+    {
         UnityEngine.Debug.Log("[MultiplayerTest] Building game...");
+        
+        // Clean build: delete the entire Build folder to avoid SyncType mismatches
+        if (cleanBuild)
+        {
+            string buildDir = Path.Combine(Directory.GetCurrentDirectory(), "Build");
+            if (Directory.Exists(buildDir))
+            {
+                try
+                {
+                    UnityEngine.Debug.Log("[MultiplayerTest] Clean build: Deleting old Build folder...");
+                    Directory.Delete(buildDir, true);
+                    UnityEngine.Debug.Log("[MultiplayerTest] Old build deleted.");
+                }
+                catch (System.Exception e)
+                {
+                    UnityEngine.Debug.LogWarning($"[MultiplayerTest] Could not delete Build folder: {e.Message}");
+                }
+            }
+        }
         
         // Get scenes from build settings
         string[] scenes = GetBuildScenes();

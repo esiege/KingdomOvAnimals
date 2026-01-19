@@ -27,6 +27,48 @@ namespace KOA.Network
                 return;
             }
             Instance = this;
+            
+            // Diagnostic: Log SyncVar indices
+            LogSyncTypeIndices();
+        }
+        
+        /// <summary>
+        /// Logs all SyncType indices registered for this NetworkBehaviour.
+        /// Used to diagnose index mismatch between editor and build.
+        /// </summary>
+        private void LogSyncTypeIndices()
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine($"[NetworkBoardState] SyncType indices on {(Application.isEditor ? "EDITOR" : "BUILD")}:");
+            
+            // Use reflection to access FishNet's internal _syncTypes dictionary
+            var field = typeof(FishNet.Object.NetworkBehaviour).GetField("_syncTypes", 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            
+            if (field != null)
+            {
+                var syncTypes = field.GetValue(this) as System.Collections.IDictionary;
+                if (syncTypes != null)
+                {
+                    sb.AppendLine($"  Total SyncTypes registered: {syncTypes.Count}");
+                    foreach (System.Collections.DictionaryEntry entry in syncTypes)
+                    {
+                        var syncBase = entry.Value as FishNet.Object.Synchronizing.Internal.SyncBase;
+                        string typeName = syncBase?.GetType().Name ?? "unknown";
+                        sb.AppendLine($"  Index {entry.Key}: {typeName}");
+                    }
+                }
+                else
+                {
+                    sb.AppendLine("  _syncTypes is null (not yet initialized)");
+                }
+            }
+            else
+            {
+                sb.AppendLine("  Could not find _syncTypes field via reflection");
+            }
+            
+            Debug.Log(sb.ToString());
         }
         
         private void OnDestroy()
