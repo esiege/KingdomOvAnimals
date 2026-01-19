@@ -16,6 +16,14 @@ using KOA.Data;
 /// </summary>
 public class NetworkGameManager : NetworkBehaviour
 {
+    #region Build Stamp
+    
+    // BUILD STAMP - Change this every time we rebuild to confirm which code is running
+    // Format: YYYYMMDD_HHMM
+    public const string BUILD_STAMP = "20260119_0001";
+    
+    #endregion
+    
     public static NetworkGameManager Instance { get; private set; }
 
     [Header("Turn State (Synced)")]
@@ -61,67 +69,45 @@ public class NetworkGameManager : NetworkBehaviour
 
     private void Awake()
     {
+        string env = Application.isEditor ? "EDITOR" : "BUILD";
+        Debug.Log($"[NetworkGameManager] ========== AWAKE ==========");
+        Debug.Log($"[NetworkGameManager] BUILD_STAMP: {BUILD_STAMP}");
+        Debug.Log($"[NetworkGameManager] Environment: {env}");
+        Debug.Log($"[NetworkGameManager] Instance: {GetInstanceID()}");
+        
         if (Instance != null && Instance != this)
         {
+            Debug.Log($"[NetworkGameManager] Destroying duplicate instance");
             Destroy(gameObject);
             return;
         }
         Instance = this;
         
+        Debug.Log($"[NetworkGameManager] Initial SyncVar values:");
+        Debug.Log($"[NetworkGameManager]   CurrentTurnObjectId.Value = {CurrentTurnObjectId.Value}");
+        Debug.Log($"[NetworkGameManager]   TurnNumber.Value = {TurnNumber.Value}");
+        Debug.Log($"[NetworkGameManager]   GameStarted.Value = {GameStarted.Value}");
+        Debug.Log($"[NetworkGameManager]   ShuffleSeed.Value = {ShuffleSeed.Value}");
+        Debug.Log($"[NetworkGameManager]   OpponentDisconnected.Value = {OpponentDisconnected.Value}");
+        
         // Subscribe to SyncVar changes
         CurrentTurnObjectId.OnChange += OnTurnChanged;
         TurnNumber.OnChange += OnTurnNumberChanged;
         GameStarted.OnChange += OnGameStartedChanged;
+        ShuffleSeed.OnChange += OnShuffleSeedChanged;
         OpponentDisconnected.OnChange += OnOpponentDisconnectedChanged;
         
-        // Diagnostic: Log SyncVar indices
-        LogSyncTypeIndices();
-    }
-    
-    /// <summary>
-    /// Logs all SyncType indices registered for this NetworkBehaviour.
-    /// Used to diagnose index mismatch between editor and build.
-    /// </summary>
-    private void LogSyncTypeIndices()
-    {
-        var sb = new System.Text.StringBuilder();
-        sb.AppendLine($"[NetworkGameManager] SyncType indices on {(Application.isEditor ? "EDITOR" : "BUILD")}:");
-        
-        // Use reflection to access FishNet's internal _syncTypes dictionary
-        var field = typeof(FishNet.Object.NetworkBehaviour).GetField("_syncTypes", 
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        
-        if (field != null)
-        {
-            var syncTypes = field.GetValue(this) as System.Collections.IDictionary;
-            if (syncTypes != null)
-            {
-                sb.AppendLine($"  Total SyncTypes registered: {syncTypes.Count}");
-                foreach (System.Collections.DictionaryEntry entry in syncTypes)
-                {
-                    var syncBase = entry.Value as FishNet.Object.Synchronizing.Internal.SyncBase;
-                    string typeName = syncBase?.GetType().Name ?? "unknown";
-                    sb.AppendLine($"  Index {entry.Key}: {typeName}");
-                }
-            }
-            else
-            {
-                sb.AppendLine("  _syncTypes is null (not yet initialized)");
-            }
-        }
-        else
-        {
-            sb.AppendLine("  Could not find _syncTypes field via reflection");
-        }
-        
-        Debug.Log(sb.ToString());
+        Debug.Log($"[NetworkGameManager] Subscribed to all 5 SyncVar OnChange callbacks");
+        Debug.Log($"[NetworkGameManager] ========== AWAKE COMPLETE ==========");
     }
     
     private void OnDestroy()
     {
+        Debug.Log($"[NetworkGameManager] OnDestroy");
         CurrentTurnObjectId.OnChange -= OnTurnChanged;
         TurnNumber.OnChange -= OnTurnNumberChanged;
         GameStarted.OnChange -= OnGameStartedChanged;
+        ShuffleSeed.OnChange -= OnShuffleSeedChanged;
         OpponentDisconnected.OnChange -= OnOpponentDisconnectedChanged;
         
         if (Instance == this)
@@ -165,14 +151,28 @@ public class NetworkGameManager : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-        Debug.Log("[NetworkGameManager] OnStartClient - finding existing players");
+        
+        Debug.Log($"[NetworkGameManager] ========== OnStartClient ==========");
+        Debug.Log($"[NetworkGameManager] BUILD_STAMP: {BUILD_STAMP}");
+        Debug.Log($"[NetworkGameManager] ObjectId: {ObjectId}");
+        Debug.Log($"[NetworkGameManager] IsServer: {IsServer}");
+        Debug.Log($"[NetworkGameManager] IsHost: {IsHost}");
+        
+        Debug.Log($"[NetworkGameManager] SyncVar values received:");
+        Debug.Log($"[NetworkGameManager]   CurrentTurnObjectId.Value = {CurrentTurnObjectId.Value}");
+        Debug.Log($"[NetworkGameManager]   TurnNumber.Value = {TurnNumber.Value}");
+        Debug.Log($"[NetworkGameManager]   GameStarted.Value = {GameStarted.Value}");
+        Debug.Log($"[NetworkGameManager]   ShuffleSeed.Value = {ShuffleSeed.Value}");
+        Debug.Log($"[NetworkGameManager]   OpponentDisconnected.Value = {OpponentDisconnected.Value}");
         
         // Find all existing NetworkPlayers
         var existingPlayers = FindObjectsOfType<KOA.Network.NetworkPlayer>();
+        Debug.Log($"[NetworkGameManager] Found {existingPlayers.Length} existing NetworkPlayers");
         foreach (var player in existingPlayers)
         {
             RegisterNetworkPlayer(player);
         }
+        Debug.Log($"[NetworkGameManager] ========== OnStartClient COMPLETE ==========");
     }
 
     /// <summary>
@@ -414,21 +414,27 @@ public class NetworkGameManager : NetworkBehaviour
 
     private void OnTurnChanged(int prev, int next, bool asServer)
     {
-        Debug.Log($"[NetworkGameManager] Turn changed: ObjectId {prev} -> {next}");
+        Debug.Log($"[NetworkGameManager] SYNCVAR CHANGE: CurrentTurnObjectId {prev} -> {next} (asServer: {asServer}, ObjectId: {ObjectId})");
     }
     
     private void OnTurnNumberChanged(int prev, int next, bool asServer)
     {
-        Debug.Log($"[NetworkGameManager] Turn number: {prev} -> {next}");
+        Debug.Log($"[NetworkGameManager] SYNCVAR CHANGE: TurnNumber {prev} -> {next} (asServer: {asServer}, ObjectId: {ObjectId})");
     }
     
     private void OnGameStartedChanged(bool prev, bool next, bool asServer)
     {
-        Debug.Log($"[NetworkGameManager] Game started: {prev} -> {next}");
+        Debug.Log($"[NetworkGameManager] SYNCVAR CHANGE: GameStarted {prev} -> {next} (asServer: {asServer}, ObjectId: {ObjectId})");
+    }
+    
+    private void OnShuffleSeedChanged(int prev, int next, bool asServer)
+    {
+        Debug.Log($"[NetworkGameManager] SYNCVAR CHANGE: ShuffleSeed {prev} -> {next} (asServer: {asServer}, ObjectId: {ObjectId})");
     }
     
     private void OnOpponentDisconnectedChanged(bool prev, bool next, bool asServer)
     {
+        Debug.Log($"[NetworkGameManager] SYNCVAR CHANGE: OpponentDisconnected {prev} -> {next} (asServer: {asServer}, ObjectId: {ObjectId})");
         if (next && !prev)
         {
             Debug.Log("[NetworkGameManager] Opponent disconnected - starting grace period");

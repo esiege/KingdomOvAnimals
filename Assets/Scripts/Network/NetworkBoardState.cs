@@ -15,64 +15,41 @@ namespace KOA.Network
     /// </summary>
     public class NetworkBoardState : NetworkBehaviour
     {
+        #region Build Stamp
+        
+        // BUILD STAMP - Change this every time we rebuild to confirm which code is running
+        // Format: YYYYMMDD_HHMM
+        public const string BUILD_STAMP = "20260119_0001";
+        
+        #endregion
+        
         #region Singleton
         
         public static NetworkBoardState Instance { get; private set; }
         
         private void Awake()
         {
+            string env = Application.isEditor ? "EDITOR" : "BUILD";
+            Debug.Log($"[NetworkBoardState] ========== AWAKE ==========");
+            Debug.Log($"[NetworkBoardState] BUILD_STAMP: {BUILD_STAMP}");
+            Debug.Log($"[NetworkBoardState] Environment: {env}");
+            Debug.Log($"[NetworkBoardState] Instance: {GetInstanceID()}");
+            
             if (Instance != null && Instance != this)
             {
+                Debug.Log($"[NetworkBoardState] Destroying duplicate instance");
                 Destroy(gameObject);
                 return;
             }
             Instance = this;
             
-            // Diagnostic: Log SyncVar indices
-            LogSyncTypeIndices();
-        }
-        
-        /// <summary>
-        /// Logs all SyncType indices registered for this NetworkBehaviour.
-        /// Used to diagnose index mismatch between editor and build.
-        /// </summary>
-        private void LogSyncTypeIndices()
-        {
-            var sb = new System.Text.StringBuilder();
-            sb.AppendLine($"[NetworkBoardState] SyncType indices on {(Application.isEditor ? "EDITOR" : "BUILD")}:");
-            
-            // Use reflection to access FishNet's internal _syncTypes dictionary
-            var field = typeof(FishNet.Object.NetworkBehaviour).GetField("_syncTypes", 
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            
-            if (field != null)
-            {
-                var syncTypes = field.GetValue(this) as System.Collections.IDictionary;
-                if (syncTypes != null)
-                {
-                    sb.AppendLine($"  Total SyncTypes registered: {syncTypes.Count}");
-                    foreach (System.Collections.DictionaryEntry entry in syncTypes)
-                    {
-                        var syncBase = entry.Value as FishNet.Object.Synchronizing.Internal.SyncBase;
-                        string typeName = syncBase?.GetType().Name ?? "unknown";
-                        sb.AppendLine($"  Index {entry.Key}: {typeName}");
-                    }
-                }
-                else
-                {
-                    sb.AppendLine("  _syncTypes is null (not yet initialized)");
-                }
-            }
-            else
-            {
-                sb.AppendLine("  Could not find _syncTypes field via reflection");
-            }
-            
-            Debug.Log(sb.ToString());
+            Debug.Log($"[NetworkBoardState] Initial State.Value: {State.Value}");
+            Debug.Log($"[NetworkBoardState] ========== AWAKE COMPLETE ==========");
         }
         
         private void OnDestroy()
         {
+            Debug.Log($"[NetworkBoardState] OnDestroy");
             if (Instance == this)
             {
                 Instance = null;
@@ -151,25 +128,41 @@ namespace KOA.Network
         public override void OnStartServer()
         {
             base.OnStartServer();
-            Debug.Log("[NetworkBoardState] Server started");
+            Debug.Log($"[NetworkBoardState] ========== OnStartServer ==========");
+            Debug.Log($"[NetworkBoardState] BUILD_STAMP: {BUILD_STAMP}");
+            Debug.Log($"[NetworkBoardState] ObjectId: {ObjectId}");
+            Debug.Log($"[NetworkBoardState] State.Value: {State.Value}");
+            Debug.Log($"[NetworkBoardState] ========== OnStartServer COMPLETE ==========");
         }
         
         public override void OnStartClient()
         {
             base.OnStartClient();
+            
+            Debug.Log($"[NetworkBoardState] ========== OnStartClient ==========");
+            Debug.Log($"[NetworkBoardState] BUILD_STAMP: {BUILD_STAMP}");
+            Debug.Log($"[NetworkBoardState] ObjectId: {ObjectId}");
+            Debug.Log($"[NetworkBoardState] IsServer: {IsServer}");
+            Debug.Log($"[NetworkBoardState] IsHost: {IsHost}");
+            Debug.Log($"[NetworkBoardState] State.Value: {State.Value}");
+            
             State.OnChange += OnBoardStateChanged;
-            Debug.Log("[NetworkBoardState] Client started, subscribed to state changes");
+            Debug.Log("[NetworkBoardState] Subscribed to State.OnChange");
+            Debug.Log($"[NetworkBoardState] ========== OnStartClient COMPLETE ==========");
         }
         
         public override void OnStopClient()
         {
             base.OnStopClient();
+            Debug.Log($"[NetworkBoardState] OnStopClient");
             State.OnChange -= OnBoardStateChanged;
         }
         
         private void OnBoardStateChanged(BoardState prev, BoardState next, bool asServer)
         {
-            Debug.Log($"[NetworkBoardState] State changed (asServer={asServer}): {next}");
+            Debug.Log($"[NetworkBoardState] SYNCVAR CHANGE: State (asServer={asServer}, ObjectId: {ObjectId})");
+            Debug.Log($"[NetworkBoardState]   prev: {prev}");
+            Debug.Log($"[NetworkBoardState]   next: {next}");
             OnStateChanged?.Invoke(next);
         }
         

@@ -419,8 +419,6 @@ namespace FishNet.Object.Synchronizing.Internal
             if (resetSyncTick)
                 NextSyncTick = NetworkManager.TimeManager.LocalTick + _timeToTicks;
 
-            // DIAGNOSTIC: Log what index is being written
-            UnityEngine.Debug.Log($"[SyncType WRITE] Writing SyncIndex={SyncIndex} for {GetType().Name}");
             writer.WriteUInt8Unpacked((byte)SyncIndex);
         }
 
