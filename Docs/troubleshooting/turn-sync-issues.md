@@ -2,6 +2,9 @@
 
 Issues related to networked turn management and duplicate actions.
 
+> **Historical.** `EncounterController` (referenced below) no longer exists — see
+> [Turn Synchronization](../networking/turn-synchronization.md) for the current (two-system) turn tracking.
+
 ---
 
 ## Issue: Duplicate Turn Actions (Mana Refill/Card Draw)

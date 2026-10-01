@@ -1,237 +1,140 @@
 # Adventure Mode Design
 
-## Overview
+> **Not implemented — active design vision, early ideation.** *(vdate 2026-08-12)* No story-branch,
+> class-selection, or progression code exists anywhere in `Assets/Scripts`. This doc is being actively
+> re-pitched and will keep shifting; details below are the current best guess, not locked decisions. The only
+> scenes that currently exist are `MainMenu`, `DuelScreen`, `Network Test`, `CardManagement`, and `CHUDSandbox`
+> (see [CLAUDE.md](../../CLAUDE.md)).
 
-Adventure Mode is the primary gameplay experience in Kingdom Ov Animals. Players embark on a deck-building journey through narrative choices and duels, starting from a single animal class and evolving into a multi-class powerhouse.
+## Pitch
 
-## Core Gameplay Loop
+Hearthstone Duels' draft-a-run structure, crossed with Slay the Spire's map traversal and deckbuilding-through-a-run,
+built on top of this game's existing 1v1 duel combat. Players walk a branching board, making narrative/reward
+choices that grow their deck, and periodically stop to duel another live player. No NPC/PvE fights — every
+battle in the run is against a real opponent.
+
+## Run Structure
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     ADVENTURE MODE                          │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  1. CLASS SELECTION                                         │
-│     Choose from 107 animal classes                          │
-│     ↓                                                       │
-│  2. BOARD 1 (Primary Class)                                 │
-│     ┌─────────────────────────────────────────────┐        │
-│     │ Story Branch → Duel → Story → Duel → Story → Duel │  │
-│     │    (+cards)    (W/L)  (+cards) (W/L) (+cards) (W/L)│  │
-│     └─────────────────────────────────────────────┘        │
-│     ↓                                                       │
-│  3. SECONDARY CLASS SELECTION                               │
-│     Choose a second class to complement your deck           │
-│     ↓                                                       │
-│  4. BOARD 2 (Secondary Class)                               │
-│     ┌─────────────────────────────────────────────┐        │
-│     │ Story Branch → Duel → Story → Duel → Story → Duel │  │
-│     │    (+cards)    (W/L)  (+cards) (W/L) (+cards) (W/L)│  │
-│     └─────────────────────────────────────────────┘        │
-│     ↓                                                       │
-│  5. ENDGAME                                                 │
-│     Final challenges, rewards, completion                   │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│  START: pick a starter type (taxonomic class/phylum), get its    │
+│  starter deck                                                    │
+│         ↓                                                        │
+│  BOARD 1 (random type)      — 3 segments, each ends in a PvP duel│
+│         ↓  (after Board 1: get a second, random type added to    │
+│             the deck — e.g. start Aves/birds, pick up             │
+│             Cnidaria/jellyfish)                                  │
+│  BOARD 2 (random type)      — 3 segments, each ends in a PvP duel│
+│         ↓                                                        │
+│  BOARD 3 (fixed "strange" capstone board, not a normal type)     │
+│                              — 3 segments, each ends in a PvP duel│
+│         ↓                                                        │
+│  FINAL BOSS DUEL            — the 10th and last PvP battle       │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
-## Story Branches
+- 3 boards × 3 segments = 9 segment-ending duels + 1 final boss duel = **10 total PvP battles per run**
+- **3 lives**, lost only on a PvP loss (not on non-combat choices — there's nothing else to fail at)
+- 0 lives = run over
 
-### Structure
-Each story branch presents:
-1. **Narrative Text** - Atmospheric description of a scenario
-2. **Choices** (2-4 options) - Each with different rewards
-3. **Card Rewards** - Packs of cards added to deck
-4. **Specializations** - Optional card upgrades
+## Type System
 
-### Example Story Branch
+Starter type and the Board-2 type are each a taxonomic grouping — rank is deliberately inconsistent for content
+variety (a whole phylum like Cnidaria can sit alongside a class like Aves, and a large class like Mammalia can
+be split into finer family-level groups like Canidae/Felidae/Ursidae for more distinct options). This reuses
+and extends the existing `Docs/scrum/sprint-04/data/animal-classes.json` (107 Family-level groups already
+written) rather than starting from nothing — see [Prior Work](#prior-work) below.
+
+Deck mixing between the starter type and the Board-2 type is the core replayability hook: same starting type,
+different second type, meaningfully different deck every run. Stretch goal: AI-generated "mutation" cards that
+blend the two active types for extra build variety (pairs naturally with the AI story generation groundwork
+already scoped in `story-035`, just applied to card generation instead of narrative text).
+
+## Segment Flow (non-combat nodes)
+
+Between duels, each segment presents story-branch-style choices — this part of the old plan still fits well:
+
+1. **Narrative text** — atmospheric scenario description
+2. **Choices** (2-4 options) — each grants different card rewards
+3. **Card rewards** — packs of cards added to the deck
+4. **Specializations** (occasional) — upgrade an existing card down a themed path
+
+Example (unchanged from the earlier draft — still a good template):
 
 ```
 ═══════════════════════════════════════════════════════════════
 THE CALL OF THE PACK
 ═══════════════════════════════════════════════════════════════
 
-The moon rises over the forest. In the distance, you hear 
-howling - a pack of wolves on the hunt. Their eyes gleam in 
+The moon rises over the forest. In the distance, you hear
+howling - a pack of wolves on the hunt. Their eyes gleam in
 the darkness as they notice your presence...
 
 ───────────────────────────────────────────────────────────────
 Choice 1: "Join the hunt alongside them"
     Reward: 4x Wolf
-    → Path: The pack accepts you as one of their own
 ───────────────────────────────────────────────────────────────
 Choice 2: "Observe from the shadows"
     Reward: 2x Wolf + 1x Lone Wolf (rare)
-    → Path: You learn their ways through careful observation
 ───────────────────────────────────────────────────────────────
 Choice 3: "Challenge the alpha for leadership"
     Reward: 3x Wolf + 1x Alpha Wolf (legendary)
-    → Path: A bold move that could change everything
 ───────────────────────────────────────────────────────────────
 ```
 
-### Specialization Choices
-
-After certain story branches, players can specialize their cards:
+Specialization choice example:
 
 ```
 ═══════════════════════════════════════════════════════════════
 THE WOLF RISES
 ═══════════════════════════════════════════════════════════════
-
-One of your wolves has shown exceptional talent. Under the 
-moonlight, they await your guidance to unlock their potential...
-
 Choose a path of power:
 
-───────────────────────────────────────────────────────────────
-🔮 MAGE PATH
-    Wolf → Wolf Mage
-    +Magic abilities, -1 Health
-    "Channels lunar energy into devastating spells"
-───────────────────────────────────────────────────────────────
-⚔️ FIGHTER PATH
-    Wolf → Wolf Warrior
-    +Attack damage, balanced stats
-    "Raw strength honed through countless battles"
-───────────────────────────────────────────────────────────────
-🛡️ GUARDIAN PATH
-    Wolf → Wolf Guardian
-    +Health, defensive abilities
-    "An unbreakable protector of the pack"
+🔮 MAGE PATH      Wolf → Wolf Mage      +Magic abilities, -1 Health
+⚔️ FIGHTER PATH   Wolf → Wolf Warrior   +Attack damage, balanced stats
+🛡️ GUARDIAN PATH  Wolf → Wolf Guardian  +Health, defensive abilities
 ───────────────────────────────────────────────────────────────
 ```
 
-## Progression System
-
-### Lives
-- Players start with **3 lives**
-- Losing a duel costs **1 life**
-- At **0 lives**, the adventure ends
-- Lives do NOT regenerate between boards
-
-### Win Tracking
-- **Board 1**: 3 duels (0-3 wins possible)
-- **Board 2**: 3 duels (3-6 wins possible)
-- **Endgame**: Final challenges (6-12 wins)
-- **12 wins** = Complete victory
-
-### Difficulty Scaling
-- Early duels: Weaker opponent decks
-- Later duels: Stronger, more synergistic decks
-- After losses: Slightly easier matchmaking (optional mercy rule)
-
-## Deck Building
-
-### Starting Deck
-- 0 cards initially
-- First story choice grants ~4 cards
-- Minimum deck size for first duel: ~12 cards (3 branches × 4 cards)
-
-### Deck Growth
-| Phase | Cards Added | Total (Approx) |
-|-------|-------------|----------------|
-| Class Selection | 0 | 0 |
-| Story 1 | 4 | 4 |
-| Story 2 | 4 | 8 |
-| Story 3 | 4 | 12 |
-| Story 4 | 4 | 16 |
-| Story 5 | 4 | 20 |
-| Story 6 | 4 | 24 |
-
-### Multi-Class Decks
-- **Board 1**: Single animal class only
-- **Board 2**: Primary + Secondary class
-- Synergies between classes encouraged through story context
-
-## Animal Classes
-
-### Categories
-| Category | Count | Examples |
-|----------|-------|----------|
-| Mammals | 55 | Wolves, Bears, Elephants |
-| Birds | 21 | Eagles, Owls, Penguins |
-| Reptiles | 17 | Crocodiles, Snakes, Chameleons |
-| Amphibians | 6 | Frogs, Salamanders |
-| Fish | 7 | Sharks, Tuna, Salmon |
-| Insects | 10 | Ants, Bees, Butterflies |
-| Arachnids | 2 | Tarantulas, Scorpions |
-| Other | 4 | Octopuses, Crabs, Jellyfish |
-
-### Class Identity
-Each class has:
-- **Playstyle theme** (aggro, control, combo, etc.)
-- **Visual identity** (card art style)
-- **Ability keywords** (pack synergy, venom, flight, etc.)
-
-## AI Story Generation
-
-### Context Variables
-The AI receives:
-- `{className}` - Selected animal class
-- `{classDescription}` - Class flavor text
-- `{deckSummary}` - Current deck composition
-- `{lastChoice}` - Previous player decision
-- `{battleResult}` - Win/loss from last duel
-- `{winsTotal}` - Cumulative wins
-- `{currentBoard}` - Board 1 or 2
-
-### Prompt Strategy
-1. Maintain narrative consistency with previous choices
-2. Reference cards the player has collected
-3. Offer meaningful strategic choices (not just flavor)
-4. Ensure card rewards exist in the library
-
-### Fallback Content
-- Template branches for each animal class
-- Generic branches that work with any class
-- Error handling with graceful degradation
-
 ## Duels
 
-### Matchmaking
-- Adventure players matched with other adventure players
-- Similar progress (Board 1 vs Board 1)
-- Similar deck sizes
-- Optional: AI opponents if no players available
+- Every duel is PvP — no AI/NPC opponents, by design
+- Ideally matched against players at the same run position (same board/segment) so deck power stays comparable
+- Loss = -1 life, continue to the next segment either way (run only ends at 0 lives)
 
-### Rewards
-- **Win**: Progress to next story branch
-- **Lose**: Lose 1 life, continue to next story branch
+## Open Tensions (not blockers — noted so they don't get lost)
 
-### Post-Duel Narrative
-Story branches after duels reference the outcome:
-- "Your victory echoes through the forest..."
-- "Despite the defeat, your pack's spirit remains unbroken..."
+*Formal resolution tracked as [Story 044](../scrum/sprint-07/todo/story-044-adventure-mode-design-decisions.md),
+Sprint 07 — these stay open until then.*
 
-## Endgame
+- **Second type: random vs. chosen.** Current pitch says random. The older sprint-04 plan had the player choose
+  their second class. Either could work; not decided.
+- **No AI/NPC fallback removes a liveness safety valve.** The older plan allowed an AI opponent when no player
+  was queued at your run position. The current pitch cuts NPC fights entirely, which means matchmaking has to
+  actually work at every board/segment combination for the run to be playable. [Story 045](../scrum/sprint-07/todo/story-045-matchmaking-by-run-position-spike.md)
+  spikes this before the decision is locked.
+- **Board count/win total changed.** Old plan: 2 boards + a loosely-sized "endgame" (~12 total wins). Current
+  pitch: clean 3 boards × 3 segments + 1 boss = 10. Going with the new number for now.
+- **Category taxonomy needs a pass.** The existing `animal-classes.json` categories don't cleanly support
+  "Cnidaria as a marquee board type" yet — jellyfish/cnidarians are currently folded into a generic "Other"
+  bucket alongside octopuses and crabs. Fine to leave as-is until board-type selection is actually built.
 
-### After 6 Wins (Both Boards Complete)
-- Boss-tier challenges
-- Rare card rewards
-- Unique story conclusions
+## Prior Work
 
-### 12-Win Completion
-- Adventure victory screen
-- Rewards unlocked
-- Deck saved as "Hall of Fame" entry
+A meaningful chunk of this was already scoped in the old Sprint 04 and has since been rescheduled into
+Sprints 08-13 (see `Docs/scrum/backlog.md`) rather than rebuilt from scratch:
 
-## UI/UX Considerations
-
-### Board Map
-- Visual path showing progress
-- Node types: Story, Duel, Class Selection
-- Completed/current/future state visibility
-
-### Deck Viewer
-- Always accessible during story phases
-- Shows all collected cards
-- Highlights new additions
-
-### Timer Considerations
-- Story choices: No timer (thoughtful decisions)
-- Duels: Standard turn timer
+- [story-027: Animal Classification Data](../scrum/sprint-09/todo/story-027-animal-classification-data.md) +
+  [animal-classes.json](../scrum/sprint-04/data/animal-classes.json) — 107 Family-level groups already written
+- [story-028: Class Selection UI](../scrum/sprint-09/todo/story-028-class-selection-ui.md)
+- [story-029: Story Branch Data](../scrum/sprint-10/todo/story-029-story-branch-data.md) /
+  [story-030: Story Presentation UI](../scrum/sprint-10/todo/story-030-story-presentation-ui.md)
+- [story-031: Card Pack Reward](../scrum/sprint-10/todo/story-031-card-pack-reward.md) /
+  [story-032: Card Specialization](../scrum/sprint-13/todo/story-032-card-specialization.md)
+- [story-033: Adventure Progress](../scrum/sprint-08/todo/story-033-adventure-progress.md) /
+  [story-034: Board Map UI](../scrum/sprint-08/todo/story-034-board-map-ui.md)
+- [story-035: AI Story Generation](../scrum/sprint-10/todo/story-035-ai-story-generation.md) — template for the
+  AI-generated mutation-card idea (now its own spike, [story-052](../scrum/sprint-15/todo/story-052-ai-generated-mutation-cards-spike.md))
 
 ---
-
-*See also: [Story Branch Data](../scrum/sprint-04/story-029-story-branch-data/story.md) | [Animal Classes JSON](../scrum/sprint-04/data/animal-classes.json)*
+*Parent: [Game Design](./README.md)*

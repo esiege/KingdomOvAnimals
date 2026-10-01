@@ -17,13 +17,10 @@ Documentation for Kingdom Ov Animals game rules, mechanics, and design decisions
 
 ### The Targeting System
 
-Kingdom Ov Animals uses a unique **drag-to-target** system that combines playing cards and using abilities into a single intuitive action:
-
-- **Drag to empty space** → Play the unit (costs mana, gets summoning sickness)
-- **Drag to friendly unit** → Use defensive/support ability (costs mana)
-- **Drag to enemy unit** → Use offensive ability (costs mana)
-
-This eliminates the need for separate "play" and "attack" phases found in traditional card games.
+Kingdom Ov Animals combines playing cards and using abilities into click-based actions rather than separate
+"play" and "attack" phases. **Left-click** drag handles play/offense (empty slot = play, enemy = attack);
+**right-click** on your own board card handles support targeting. See [targeting.md](./targeting.md) for the
+exact current behavior (verified 2026-08-12) — it differs from a simple "drag anywhere" model.
 
 ### Turn Structure
 

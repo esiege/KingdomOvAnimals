@@ -7,7 +7,7 @@ KingdomOvAnimals is a multiplayer card game built with Unity and FishNet network
 
 ### Always Use Tools
 - **Always put Editor scripts in `Assets/Scripts/Editor/`** - Unity requires this for Editor-only code
-- **Always use namespaces** - Use `KOA.Model`, `KOA.View`, `KOA.Network`, `KOA.Data`, `KOA.Logic`, `KOA.Migration`, `KOA.Editor`
+- **Always use namespaces** - Use `KOA.Model`, `KOA.View`, `KOA.Network`, `KOA.Data`, `KOA.Logic`, `KOA.Editor`
 - **Always add XML documentation** - Public classes and methods should have `<summary>` comments
 
 ### Board State Architecture (Story 030)
@@ -42,6 +42,13 @@ KingdomOvAnimals is a multiplayer card game built with Unity and FishNet network
 - **Check PlayerSpawner** - FishNet's `PlayerSpawner` needs `NetworkPlayer` prefab assigned, or players won't spawn
 - **Scene setup matters** - Many runtime errors come from missing scene setup (prefab assignments, component references)
 
+### When Adding New Serialized Fields
+- **Always update BoardStateSetupWindow** - When adding new `[SerializeField]` fields to scene components (BoardView, InputController, etc.), add validation and auto-fix to `BoardStateSetupWindow.cs`
+- **Add validation check** - Show red/green status for whether the field is assigned
+- **Add auto-fix method** - Create `AutoCreate*` or `AutoAssign*` method to fix missing references
+- **Add to AutoFixAll** - Include new auto-fix in the `AutoFixAll()` method
+- **Test the flow** - Run the editor tool to verify validation and auto-fix work
+
 ## File Locations
 - **Data (ScriptableObjects)**: `Assets/Scripts/Data/`
 - **Model (pure data classes)**: `Assets/Scripts/Model/`
@@ -49,7 +56,6 @@ KingdomOvAnimals is a multiplayer card game built with Unity and FishNet network
 - **Network (FishNet sync)**: `Assets/Scripts/Network/`
 - **Logic (pure C# helpers)**: `Assets/Scripts/Logic/`
 - **Editor (editor-only)**: `Assets/Scripts/Editor/`
-- **Migration (old↔new bridges)**: `Assets/Scripts/Migration/`
 - **Documentation**: `Docs/scrum/stories/`
 
 ## Testing
@@ -58,8 +64,17 @@ KingdomOvAnimals is a multiplayer card game built with Unity and FishNet network
 
 ## Debugging & Logs
 - **Always check both log files** when diagnosing multiplayer issues:
-  - `Docs/log_editor.log` - Unity Editor logs (usually the client that joins)
-  - `Docs/log_build.log` - Build executable logs (usually the host)
+  - `Docs/log_editor.log` - Unity Editor logs (the host, when using `KOA → Testing → Build + Run Both`)
+  - `Docs/log_build.log` - Build executable logs (the client)
 - **SyncType errors** like `SyncType not found for index X` indicate build/editor version mismatch - rebuild required
 - **Look for "Opponent identified"** and **"Local player identified"** to verify player registration
 - **Check timestamps** - logs have dates, ensure you're looking at recent logs (not old `.txt` files)
+
+## Documentation
+
+*vdate = date checked against source. See [Docs/README.md](../Docs/README.md) for the full index.*
+
+- [Docs/architecture.md](../Docs/architecture.md) - vdate 2026-08-12 - layered Model/Network/View design
+- [Docs/networking/README.md](../Docs/networking/README.md) - vdate 2026-08-12 - FishNet components, two turn-tracking systems, reconnection status
+- [Docs/controllers/README.md](../Docs/controllers/README.md) - vdate 2026-08-12 - current View/Input classes
+- [Docs/game-design/](../Docs/game-design/README.md) - vdate 2026-08-12 - some pages (adventure-mode, most of abilities.md) are design vision, flagged inline as not implemented

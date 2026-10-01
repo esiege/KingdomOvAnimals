@@ -116,6 +116,18 @@ namespace KOA.Network
         public System.Action<int, int, int> OnPlayerDamaged;
         
         /// <summary>
+        /// Fired when a player is healed.
+        /// Args: playerId, healAmount, newHealth
+        /// </summary>
+        public System.Action<int, int, int> OnPlayerHealed;
+        
+        /// <summary>
+        /// Fired when a support ability is used (heal, buff on friendly card).
+        /// Args: sourcePlayerId, sourceSlot, targetPlayerId, targetSlot, abilityType
+        /// </summary>
+        public System.Action<int, int, int, int, string> OnSupportAbilityUsed;
+        
+        /// <summary>
         /// Fired when the game ends.
         /// Args: winnerPlayerId
         /// </summary>
@@ -174,6 +186,8 @@ namespace KOA.Network
         public void InitializeGame(List<string> player0Deck, List<string> player1Deck)
         {
             Debug.Log("[NetworkBoardState] Initializing game");
+            Debug.Log($"[NetworkBoardState] Player 0 deck size: {player0Deck.Count}");
+            Debug.Log($"[NetworkBoardState] Player 1 deck size: {player1Deck.Count}");
             
             var newState = new BoardState();
             newState.Players[0].Deck = new List<string>(player0Deck);
@@ -182,13 +196,17 @@ namespace KOA.Network
             // Shuffle decks
             ShuffleDeck(newState.Players[0].Deck);
             ShuffleDeck(newState.Players[1].Deck);
+            Debug.Log($"[NetworkBoardState] Decks shuffled");
             
             // Draw initial hands (4 cards each)
+            Debug.Log($"[NetworkBoardState] Drawing initial hands (4 cards each)");
             for (int i = 0; i < 4; i++)
             {
                 DrawCardInternal(newState, 0);
                 DrawCardInternal(newState, 1);
             }
+            Debug.Log($"[NetworkBoardState] Player 0 hand size: {newState.Players[0].Hand.Count}");
+            Debug.Log($"[NetworkBoardState] Player 1 hand size: {newState.Players[1].Hand.Count}");
             
             newState.StartGame();
             State.Value = newState;
@@ -562,6 +580,171 @@ namespace KOA.Network
             }
         }
         
+        /// <summary>
+        /// Request to use a support ability (heal/buff) on a friendly card.
+        /// Source is a board card, target is a friendly card.
+        /// </summary>
+        [ServerRpc(RequireOwnership = false)]
+        public void CmdUseSupportAbility(int sourcePlayerId, int sourceSlotIndex, int targetPlayerId, int targetSlotIndex, NetworkConnection conn = null)
+        {
+            Debug.Log($"[NetworkBoardState] CmdUseSupportAbility: source=({sourcePlayerId}, {sourceSlotIndex}), target=({targetPlayerId}, {targetSlotIndex})");
+            
+            var state = State.Value;
+            
+            // Validate turn
+            if (!state.IsPlayerTurn(sourcePlayerId))
+            {
+                Debug.LogWarning("[NetworkBoardState] Not player's turn");
+                return;
+            }
+            
+            var sourcePlayer = state.GetPlayer(sourcePlayerId);
+            var sourceCard = sourcePlayer.GetCardInSlot(sourceSlotIndex);
+            if (sourceCard == null || !sourceCard.CanAct)
+            {
+                Debug.LogWarning("[NetworkBoardState] Source card cannot act");
+                return;
+            }
+            
+            // Get defensive ability
+            var cardData = _cardLibrary.GetCardById(sourceCard.CardDataId);
+            if (cardData == null || cardData.defensiveAbility == null)
+            {
+                Debug.LogWarning("[NetworkBoardState] Card has no defensive ability");
+                return;
+            }
+            
+            // Validate target is friendly
+            if (targetPlayerId != sourcePlayerId)
+            {
+                Debug.LogWarning("[NetworkBoardState] Support abilities can only target friendly cards");
+                return;
+            }
+            
+            var targetCard = sourcePlayer.GetCardInSlot(targetSlotIndex);
+            if (targetCard == null)
+            {
+                Debug.LogWarning($"[NetworkBoardState] No card in target slot ({targetPlayerId}, {targetSlotIndex})");
+                return;
+            }
+            
+            // Execute support ability based on behavior type
+            var ability = cardData.defensiveAbility;
+            ExecuteSupportAbility(ability, sourceCard, targetCard, cardData);
+            
+            // Mark source as having acted
+            sourceCard.IsTapped = true;
+            
+            // Update state
+            State.Value = state;
+            
+            // Notify clients
+            RpcSupportAbilityUsed(sourcePlayerId, sourceSlotIndex, targetPlayerId, targetSlotIndex, ability.behaviorType);
+        }
+        
+        /// <summary>
+        /// Request to heal the player directly (self-targeting support).
+        /// </summary>
+        [ServerRpc(RequireOwnership = false)]
+        public void CmdHealPlayer(int sourcePlayerId, int sourceSlotIndex, NetworkConnection conn = null)
+        {
+            Debug.Log($"[NetworkBoardState] CmdHealPlayer: source=({sourcePlayerId}, {sourceSlotIndex})");
+            
+            var state = State.Value;
+            
+            // Validate turn
+            if (!state.IsPlayerTurn(sourcePlayerId))
+            {
+                Debug.LogWarning("[NetworkBoardState] Not player's turn");
+                return;
+            }
+            
+            var sourcePlayer = state.GetPlayer(sourcePlayerId);
+            var sourceCard = sourcePlayer.GetCardInSlot(sourceSlotIndex);
+            if (sourceCard == null || !sourceCard.CanAct)
+            {
+                Debug.LogWarning("[NetworkBoardState] Source card cannot act");
+                return;
+            }
+            
+            // Get defensive ability
+            var cardData = _cardLibrary.GetCardById(sourceCard.CardDataId);
+            if (cardData == null || cardData.defensiveAbility == null)
+            {
+                Debug.LogWarning("[NetworkBoardState] Card has no defensive ability");
+                return;
+            }
+            
+            var ability = cardData.defensiveAbility;
+            int healAmount = ability.healAmount > 0 ? ability.healAmount : ability.damage; // Fallback to damage field
+            
+            // Execute heal on player
+            int oldHealth = sourcePlayer.Health;
+            sourcePlayer.Heal(healAmount);
+            int actualHeal = sourcePlayer.Health - oldHealth;
+            
+            Debug.Log($"[NetworkBoardState] {sourceCard.CardDataId} heals player {sourcePlayerId} for {actualHeal}");
+            
+            // Mark source as having acted
+            sourceCard.IsTapped = true;
+            
+            // Update state
+            State.Value = state;
+            
+            // Notify clients
+            RpcPlayerHealed(sourcePlayerId, actualHeal, sourcePlayer.Health);
+        }
+        
+        /// <summary>
+        /// Execute a support ability effect on a target card.
+        /// </summary>
+        private void ExecuteSupportAbility(Data.AbilityData ability, CardState source, CardState target, Data.CardData sourceCardData)
+        {
+            string behaviorType = ability.behaviorType?.ToLower() ?? "";
+            
+            if (behaviorType.Contains("heal"))
+            {
+                // Heal ability
+                int healAmount = ability.healAmount > 0 ? ability.healAmount : ability.damage;
+                int maxHealth = sourceCardData.health; // Use source's max health as reference for target
+                
+                // Look up target's actual max health
+                var targetCardData = _cardLibrary.GetCardById(target.CardDataId);
+                if (targetCardData != null)
+                {
+                    maxHealth = targetCardData.health;
+                }
+                
+                int oldHealth = target.CurrentHealth;
+                target.Heal(healAmount, maxHealth);
+                Debug.Log($"[NetworkBoardState] Healed {target.CardDataId}: {oldHealth} -> {target.CurrentHealth}");
+            }
+            else if (behaviorType.Contains("buff"))
+            {
+                // Buff ability - would need status effect system
+                // For now, just log
+                Debug.Log($"[NetworkBoardState] Buff ability on {target.CardDataId} (effect system TODO)");
+            }
+            else
+            {
+                Debug.Log($"[NetworkBoardState] Unknown support ability type: {behaviorType}");
+            }
+        }
+        
+        [ObserversRpc]
+        private void RpcSupportAbilityUsed(int sourcePlayerId, int sourceSlotIndex, int targetPlayerId, int targetSlotIndex, string abilityType)
+        {
+            Debug.Log($"[Client] Support ability used: ({sourcePlayerId}, {sourceSlotIndex}) -> ({targetPlayerId}, {targetSlotIndex}), type={abilityType}");
+            OnSupportAbilityUsed?.Invoke(sourcePlayerId, sourceSlotIndex, targetPlayerId, targetSlotIndex, abilityType);
+        }
+        
+        [ObserversRpc]
+        private void RpcPlayerHealed(int playerId, int healAmount, int newHealth)
+        {
+            Debug.Log($"[Client] Player healed: {playerId} for {healAmount}, now at {newHealth}");
+            OnPlayerHealed?.Invoke(playerId, healAmount, newHealth);
+        }
+
         [ObserversRpc]
         private void RpcCardDamaged(int playerId, int slotIndex, int damage, int newHealth)
         {

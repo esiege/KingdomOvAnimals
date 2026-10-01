@@ -1,11 +1,14 @@
 # Troubleshooting Guide
 
-This folder contains documentation for issues encountered during development and their solutions.
+This folder contains dated incident logs from past debugging sessions. **They describe the codebase as it was
+on the date listed in each entry** — several reference `PlayerConnectionHandler` and `EncounterController`,
+classes that were later removed in the Story 030/036 architecture revamp (see [architecture.md](../architecture.md)
+for current class names). Read them for the failure *patterns* (singleton destruction races, duplicate
+turn-start actions), not as a guide to current code structure.
 
 ## Index
 
 ### FishNet Networking
-- [SyncVar Issues](./fishnet-syncvar-issues.md) - Default values, dirty state, initial sync
 - [Reconnection Debugging](./reconnection-debugging.md) - Object lifecycle, logging issues
 - [Turn Sync Issues](./turn-sync-issues.md) - Duplicate actions, wrong player execution
 

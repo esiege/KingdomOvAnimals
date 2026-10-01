@@ -307,6 +307,17 @@ namespace KOA.Network
             Debug.Log($"[NetworkPlayer]   CurrentMana.Value = {CurrentMana.Value}");
             Debug.Log($"[NetworkPlayer]   MaxMana.Value = {MaxMana.Value}");
             
+            // Register with NetworkGameManager
+            if (NetworkGameManager.Instance != null)
+            {
+                Debug.Log($"[NetworkPlayer] Registering with NetworkGameManager (Server)");
+                NetworkGameManager.Instance.RegisterNetworkPlayer(this);
+            }
+            else
+            {
+                Debug.LogWarning($"[NetworkPlayer] NetworkGameManager.Instance is null - cannot register!");
+            }
+            
             Debug.Log($"[NetworkPlayer] ========== OnStartServer COMPLETE ==========");
         }
 

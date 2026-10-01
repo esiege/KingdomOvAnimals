@@ -1,74 +1,65 @@
 # Utilities
 
-Helper classes and services used across the project.
+*Verified against source: 2026-08-12 (vdate)*
 
 ## ConsoleLogToFile
 
-Debug utility that writes Unity console logs to a text file for post-session analysis.
-
-### Purpose
-- Capture log output from builds where console isn't visible
-- Debug reconnection issues across multiple sessions
-- Track timing of events with timestamps
-
-### Usage
-Attached to a GameObject in scene. Automatically captures `Debug.Log`, `Debug.LogWarning`, and `Debug.LogError`.
+Captures Unity console output to a file. Attached to a persistent GameObject.
 
 ### Output Files
-| File | Location |
-|------|----------|
-| Editor | `Assets/../reconnect_editor.txt` |
-| Build | `<build_folder>/reconnect_build.txt` |
+
+Editor and Build write to **different files** so host/client logs don't clobber each other:
+
+| Environment | File |
+|-------------|------|
+| Editor | `Docs/log_editor.log` |
+| Build | `Docs/log_build.log` |
+
+(`.log` extension is intentional — Unity ignores it for domain reload, unlike `.txt`.)
 
 ### Features
-- Timestamp on each log entry
-- Separates editor vs build logs
-- Appends to existing file (doesn't overwrite)
-- Flushes after each write
+- Timestamp on each line (configurable)
+- Includes stack traces (configurable)
+- Separate singleton instance per environment
 
-### Configuration
-| Property | Description |
-|----------|-------------|
-| `logFileName` | Base filename for log output |
-| `includeTimestamp` | Add timestamp prefix |
-| `logLevel` | Filter by log severity |
+---
+
+## ReconnectionManager
+
+Static class (`Assets/Scripts/Network/ReconnectionManager.cs`) that survives MonoBehaviour destruction (uses
+Unity's `Application.quitting` / `EditorApplication.update` hooks rather than a scene lifecycle). Logs to
+`Logs/GameLogs/reconnect_manager_editor.log` / `reconnect_manager_build.log`. As of this writing its
+`StartReconnectionWait()` entry point has no call sites elsewhere in the codebase — see
+[architecture.md](./architecture.md#network) for current status.
 
 ---
 
 ## CardLibrary
 
-ScriptableObject asset containing all card templates in the game.
-
-### Purpose
-- Central registry of all CardTemplates
-- Easy lookup by card ID or name
-- Used for deck building and spawning cards
+Singleton (`Assets/Scripts/Data/CardLibrary.cs`, `DontDestroyOnLoad`) that loads all `CardData` and
+`AbilityData` ScriptableObjects from `Resources/Cards` and `Resources/Abilities` on `Awake` and indexes them by
+ID.
 
 ### Methods
-
 | Method | Description |
 |--------|-------------|
-| `GetCardById(string id)` | Find template by unique ID |
-| `GetCardByName(string name)` | Find template by display name |
-| `GetAllCards()` | Return complete card list |
-| `GetCardsByType(CardType type)` | Filter by creature/spell type |
+| `GetCardById(id)` / `GetCardDataById(id)` | Look up a `CardData` (the two are aliases) |
+| `GetAbilityDataById(id)` | Look up an `AbilityData` |
+| `GetAllCardData()` / `GetAllAbilityData()` | Full lists (copies) |
+| `GetCardDataByType(CardType)` | Filter by card type |
+| `HasCardData(id)` / `HasAbilityData(id)` | Existence checks |
+| `CardDataCount` / `AbilityDataCount` | Counts |
+| `ReloadDataAssets()` | Re-scan Resources (editor use) |
 
-### Location
-`Assets/Resources/CardLibrary` - Must be in Resources for runtime loading.
-
-### Network Usage
-- Server selects cards by ID
-- ID transmitted over network
-- Client looks up local template
+`CardLibrary.EnsureInitialized()` creates the singleton on demand if it doesn't exist yet.
 
 ---
 
 ## Adding New Utilities
 
-1. Create script in `Assets/Scripts/Utilities/`
-2. Document purpose and usage in this file
-3. Keep utilities stateless where possible
-4. Prefer ScriptableObjects for data containers
+1. Create the script in `Assets/Scripts/Utilities/`
+2. Document purpose and usage here
+3. Prefer stateless helpers; use ScriptableObjects for data containers
 
 ---
 *Back to [Main Documentation](./README.md)*

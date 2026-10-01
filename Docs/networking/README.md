@@ -1,67 +1,43 @@
 # Networking System
 
-Kingdom Ov Animals uses **FishNet** for multiplayer functionality. The networking layer handles player connections, game state synchronization, turn management, and reconnection support.
+*Verified against source: 2026-08-12 (vdate)*
 
-## Architecture Overview
+Kingdom Ov Animals uses **FishNet**. Server-authoritative: only the server mutates state, clients read via
+SyncVars and events.
 
-The networking system consists of five core components:
+> This folder previously described `PlayerConnectionHandler` and `GameStateSnapshot` — neither class exists
+> anymore. Reconnection now leans on `NetworkBoardState`'s own `SyncVar<BoardState>` instead of a hand-rolled
+> JSON snapshot. See [Reconnection](./reconnection.md) for current (partial/WIP) status.
+
+## Components
 
 | Component | Purpose |
 |-----------|---------|
-| `NetworkGameManager` | Game state orchestration and turn synchronization |
-| `PlayerConnectionHandler` | Connection lifecycle and player spawning |
-| `NetworkPlayer` | Per-player state synchronization (health, mana) |
-| `MainMenuController` | Matchmaking and lobby management |
-| `GameStateSnapshot` | State serialization for reconnection |
+| [`NetworkBoardState`](./network-board-state.md) | Single source of truth for cards/hands/mana/health — all game rules execute here |
+| [`NetworkGameManager`](./network-game-manager.md) | Turn-order bookkeeping (separate from BoardState's own turn tracking — see below), player registration, disconnect grace period |
+| [`NetworkPlayer`](./network-player.md) | Per-connection identity + basic stats (health/mana mirror) |
+| `ConnectionManager` | Thin wrapper over FishNet's start/stop host/server/client |
+| `MainMenuController` | Matchmaking: try to join, fall back to hosting after a timeout |
+| [Reconnection](./reconnection.md) | `ReconnectionManager` + `DisconnectedPlayerState` — scaffolded, not fully wired as of vdate |
 
-## Connection Flow
+## ⚠️ Two turn-tracking systems
 
-1. **First player** clicks "Find Match" → attempts to join existing game
-2. After 3-second timeout, becomes **host** (server + client)
-3. **Second player** clicks "Find Match" → successfully connects as client
-4. When both players connect, host loads DuelScreen scene globally
-5. `NetworkGameManager` links `NetworkPlayer` objects to local `PlayerController` objects
+There are currently **two independent turn counters**:
 
-## State Synchronization
+1. `NetworkGameManager.CurrentTurnObjectId` / `TurnNumber` — ObjectId-based, driven by `EndTurnController`
+2. `NetworkBoardState`'s `BoardState.CurrentTurnPlayerId` / `TurnNumber` — playerId-based, driven by
+   `InputController.EndTurn()`, and the one that actually draws a card and resets board state on turn change
 
-All networked state uses FishNet SyncVars with automatic client notification:
-
-**NetworkGameManager SyncVars:**
-- `CurrentTurnObjectId` - Which NetworkPlayer's turn
-- `TurnNumber` - Current turn count
-- `GameStarted` - Game initialization flag
-- `ShuffleSeed` - Deterministic deck shuffling
-- `OpponentDisconnected` - Disconnect detection flag
-
-**NetworkPlayer SyncVars:**
-- `PlayerId` - Connection identifier
-- `PlayerName` - Display name
-- `CurrentHealth` / `MaxHealth`
-- `CurrentMana` / `MaxMana`
-- `IsReady` - Ready status
+See [Turn Synchronization](./turn-synchronization.md) for details. Check which path a given UI element actually
+calls before assuming turn-end behavior.
 
 ## Client-Server Communication
 
-Actions flow through ServerRpc (client→server) and ObserversRpc (server→all clients):
-
 ```
-Client Input → ServerRpc → Server Validation → State Change → ObserversRpc → All Clients
+Client Input → ServerRpc (Cmd*) → Server validates against BoardState → State mutated → ObserversRpc (Rpc*) + C# event → All Clients re-render
 ```
 
-Example commands:
-- `CmdPlayCard(cardIndex, slotIndex)` - Play card from hand
-- `CmdUseAbilityOnCard(attackerSlot, targetSlot, isOffensive)` - Use ability
-- `CmdEndTurn()` - End current turn
-- `CmdRefillMana()` - Refill mana (turn start)
-
-## Documentation Index
-
-- [NetworkGameManager](./network-game-manager.md) - Core game state management
-- [PlayerConnectionHandler](./player-connection-handler.md) - Connection lifecycle
-- [NetworkPlayer](./network-player.md) - Per-player synchronization
-- [Turn Synchronization](./turn-synchronization.md) - Turn management details
-- [Reconnection System](./reconnection.md) - Disconnect handling
-- [State Snapshot](./state-snapshot.md) - Game state serialization
+See [architecture.md](../architecture.md#network) for the full `Cmd*`/`Rpc*` list.
 
 ---
 *See also: [Troubleshooting](../troubleshooting/README.md)*

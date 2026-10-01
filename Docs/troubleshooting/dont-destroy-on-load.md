@@ -2,6 +2,10 @@
 
 Issues related to Unity's persistence system and object lifecycle.
 
+> **Historical.** `PlayerConnectionHandler` (referenced below) no longer exists — see
+> [architecture.md](../architecture.md) for current networking classes. The failure pattern (singleton
+> destroyed despite `DontDestroyOnLoad`) is still a useful reference regardless of class name.
+
 ---
 
 ## Issue: DontDestroyOnLoad Objects Still Destroyed

@@ -371,6 +371,107 @@ namespace KOA.Editor
                 DrawValidationItemWithFix("BoardView.PlayerSlots", hasSlots,
                     hasSlots ? $"{slotsRef.arraySize} slots configured" : "Need 3 slot transforms!",
                     !hasSlots ? () => AutoFindAndAssignSlots(boardView) : (System.Action)null);
+                
+                // Check CardView prefab - CRITICAL for displaying cards
+                var cardViewPrefabRef = so.FindProperty("_cardViewPrefab");
+                bool hasCardViewPrefab = cardViewPrefabRef != null && cardViewPrefabRef.objectReferenceValue != null;
+                DrawValidationItemWithFix("BoardView.CardViewPrefab", hasCardViewPrefab,
+                    hasCardViewPrefab ? "Assigned" : "NOT ASSIGNED - Cards won't display!",
+                    !hasCardViewPrefab ? () => AutoAssignCardViewPrefab(boardView) : (System.Action)null);
+                
+                // Check CardLibrary reference
+                var boardViewCardLibRef = so.FindProperty("_cardLibrary");
+                bool hasBoardViewCardLib = boardViewCardLibRef != null && boardViewCardLibRef.objectReferenceValue != null;
+                DrawValidationItemWithFix("BoardView.CardLibrary", hasBoardViewCardLib,
+                    hasBoardViewCardLib ? "Assigned" : "Not assigned!",
+                    !hasBoardViewCardLib && cardLibrary != null ? () => AutoAssignCardLibraryToBoardView(boardView, cardLibrary) : (System.Action)null);
+                
+                // Check Player Avatar Zones (for player targeting - Phase 7.6)
+                var opponentAvatarRef = so.FindProperty("_opponentAvatarZone");
+                bool hasOpponentAvatar = opponentAvatarRef != null && opponentAvatarRef.objectReferenceValue != null;
+                DrawValidationItemWithFix("BoardView.OpponentAvatarZone", hasOpponentAvatar,
+                    hasOpponentAvatar ? "Assigned" : "Not assigned - Player targeting won't work!",
+                    !hasOpponentAvatar ? () => AutoCreatePlayerAvatarZones(boardView) : (System.Action)null);
+                
+                // Check Hand Areas (CRITICAL for card rendering)
+                var myHandAreaRef = so.FindProperty("_myHandArea");
+                bool hasMyHandArea = myHandAreaRef != null && myHandAreaRef.objectReferenceValue != null;
+                DrawValidationItemWithFix("BoardView.MyHandArea", hasMyHandArea,
+                    hasMyHandArea ? "Assigned" : "NOT ASSIGNED - Hand cards won't position!",
+                    !hasMyHandArea ? () => AutoCreateHandAreas(boardView) : (System.Action)null);
+                
+                var opponentHandAreaRef = so.FindProperty("_opponentHandArea");
+                bool hasOpponentHandArea = opponentHandAreaRef != null && opponentHandAreaRef.objectReferenceValue != null;
+                DrawValidationItemWithFix("BoardView.OpponentHandArea", hasOpponentHandArea,
+                    hasOpponentHandArea ? "Assigned" : "NOT ASSIGNED - Opponent hand cards won't position!",
+                    !hasOpponentHandArea ? () => AutoCreateHandAreas(boardView) : (System.Action)null);
+            }
+            
+            // Check InputController references (Phase 7)
+            var inputController = FindObjectOfType<InputController>();
+            if (inputController != null)
+            {
+                var inputSo = new SerializedObject(inputController);
+                
+                // Check BoardView reference
+                var boardViewRef = inputSo.FindProperty("_boardView");
+                bool hasInputBoardView = boardViewRef != null && boardViewRef.objectReferenceValue != null;
+                DrawValidationItemWithFix("InputController.BoardView", hasInputBoardView,
+                    hasInputBoardView ? "Assigned" : "Not assigned!",
+                    !hasInputBoardView && boardView != null ? () => AutoAssignBoardViewToInput(inputController, boardView) : (System.Action)null);
+                
+                // Check CardLibrary reference
+                var inputCardLibRef = inputSo.FindProperty("_cardLibrary");
+                bool hasInputCardLib = inputCardLibRef != null && inputCardLibRef.objectReferenceValue != null;
+                DrawValidationItemWithFix("InputController.CardLibrary", hasInputCardLib,
+                    hasInputCardLib ? "Assigned" : "Not assigned - Support ability check won't work!",
+                    !hasInputCardLib && cardLibrary != null ? () => AutoAssignCardLibraryToInput(inputController, cardLibrary) : (System.Action)null);
+                
+                // Check Layer Masks
+                var cardLayerMask = inputSo.FindProperty("_cardLayerMask");
+                bool hasCardLayer = cardLayerMask != null && cardLayerMask.intValue != 0;
+                DrawValidationItemWithFix("InputController.CardLayerMask", hasCardLayer,
+                    hasCardLayer ? "Configured" : "Not set - Card selection won't work!",
+                    !hasCardLayer ? () => AutoSetCardLayerMask(inputController) : (System.Action)null);
+                    
+                var playerAvatarLayerMask = inputSo.FindProperty("_playerAvatarLayerMask");
+                bool hasAvatarLayer = playerAvatarLayerMask != null && playerAvatarLayerMask.intValue != 0;
+                DrawValidationItemWithFix("InputController.PlayerAvatarLayerMask", hasAvatarLayer,
+                    hasAvatarLayer ? "Configured" : "Not set - Player targeting by layer won't work (OK if using collider)",
+                    !hasAvatarLayer ? () => AutoSetPlayerAvatarLayerMask(inputController) : (System.Action)null);
+                    
+                // Check HandView reference for hand card detection
+                var myHandViewRef = inputSo.FindProperty("_myHandView");
+                bool hasMyHandView = myHandViewRef != null && myHandViewRef.objectReferenceValue != null;
+                DrawValidationItemWithFix("InputController.MyHandView", hasMyHandView,
+                    hasMyHandView ? "Assigned" : "Not assigned - Hand card clicks won't work!",
+                    !hasMyHandView ? () => AutoAssignMyHandViewToInput(inputController) : (System.Action)null);
+            }
+            
+            // Check HandView existence (required for hand rendering)
+            var handViews = FindObjectsOfType<HandView>();
+            bool hasHandViews = handViews != null && handViews.Length > 0;
+            DrawValidationItemWithFix("HandView (in scene)", hasHandViews,
+                hasHandViews ? $"{handViews.Length} found" : "None! Hands won't render without HandView components.",
+                !hasHandViews ? () => AutoCreateHandViews(boardView) : (System.Action)null);
+            
+            // Check HandView prefab assignments (only if HandViews exist)
+            if (hasHandViews)
+            {
+                bool allHandViewsHavePrefab = true;
+                foreach (var handView in handViews)
+                {
+                    var handSo = new SerializedObject(handView);
+                    var handCardPrefabRef = handSo.FindProperty("_cardPrefab");
+                    if (handCardPrefabRef == null || handCardPrefabRef.objectReferenceValue == null)
+                    {
+                        allHandViewsHavePrefab = false;
+                        break;
+                    }
+                }
+                DrawValidationItemWithFix($"HandView.CardPrefab", allHandViewsHavePrefab,
+                    allHandViewsHavePrefab ? "All assigned" : "Some missing - Hands won't display cards!",
+                    !allHandViewsHavePrefab ? () => AutoAssignCardPrefabToHandViews(handViews) : (System.Action)null);
             }
             
             // Check for NetworkObject on NetworkBoardState
@@ -472,6 +573,66 @@ namespace KOA.Editor
             if (boardView != null)
             {
                 AutoFindAndAssignSlots(boardView);
+                AutoAssignCardViewPrefab(boardView);
+                if (cardLibrary != null)
+                {
+                    AutoAssignCardLibraryToBoardView(boardView, cardLibrary);
+                }
+                // Fix player avatar zones (Phase 7.6)
+                AutoCreatePlayerAvatarZones(boardView);
+                // Fix hand areas (CRITICAL for card positioning)
+                AutoCreateHandAreas(boardView);
+            }
+            
+            // Fix InputController references (Phase 7)
+            var inputController = FindObjectOfType<InputController>();
+            if (inputController != null)
+            {
+                if (boardView != null)
+                {
+                    AutoAssignBoardViewToInput(inputController, boardView);
+                }
+                if (cardLibrary != null)
+                {
+                    AutoAssignCardLibraryToInput(inputController, cardLibrary);
+                }
+                
+                // Fix layer masks
+                var inputSo = new SerializedObject(inputController);
+                var cardLayerProp = inputSo.FindProperty("_cardLayerMask");
+                if (cardLayerProp != null && cardLayerProp.intValue == 0)
+                {
+                    AutoSetCardLayerMask(inputController);
+                }
+                var avatarLayerProp = inputSo.FindProperty("_playerAvatarLayerMask");
+                if (avatarLayerProp != null && avatarLayerProp.intValue == 0)
+                {
+                    AutoSetPlayerAvatarLayerMask(inputController);
+                }
+                
+                // Fix HandView reference for hand card detection
+                var myHandViewProp = inputSo.FindProperty("_myHandView");
+                if (myHandViewProp != null && myHandViewProp.objectReferenceValue == null)
+                {
+                    AutoAssignMyHandViewToInput(inputController);
+                }
+            }
+            
+            // Create HandViews if none exist (must be after hand areas are created)
+            var handViews = FindObjectsOfType<HandView>();
+            if (handViews == null || handViews.Length == 0)
+            {
+                if (boardView != null)
+                {
+                    AutoCreateHandViews(boardView);
+                    handViews = FindObjectsOfType<HandView>(); // Re-query after creation
+                }
+            }
+            
+            // Fix HandView CardPrefab
+            if (handViews != null && handViews.Length > 0)
+            {
+                AutoAssignCardPrefabToHandViews(handViews);
             }
             
             // Fix NetworkObject
@@ -526,6 +687,648 @@ namespace KOA.Editor
                 so.ApplyModifiedProperties();
                 Debug.Log("[BoardStateSetup] Assigned CardLibrary to NetworkBoardState");
             }
+        }
+        
+        private void AutoAssignCardLibraryToBoardView(BoardView boardView, CardLibrary cardLibrary)
+        {
+            var so = new SerializedObject(boardView);
+            var prop = so.FindProperty("_cardLibrary");
+            if (prop != null)
+            {
+                prop.objectReferenceValue = cardLibrary;
+                so.ApplyModifiedProperties();
+                EditorUtility.SetDirty(boardView);
+                Debug.Log("[BoardStateSetup] Assigned CardLibrary to BoardView");
+            }
+        }
+        
+        /// <summary>
+        /// Creates player avatar zone colliders for player targeting (Phase 7.6).
+        /// </summary>
+        private void AutoCreatePlayerAvatarZones(BoardView boardView)
+        {
+            var so = new SerializedObject(boardView);
+            
+            // Check if zones already exist in scene by name
+            var existingMyAvatar = GameObject.Find("MyPlayerAvatar") ?? GameObject.Find("PlayerAvatar_Local");
+            var existingOpponentAvatar = GameObject.Find("OpponentAvatar") ?? GameObject.Find("PlayerAvatar_Opponent");
+            
+            // Create My Avatar Zone if needed
+            if (existingMyAvatar == null)
+            {
+                existingMyAvatar = CreatePlayerAvatarZone("MyPlayerAvatar", new Vector3(0, -4f, 0));
+            }
+            
+            // Create Opponent Avatar Zone if needed
+            if (existingOpponentAvatar == null)
+            {
+                existingOpponentAvatar = CreatePlayerAvatarZone("OpponentAvatar", new Vector3(0, 4f, 0));
+            }
+            
+            // Assign to BoardView
+            var myAvatarProp = so.FindProperty("_myPlayerAvatarZone");
+            var opponentAvatarProp = so.FindProperty("_opponentAvatarZone");
+            
+            if (myAvatarProp != null && existingMyAvatar != null)
+            {
+                var collider = existingMyAvatar.GetComponent<Collider2D>();
+                if (collider != null)
+                {
+                    myAvatarProp.objectReferenceValue = collider;
+                }
+            }
+            
+            if (opponentAvatarProp != null && existingOpponentAvatar != null)
+            {
+                var collider = existingOpponentAvatar.GetComponent<Collider2D>();
+                if (collider != null)
+                {
+                    opponentAvatarProp.objectReferenceValue = collider;
+                }
+            }
+            
+            so.ApplyModifiedProperties();
+            EditorUtility.SetDirty(boardView);
+            Debug.Log("[BoardStateSetup] Created/assigned player avatar zones for targeting");
+        }
+        
+        /// <summary>
+        /// Creates a player avatar zone GameObject with a BoxCollider2D.
+        /// </summary>
+        private GameObject CreatePlayerAvatarZone(string name, Vector3 position)
+        {
+            var go = new GameObject(name);
+            go.transform.position = position;
+            
+            // Add a box collider for hit detection
+            var collider = go.AddComponent<BoxCollider2D>();
+            collider.size = new Vector2(3f, 1.5f); // Adjust size as needed
+            collider.isTrigger = true;
+            
+            // Add a sprite renderer for visual feedback (optional)
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.color = new Color(1f, 0.5f, 0.5f, 0.2f); // Semi-transparent red
+            
+            Undo.RegisterCreatedObjectUndo(go, $"Create {name}");
+            Debug.Log($"[BoardStateSetup] Created player avatar zone: {name} at {position}");
+            
+            return go;
+        }
+        
+        /// <summary>
+        /// Creates hand area transforms for card positioning.
+        /// </summary>
+        private void AutoCreateHandAreas(BoardView boardView)
+        {
+            var so = new SerializedObject(boardView);
+            
+            // Check if hand areas already exist in scene by name
+            var existingMyHand = GameObject.Find("MyHandArea") ?? GameObject.Find("HandArea_Local") ?? GameObject.Find("PlayerHand");
+            var existingOpponentHand = GameObject.Find("OpponentHandArea") ?? GameObject.Find("HandArea_Opponent") ?? GameObject.Find("OpponentHand");
+            
+            // Create My Hand Area if needed
+            if (existingMyHand == null)
+            {
+                existingMyHand = new GameObject("MyHandArea");
+                existingMyHand.transform.position = new Vector3(0, -3.5f, 0);
+                Undo.RegisterCreatedObjectUndo(existingMyHand, "Create MyHandArea");
+                Debug.Log("[BoardStateSetup] Created MyHandArea at (0, -3.5, 0)");
+            }
+            
+            // Create Opponent Hand Area if needed
+            if (existingOpponentHand == null)
+            {
+                existingOpponentHand = new GameObject("OpponentHandArea");
+                existingOpponentHand.transform.position = new Vector3(0, 3.5f, 0);
+                Undo.RegisterCreatedObjectUndo(existingOpponentHand, "Create OpponentHandArea");
+                Debug.Log("[BoardStateSetup] Created OpponentHandArea at (0, 3.5, 0)");
+            }
+            
+            // Assign to BoardView
+            var myHandProp = so.FindProperty("_myHandArea");
+            var opponentHandProp = so.FindProperty("_opponentHandArea");
+            
+            if (myHandProp != null && existingMyHand != null)
+            {
+                myHandProp.objectReferenceValue = existingMyHand.transform;
+            }
+            
+            if (opponentHandProp != null && existingOpponentHand != null)
+            {
+                opponentHandProp.objectReferenceValue = existingOpponentHand.transform;
+            }
+            
+            so.ApplyModifiedProperties();
+            EditorUtility.SetDirty(boardView);
+            Debug.Log("[BoardStateSetup] Assigned hand areas to BoardView");
+        }
+        
+        /// <summary>
+        /// Assigns BoardView reference to InputController.
+        /// </summary>
+        private void AutoAssignBoardViewToInput(InputController inputController, BoardView boardView)
+        {
+            var so = new SerializedObject(inputController);
+            var prop = so.FindProperty("_boardView");
+            if (prop != null)
+            {
+                prop.objectReferenceValue = boardView;
+                so.ApplyModifiedProperties();
+                EditorUtility.SetDirty(inputController);
+                Debug.Log("[BoardStateSetup] Assigned BoardView to InputController");
+            }
+        }
+        
+        /// <summary>
+        /// Assigns CardLibrary reference to InputController.
+        /// </summary>
+        private void AutoAssignCardLibraryToInput(InputController inputController, CardLibrary cardLibrary)
+        {
+            var so = new SerializedObject(inputController);
+            var prop = so.FindProperty("_cardLibrary");
+            if (prop != null)
+            {
+                prop.objectReferenceValue = cardLibrary;
+                so.ApplyModifiedProperties();
+                EditorUtility.SetDirty(inputController);
+                Debug.Log("[BoardStateSetup] Assigned CardLibrary to InputController");
+            }
+        }
+        
+        /// <summary>
+        /// Assigns the local player's HandView reference to InputController.
+        /// Finds a HandView that is likely the local player's (IsLocalHand = true).
+        /// </summary>
+        private void AutoAssignMyHandViewToInput(InputController inputController)
+        {
+            var handViews = FindObjectsOfType<HandView>();
+            HandView localHandView = null;
+            
+            foreach (var hv in handViews)
+            {
+                // Try to find the local player's hand view
+                var so = new SerializedObject(hv);
+                var isLocalProp = so.FindProperty("IsLocalHand");
+                
+                // Prefer hand views marked as local, or first one found
+                if (isLocalProp != null && isLocalProp.boolValue)
+                {
+                    localHandView = hv;
+                    break;
+                }
+                else if (localHandView == null)
+                {
+                    localHandView = hv; // Fallback to first found
+                }
+            }
+            
+            if (localHandView != null)
+            {
+                var inputSo = new SerializedObject(inputController);
+                var prop = inputSo.FindProperty("_myHandView");
+                if (prop != null)
+                {
+                    prop.objectReferenceValue = localHandView;
+                    inputSo.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(inputController);
+                    Debug.Log($"[BoardStateSetup] Assigned HandView to InputController._myHandView");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[BoardStateSetup] No HandView found in scene to assign to InputController");
+            }
+        }
+        
+        /// <summary>
+        /// Auto-sets the CardLayerMask on InputController.
+        /// Tries to find a "Card" or "Cards" layer, or uses Default layer.
+        /// </summary>
+        private void AutoSetCardLayerMask(InputController inputController)
+        {
+            var so = new SerializedObject(inputController);
+            var prop = so.FindProperty("_cardLayerMask");
+            if (prop == null) return;
+            
+            // Try to find a Card layer
+            int cardLayer = LayerMask.NameToLayer("Card");
+            if (cardLayer == -1) cardLayer = LayerMask.NameToLayer("Cards");
+            if (cardLayer == -1) cardLayer = LayerMask.NameToLayer("UI");
+            if (cardLayer == -1) cardLayer = 0; // Default layer
+            
+            int layerMask = 1 << cardLayer;
+            prop.intValue = layerMask;
+            so.ApplyModifiedProperties();
+            EditorUtility.SetDirty(inputController);
+            
+            string layerName = cardLayer == 0 ? "Default" : LayerMask.LayerToName(cardLayer);
+            Debug.Log($"[BoardStateSetup] Set CardLayerMask to layer '{layerName}' (mask={layerMask})");
+            
+            // Warn if using Default layer
+            if (cardLayer == 0)
+            {
+                Debug.LogWarning("[BoardStateSetup] No 'Card' or 'Cards' layer found. Using 'Default' layer. " +
+                    "For best results, create a 'Card' layer and assign it to card prefabs.");
+            }
+        }
+        
+        /// <summary>
+        /// Auto-sets the PlayerAvatarLayerMask on InputController.
+        /// Tries to find a "PlayerAvatar" or similar layer, or uses Default layer.
+        /// </summary>
+        private void AutoSetPlayerAvatarLayerMask(InputController inputController)
+        {
+            var so = new SerializedObject(inputController);
+            var prop = so.FindProperty("_playerAvatarLayerMask");
+            if (prop == null) return;
+            
+            // Try to find a PlayerAvatar layer
+            int avatarLayer = LayerMask.NameToLayer("PlayerAvatar");
+            if (avatarLayer == -1) avatarLayer = LayerMask.NameToLayer("Avatar");
+            if (avatarLayer == -1) avatarLayer = LayerMask.NameToLayer("Player");
+            if (avatarLayer == -1) avatarLayer = LayerMask.NameToLayer("UI");
+            if (avatarLayer == -1) avatarLayer = 0; // Default layer
+            
+            int layerMask = 1 << avatarLayer;
+            prop.intValue = layerMask;
+            so.ApplyModifiedProperties();
+            EditorUtility.SetDirty(inputController);
+            
+            string layerName = avatarLayer == 0 ? "Default" : LayerMask.LayerToName(avatarLayer);
+            Debug.Log($"[BoardStateSetup] Set PlayerAvatarLayerMask to layer '{layerName}' (mask={layerMask})");
+            
+            // Warn if using Default layer
+            if (avatarLayer == 0)
+            {
+                Debug.LogWarning("[BoardStateSetup] No 'PlayerAvatar' layer found. Using 'Default' layer. " +
+                    "For best results, create a 'PlayerAvatar' layer and assign it to avatar zone objects.");
+            }
+        }
+        
+        /// <summary>
+        /// Finds or creates a CardView prefab and assigns it to BoardView.
+        /// </summary>
+        private void AutoAssignCardViewPrefab(BoardView boardView)
+        {
+            var prefab = FindOrCreateCardViewPrefab();
+            if (prefab == null) return;
+            
+            var so = new SerializedObject(boardView);
+            var prop = so.FindProperty("_cardViewPrefab");
+            if (prop != null)
+            {
+                prop.objectReferenceValue = prefab;
+                so.ApplyModifiedProperties();
+                EditorUtility.SetDirty(boardView);
+                Debug.Log("[BoardStateSetup] Assigned CardView prefab to BoardView");
+            }
+        }
+        
+        /// <summary>
+        /// Creates HandView components for local player hand area.
+        /// Requires BoardView with _myHandArea assigned.
+        /// </summary>
+        private void AutoCreateHandViews(BoardView boardView)
+        {
+            if (boardView == null)
+            {
+                Debug.LogError("[BoardStateSetup] Cannot create HandViews - no BoardView found");
+                return;
+            }
+            
+            var boardSo = new SerializedObject(boardView);
+            var myHandAreaProp = boardSo.FindProperty("_myHandArea");
+            
+            if (myHandAreaProp == null || myHandAreaProp.objectReferenceValue == null)
+            {
+                Debug.LogError("[BoardStateSetup] Cannot create HandViews - BoardView._myHandArea not assigned. Run Auto-Fix for hand areas first.");
+                return;
+            }
+            
+            var myHandArea = myHandAreaProp.objectReferenceValue as Transform;
+            
+            // Add HandView component to hand area
+            var handView = myHandArea.GetComponent<HandView>();
+            if (handView == null)
+            {
+                handView = myHandArea.gameObject.AddComponent<HandView>();
+                Debug.Log($"[BoardStateSetup] Created HandView component on {myHandArea.name}");
+            }
+            
+            // Configure the HandView
+            var handSo = new SerializedObject(handView);
+            
+            // Set hand container to self
+            var containerProp = handSo.FindProperty("_handContainer");
+            if (containerProp != null)
+            {
+                containerProp.objectReferenceValue = myHandArea;
+            }
+            
+            // Assign card library
+            var cardLibrary = FindObjectOfType<CardLibrary>();
+            var libProp = handSo.FindProperty("_cardLibrary");
+            if (libProp != null && cardLibrary != null)
+            {
+                libProp.objectReferenceValue = cardLibrary;
+            }
+            
+            // Assign BoardView reference
+            var boardViewProp = handSo.FindProperty("_boardView");
+            if (boardViewProp != null)
+            {
+                boardViewProp.objectReferenceValue = boardView;
+            }
+            
+            // Assign card prefab
+            var prefab = FindOrCreateCardViewPrefab();
+            var prefabProp = handSo.FindProperty("_cardPrefab");
+            if (prefabProp != null && prefab != null)
+            {
+                prefabProp.objectReferenceValue = prefab;
+            }
+            
+            // Set as local hand
+            handView.IsLocalHand = true;
+            
+            handSo.ApplyModifiedProperties();
+            EditorUtility.SetDirty(handView);
+            
+            Debug.Log("[BoardStateSetup] HandView configured for local player hand");
+        }
+        
+        /// <summary>
+        /// Assigns CardView prefab to all HandViews in the scene.
+        /// </summary>
+        private void AutoAssignCardPrefabToHandViews(HandView[] handViews)
+        {
+            var prefab = FindOrCreateCardViewPrefab();
+            if (prefab == null) return;
+            
+            foreach (var handView in handViews)
+            {
+                var so = new SerializedObject(handView);
+                var prop = so.FindProperty("_cardPrefab");
+                if (prop != null && prop.objectReferenceValue == null)
+                {
+                    prop.objectReferenceValue = prefab;
+                    so.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(handView);
+                    Debug.Log($"[BoardStateSetup] Assigned CardView prefab to HandView: {handView.name}");
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Finds an existing CardView prefab or creates one from the Card prefab.
+        /// </summary>
+        private GameObject FindOrCreateCardViewPrefab()
+        {
+            // First, try to find an existing CardView prefab
+            string[] searchPaths = new string[]
+            {
+                "Assets/Prefabs/Card/CardView.prefab",
+                "Assets/Prefabs/CardView.prefab",
+                "Assets/Prefabs/Network/CardView.prefab",
+                "Assets/Prefabs/View/CardView.prefab"
+            };
+            
+            foreach (var path in searchPaths)
+            {
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                if (prefab != null && prefab.GetComponent<CardView>() != null)
+                {
+                    Debug.Log($"[BoardStateSetup] Found CardView prefab at: {path}");
+                    return prefab;
+                }
+            }
+            
+            // Search by name
+            string[] guids = AssetDatabase.FindAssets("CardView t:Prefab");
+            foreach (var guid in guids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                if (prefab != null && prefab.GetComponent<CardView>() != null)
+                {
+                    Debug.Log($"[BoardStateSetup] Found CardView prefab via search: {path}");
+                    return prefab;
+                }
+            }
+            
+            // If no CardView prefab exists, try to create one from the existing Card prefab
+            string[] cardPrefabPaths = new string[]
+            {
+                "Assets/Prefabs/Card/Card.prefab",
+                "Assets/Prefabs/Card.prefab"
+            };
+            
+            GameObject cardPrefab = null;
+            string cardPrefabPath = null;
+            foreach (var path in cardPrefabPaths)
+            {
+                cardPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                if (cardPrefab != null)
+                {
+                    cardPrefabPath = path;
+                    break;
+                }
+            }
+            
+            if (cardPrefab == null)
+            {
+                // Search for any Card prefab
+                string[] cardGuids = AssetDatabase.FindAssets("Card t:Prefab");
+                foreach (var guid in cardGuids)
+                {
+                    var path = AssetDatabase.GUIDToAssetPath(guid);
+                    if (path.Contains("Card.prefab") && !path.Contains("CardView"))
+                    {
+                        cardPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                        cardPrefabPath = path;
+                        if (cardPrefab != null) break;
+                    }
+                }
+            }
+            
+            if (cardPrefab == null)
+            {
+                Debug.LogWarning("[BoardStateSetup] Could not find Card prefab to base CardView on. Please create CardView prefab manually.");
+                CreateEmptyCardViewPrefab();
+                return null;
+            }
+            
+            // Create CardView prefab based on Card prefab
+            return CreateCardViewPrefabFromCard(cardPrefab, cardPrefabPath);
+        }
+        
+        /// <summary>
+        /// Creates a CardView prefab by adding CardView component to a copy of the Card prefab.
+        /// </summary>
+        private GameObject CreateCardViewPrefabFromCard(GameObject cardPrefab, string cardPrefabPath)
+        {
+            // Determine output path
+            string directory = System.IO.Path.GetDirectoryName(cardPrefabPath);
+            string cardViewPath = System.IO.Path.Combine(directory, "CardView.prefab");
+            
+            // Check if it already exists
+            var existing = AssetDatabase.LoadAssetAtPath<GameObject>(cardViewPath);
+            if (existing != null)
+            {
+                // Add CardView component if missing
+                if (existing.GetComponent<CardView>() == null)
+                {
+                    var instance = PrefabUtility.InstantiatePrefab(existing) as GameObject;
+                    RemoveMissingScripts(instance);
+                    instance.AddComponent<CardView>();
+                    PrefabUtility.SaveAsPrefabAsset(instance, cardViewPath);
+                    DestroyImmediate(instance);
+                    Debug.Log($"[BoardStateSetup] Added CardView component to existing prefab: {cardViewPath}");
+                }
+                return AssetDatabase.LoadAssetAtPath<GameObject>(cardViewPath);
+            }
+            
+            // Create new prefab - use Instantiate instead of InstantiatePrefab to break prefab connection
+            var cardInstance = Object.Instantiate(cardPrefab);
+            cardInstance.name = "CardView";
+            
+            // Remove any missing scripts from the source prefab
+            RemoveMissingScripts(cardInstance);
+            
+            // Add CardView component
+            var cardView = cardInstance.AddComponent<CardView>();
+            
+            // Try to wire up references from existing UI components
+            WireUpCardViewReferences(cardView);
+            
+            // Save as new prefab
+            try
+            {
+                GameObject newPrefab = PrefabUtility.SaveAsPrefabAsset(cardInstance, cardViewPath);
+                DestroyImmediate(cardInstance);
+                
+                Debug.Log($"[BoardStateSetup] Created CardView prefab at: {cardViewPath}");
+                Debug.LogWarning("[BoardStateSetup] CardView prefab created - please verify UI references in Inspector!");
+                
+                return newPrefab;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[BoardStateSetup] Failed to save CardView prefab: {e.Message}");
+                DestroyImmediate(cardInstance);
+                
+                // Fall back to creating an empty prefab
+                CreateEmptyCardViewPrefab();
+                return AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Card/CardView.prefab");
+            }
+        }
+        
+        /// <summary>
+        /// Removes all missing script components from a GameObject and its children.
+        /// </summary>
+        private void RemoveMissingScripts(GameObject go)
+        {
+            // Remove from this object
+            GameObjectUtility.RemoveMonoBehavioursWithMissingScript(go);
+            
+            // Remove from all children
+            foreach (Transform child in go.transform)
+            {
+                RemoveMissingScripts(child.gameObject);
+            }
+        }
+        
+        /// <summary>
+        /// Creates a minimal empty CardView prefab if no Card prefab is available.
+        /// </summary>
+        private void CreateEmptyCardViewPrefab()
+        {
+            string path = "Assets/Prefabs/Card/CardView.prefab";
+            
+            // Ensure directory exists
+            string directory = System.IO.Path.GetDirectoryName(path);
+            if (!System.IO.Directory.Exists(directory))
+            {
+                System.IO.Directory.CreateDirectory(directory);
+                AssetDatabase.Refresh();
+            }
+            
+            // Create empty GameObject with CardView
+            var go = new GameObject("CardView");
+            go.AddComponent<CardView>();
+            
+            // Add Canvas for UI
+            var canvas = new GameObject("Canvas");
+            canvas.transform.SetParent(go.transform);
+            canvas.AddComponent<Canvas>();
+            canvas.AddComponent<UnityEngine.UI.CanvasScaler>();
+            canvas.AddComponent<UnityEngine.UI.GraphicRaycaster>();
+            
+            PrefabUtility.SaveAsPrefabAsset(go, path);
+            DestroyImmediate(go);
+            
+            Debug.Log($"[BoardStateSetup] Created empty CardView prefab at: {path}");
+            Debug.LogWarning("[BoardStateSetup] Empty CardView prefab created - you must add UI elements and wire references!");
+        }
+        
+        /// <summary>
+        /// Attempts to wire up CardView references from existing UI components.
+        /// </summary>
+        private void WireUpCardViewReferences(CardView cardView)
+        {
+            var so = new SerializedObject(cardView);
+            
+            // Try to find TMPro text components by common names
+            var nameText = FindComponentInChildren<TMPro.TextMeshProUGUI>(cardView.gameObject, "Name", "CardName", "NameText");
+            if (nameText != null)
+            {
+                var prop = so.FindProperty("_nameText");
+                if (prop != null) prop.objectReferenceValue = nameText;
+            }
+            
+            var healthText = FindComponentInChildren<TMPro.TextMeshProUGUI>(cardView.gameObject, "Health", "HealthText", "HP");
+            if (healthText != null)
+            {
+                var prop = so.FindProperty("_healthText");
+                if (prop != null) prop.objectReferenceValue = healthText;
+            }
+            
+            var manaText = FindComponentInChildren<TMPro.TextMeshProUGUI>(cardView.gameObject, "Mana", "ManaText", "Cost", "ManaCost");
+            if (manaText != null)
+            {
+                var prop = so.FindProperty("_manaText");
+                if (prop != null) prop.objectReferenceValue = manaText;
+            }
+            
+            // Try to find Image component for card image
+            var cardImage = FindComponentInChildren<UnityEngine.UI.Image>(cardView.gameObject, "CardImage", "Artwork", "Art", "Image");
+            if (cardImage != null)
+            {
+                var prop = so.FindProperty("_cardImage");
+                if (prop != null) prop.objectReferenceValue = cardImage;
+            }
+            
+            so.ApplyModifiedProperties();
+        }
+        
+        /// <summary>
+        /// Finds a component in children by checking multiple possible names.
+        /// </summary>
+        private T FindComponentInChildren<T>(GameObject parent, params string[] possibleNames) where T : Component
+        {
+            var allComponents = parent.GetComponentsInChildren<T>(true);
+            foreach (var comp in allComponents)
+            {
+                string name = comp.gameObject.name.ToLowerInvariant();
+                foreach (var possibleName in possibleNames)
+                {
+                    if (name.Contains(possibleName.ToLowerInvariant()))
+                    {
+                        return comp;
+                    }
+                }
+            }
+            return null;
         }
         
         private void AutoFindAndAssignSlots(BoardView boardView)

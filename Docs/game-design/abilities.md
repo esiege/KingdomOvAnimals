@@ -1,5 +1,15 @@
 # Ability System
 
+*Verified against source: 2026-08-12 (vdate)*
+
+> **Implemented today** (`Assets/Scripts/Abilities/Behaviors/`, auto-discovered by `AbilityBehaviorRegistry` —
+> see [architecture.md](../architecture.md#abilities)): `DamageAbility`, `HealAbility`, `BuffAttackAbility`,
+> `PoisonAbility`, `StunAbility`, `DrawCardAbility`, `ReturnToHandAbility`. Everything else on this page
+> (Freeze, Silence, Taunt, Stealth, Lifesteal, Shield, Summon, Copy, Transform, keywords, triggered abilities,
+> conditional effects, etc.) is **design vision, not yet implemented** — check the folder above before assuming
+> an effect exists in code. `AbilityData` itself currently only has `targetType`, `damage`, `healAmount`, and
+> `behaviorType` fields — the rich composable multi-effect-list model described below is aspirational.
+
 ## Overview
 
 Abilities are the core mechanic of Kingdom Ov Animals. Unlike traditional card games with attack/health stats, **cards have no inherent attack value** - instead, they have:

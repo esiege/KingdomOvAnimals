@@ -2,6 +2,9 @@
 
 Issues related to reconnection system debugging and object lifecycle.
 
+> **Historical.** `PlayerConnectionHandler` (referenced below) no longer exists — see
+> [Reconnection](../networking/reconnection.md) for the current (partially-wired) reconnection approach.
+
 ---
 
 ## Issue: Reconnection Logs Stop After Host Disconnect

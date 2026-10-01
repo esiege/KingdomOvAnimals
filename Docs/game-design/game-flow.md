@@ -1,164 +1,51 @@
 # Game Flow
 
+*Verified against source: 2026-08-12 (vdate) — rewritten; the previous version described
+`EncounterController.Start()`, which no longer exists.*
+
 ## Match Initialization
 
 ```
-EncounterController.Start()
+Both players connect and register (NetworkGameManager.RegisterNetworkPlayer)
        │
        ▼
-InitializeEncounter()
-       │
-       ├── Set currentPlayer = player (Player 1 goes first)
-       ├── player.ShuffleDeck()
-       └── opponent.ShuffleDeck()
-       │
-       ▼
-DrawInitialCards() [Coroutine]
-       │
-       ├── Draw 3 cards for Player 1 (0.1s delay each)
-       └── Draw 3 cards for Player 2 (0.1s delay each)
-       │
-       ▼
-StartTurn()
+NetworkGameManager.ServerStartGame()
+       ├── Generate ShuffleSeed
+       ├── Load a DeckData from Resources/Decks
+       ├── NetworkBoardState.InitializeGame(deck, deck) — same deck for both players
+       │     ├── Shuffle both decks (Fisher-Yates)
+       │     ├── Draw 4 cards each for opening hands
+       │     └── BoardState.StartGame() — IsGameActive = true, Mana = MaxMana = 1
+       └── Randomly pick starting player, set CurrentTurnObjectId
 ```
 
 ## Turn Structure
 
-### Start of Turn
-```
-StartTurn()
-       │
-       ├── Set currentPlayer
-       ├── Increment max mana (+1)
-       ├── RefillMana() - Restore mana to max
-       ├── ResetBoard() - Clear summoning sickness & tap status
-       ├── DrawCard(currentPlayer)
-       │
-       └── Update UI
-           ├── HideBoardTargets()
-           ├── HidePlayableHand()
-           ├── HidePlayableBoard()
-           ├── VisualizePlayableHand()
-           └── VisualizePlayableBoard()
-```
+There are two independent turn-tracking systems — see
+[Turn Synchronization](../networking/turn-synchronization.md). The one that actually affects gameplay is
+`NetworkBoardState`'s: ending a turn via `InputController.EndTurn()` → `NetworkBoardState.CmdEndTurn` runs
+`BoardState.EndTurn()`, which for the new current player:
 
-### During Turn (Player Actions)
+1. Recalculates `MaxMana` from the shared turn counter (increases roughly every other turn, capped at 10) and
+   refills `Mana` to that value
+2. Untaps all board cards and clears summoning sickness (`CardState.OnTurnStart()`)
+3. Draws one card (skipped if hand is full or deck is empty)
 
-#### Playing a Card from Hand
-```
-1. Click card in hand
-       │
-       ▼
-2. Check: currentMana >= card.manaCost
-       │
-       ▼
-3. Check: Board has open slot
-       │
-       ▼
-4. Drag card to board slot
-       │
-       ▼
-5. Execute:
-   ├── Deduct mana cost
-   ├── Remove card from hand
-   ├── Add card to board
-   ├── Set card.isInPlay = true
-   ├── Set card.hasSummoningSickness = true
-   └── Update visuals
-```
+### During Turn
 
-#### Using a Card's Ability
-```
-1. Click card on board
-       │
-       ▼
-2. Check card can act:
-   ├── owningPlayer == currentPlayer
-   ├── isInPlay == true
-   ├── hasSummoningSickness == false
-   └── isTapped == false
-       │
-       ▼
-3. Get valid targets (TargetingController)
-       │
-       ▼
-4. Highlight valid targets
-       │
-       ▼
-5. Player selects target
-       │
-       ▼
-6. Execute ability
-       │
-       ▼
-7. Tap the card (isTapped = true)
-```
+See [Targeting](./targeting.md) for the current click-based play/attack/support scheme.
 
 ### End of Turn
-```
-EndTurn()
-       │
-       ├── Toggle isCurrentPlayerTurn
-       ├── Increment turnNumber
-       │
-       └── StartTurn() for next player
-```
 
-## Mana Economy
-
-| Turn | Max Mana |
-|------|----------|
-| 1 | 1 |
-| 2 | 2 |
-| 3 | 3 |
-| ... | ... |
-| N | N |
-
-- Mana refills to max at the start of each turn
-- Playing cards costs mana equal to their `manaCost`
+Handled server-side inside `CmdEndTurn` — see above. Client UI (`EndTurnController`) currently calls a
+*different*, disconnected end-turn path (`NetworkGameManager.RequestEndTurn`) — see
+[Turn Synchronization](../networking/turn-synchronization.md) before assuming the end-turn button drives the
+turn transition described here.
 
 ## Win Conditions
 
-*(To be documented - likely player health reaching 0)*
+`BoardState.CheckGameOver()`, called after any action that deals player damage: if either player's `Health`
+reaches 0, `WinnerPlayerId` is set and `IsGameActive = false`. `NetworkBoardState` fires `OnGameEnded`.
 
-## State Machine Overview
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                    MATCH STATES                         │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  ┌──────────┐    ┌──────────────┐    ┌──────────────┐  │
-│  │  SETUP   │───▶│ PLAYER TURN  │───▶│ OPPONENT     │  │
-│  │          │    │              │    │ TURN         │  │
-│  └──────────┘    └──────────────┘    └──────────────┘  │
-│                         ▲                    │          │
-│                         └────────────────────┘          │
-│                                                         │
-│  Victory/Defeat when player health <= 0                 │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-```
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                    TURN PHASES                          │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  ┌──────────┐    ┌──────────────┐    ┌──────────────┐  │
-│  │  START   │───▶│    MAIN      │───▶│     END      │  │
-│  │  PHASE   │    │    PHASE     │    │    PHASE     │  │
-│  └──────────┘    └──────────────┘    └──────────────┘  │
-│                                                         │
-│  Start: Draw, Mana, Reset                               │
-│  Main: Play cards, Use abilities                        │
-│  End: Switch player                                     │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-```
-
-## Hand Management
-
-- Maximum hand size: 5 cards (configurable via `maxHandSize`)
-- Cards drawn when hand is full: *(behavior TBD)*
-- Card positions managed by `cardPositions` list in HandController
+---
+*Parent: [Game Design](./README.md)*

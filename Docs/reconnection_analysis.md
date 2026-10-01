@@ -1,5 +1,13 @@
 # Reconnection System Analysis & Redesign Proposal
 
+> **Historical proposal.** *(checked 2026-08-12, vdate)* This is the design discussion that led to
+> `DisconnectedPlayerState` and `ReconnectionManager` — the "Recommended Approach: Option A" below was adopted
+> in shape. But as of vdate those classes' entry points have no call sites yet (see
+> [networking/reconnection.md](./networking/reconnection.md) for exactly what's wired and what isn't). Read
+> this for the *why* behind the current class design, not as a description of finished, working behavior.
+> Everything below also predates Story 030/036 — it references `NetworkGameManager.CapturePlayerSnapshot()` and
+> `PlayerController`, which have since changed or been removed.
+
 ## Current Problems
 After a client disconnects and reconnects:
 1. Mana shows as 0 instead of the correct value

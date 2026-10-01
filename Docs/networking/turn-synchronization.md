@@ -1,71 +1,34 @@
 # Turn Synchronization
 
-Turn management in multiplayer uses server-authoritative state with client-side visual synchronization.
+*Verified against source: 2026-08-12 (vdate)*
 
-## Turn State
+There are **two independent turn-tracking systems** currently in the codebase. This is not a doc error — both
+exist in source. Confirm which one a given code path actually drives before changing turn logic.
 
-Stored in NetworkGameManager as SyncVars:
+## System 1: `NetworkGameManager` (ObjectId-based)
 
-- `CurrentTurnObjectId` - ObjectId of the NetworkPlayer whose turn it is
-- `TurnNumber` - Sequential turn counter (starts at 1)
+- SyncVars: `CurrentTurnObjectId`, `TurnNumber`
+- Advanced by: `EndTurnController.OnMouseDown()` → `NetworkGameManager.RequestEndTurn()` → `CmdEndTurn`
+- Effect: swaps `CurrentTurnObjectId` to the other registered `NetworkPlayer`, increments `TurnNumber`. **Does
+  not draw a card, does not touch `BoardState`.**
+- `IsLocalPlayerTurn()` compares `CurrentTurnObjectId` to the local `NetworkPlayer.ObjectId`.
 
-## Turn Flow
+## System 2: `NetworkBoardState` (playerId-based)
 
-### Server Side (Host)
+- Fields (inside the `BoardState` SyncVar): `CurrentTurnPlayerId`, `TurnNumber`
+- Advanced by: `InputController.EndTurn()` → `NetworkBoardState.Instance.CmdEndTurn(LocalPlayerId)`
+- Effect: `BoardState.EndTurn()` swaps `CurrentTurnPlayerId`, increments `TurnNumber` when play returns to
+  player 0, calls `PlayerBoardState.OnTurnStart()` (untaps cards, clears sickness, recalculates `MaxMana`) for
+  the new current player, **and draws that player a card**.
+- `NetworkBoardState.IsPlayerTurn(playerId)` — this is what `InputController` actually checks before accepting
+  input (`IsMyTurn()`), not `NetworkGameManager.IsLocalPlayerTurn()`.
 
-1. **Game Start**: Server randomly picks first player, sets `CurrentTurnObjectId`
-2. **End Turn**: Server increments `TurnNumber`, swaps `CurrentTurnObjectId`
-3. All changes automatically sync via SyncVars
+## Practical implication
 
-### Client Side (All)
-
-1. **SyncVar Callback**: `OnTurnChanged()` fires when `CurrentTurnObjectId` changes
-2. **Determine Turn**: Compare `CurrentTurnObjectId` with local NetworkPlayer's `ObjectId`
-3. **Execute Start**: If it's local player's turn, run turn-start logic
-
-## Turn Start Actions
-
-When turn changes to local player:
-
-| Action | Description |
-|--------|-------------|
-| Refill Mana | Restore mana to max via `CmdRefillMana()` |
-| Draw Card | Draw one card from deck |
-| Reset Board | Clear tapped/summoning sickness flags |
-| Update UI | Highlight playable cards |
-
-These actions are **only executed by the player whose turn it is**.
-
-## First Turn Handling
-
-Turn 1 is special - no mana refill or card draw (players drew initial hands during setup). The first turn only enables card interactions for the first player.
-
-## End Turn
-
-1. Player clicks End Turn button
-2. `CmdEndTurn()` ServerRpc fires
-3. Server validates it's actually their turn
-4. Server calls `NetworkGameManager.EndTurnServer()`
-5. Server updates `TurnNumber` and `CurrentTurnObjectId`
-6. SyncVar callbacks fire on all clients
-7. Next player's turn starts
-
-## Local Turn Check
-
-```
-bool IsLocalPlayerTurn = (NetworkGameManager.CurrentTurnObjectId == localPlayer.ObjectId)
-```
-
-Used for:
-- Validating client actions before sending to server
-- Enabling/disabling UI interactions
-- Determining which player runs turn-start logic
-
-## Edge Cases
-
-- **Disconnect during turn**: Turn continues for remaining player after grace period
-- **Reconnection**: Turn state restored from snapshot, continues from last known state
-- **Simultaneous actions**: Server serializes all actions, only processes one at a time
+`InputController` (the thing players actually interact with) gates on **System 2**. `EndTurnController`'s
+button drives **System 1**. Whether a given UI's end-turn button and the board's actual turn state stay in sync
+depends on which of these two paths is actually wired to it in the scene — check both before debugging a
+"turn didn't advance" or "card wasn't drawn" issue.
 
 ---
 *Parent: [Networking System](./README.md)*

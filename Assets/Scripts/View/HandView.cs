@@ -238,6 +238,14 @@ namespace KOA.View
         }
         
         /// <summary>
+        /// Get all cards in hand for input detection.
+        /// </summary>
+        public IReadOnlyList<CardView> GetAllCards()
+        {
+            return _handCards;
+        }
+        
+        /// <summary>
         /// Clear all cards from hand.
         /// </summary>
         public void Clear()

@@ -40,10 +40,15 @@ Integrate the card management system into the actual duel/match gameplay.
 |-------|-------|--------|--------------|
 | 021 | Deck Loader System | Complete ✓ | 020 |
 | 022 | CardController Uses CardData | Complete ✓ | 012, 021 |
-| 023 | Ability Execution System | Not Started | 018, 022 |
+| 023 | Ability Execution System | Done (superseded)¹ | 018, 022 |
 | 024 | Match Setup with Decks | Not Started | 026 |
-| 025 | Card Drawing System | Not Started | 026 |
-| 026 | Data-Driven Card Spawning | In Progress | 022 |
+| 025 | Card Drawing System | Done (superseded)¹ | 026 |
+| 026 | Data-Driven Card Spawning | Done (superseded)¹ | 022 |
+| 036 | Board State Architecture Revamp | Complete ✓ | 021-026 |
+
+¹ *Reclassified 2026-08-12: these shipped, but via Story 036's `NetworkBoardState` rewrite rather than their
+original plans. See `Docs/scrum/sprint-03/done/` for details. Story 036 wasn't in this table originally — it
+was scoped and completed mid-sprint, replacing the incremental approach 023-026 assumed.*
 
 ---
 
@@ -267,65 +272,55 @@ Acceptance Criteria:
 
 ---
 
-## Sprint 04 - Adventure Mode Foundation
+## Sprint 04 - Retired
 
-### Epic: Adventure Mode Core Loop
+*(vdate 2026-08-12)* Sprint 04's original 9 stories (027-035, "Adventure Mode Foundation") were planned before
+the current Adventure Mode pitch (Hearthstone Duels × Slay the Spire — see `Docs/game-design/adventure-mode.md`)
+and before Story 036 (Board State Architecture Revamp) even existed as a concept, let alone the numbering
+collision it caused with the old "future backlog" placeholder below. Rather than leave a stale sprint, all 9
+stories were rescheduled into Sprints 08-13 (see the summary table below) with amendment notes where the new
+pitch changes their scope. `Docs/scrum/sprint-04/data/animal-classes.json` stays in place as shared reference
+data — it's not a story, and Story 027 (now in Sprint 09) still points to it.
 
-The primary single-player/multiplayer progression mode where players build decks through narrative choices.
-
-| Story | Title | Points | Status | Dependencies |
-|-------|-------|--------|--------|--------------|
-| 027 | Animal Classification Data System | 5 | Planned | None |
-| 028 | Class Selection UI | 3 | Planned | 027 |
-| 029 | Story Branch Data Structure | 5 | Planned | 027 |
-| 030 | Story Presentation UI | 5 | Planned | 029 |
-| 031 | Card Pack Reward System | 3 | Planned | 029, 020 |
-| 032 | Card Specialization/Upgrade System | 5 | Planned | 031 |
-| 033 | Adventure Progress Tracker | 3 | Planned | 029, 031 |
-| 034 | Board Map UI | 5 | Planned | 033, 030 |
-| 035 | AI Story Generation Integration | 8 | Planned | 029, 027 |
-
-### Story Summaries
-
-#### 027 - Animal Classification Data System
-Load 107 animal classes from JSON for class selection and card theming.
-
-#### 028 - Class Selection UI
-Browse and select an animal class to start adventure mode.
-
-#### 029 - Story Branch Data Structure
-Flexible data model for branching narratives with card rewards.
-
-#### 030 - Story Presentation UI
-Display story scenarios and let players make choices.
-
-#### 031 - Card Pack Reward System
-Add cards to adventure deck based on story choices.
-
-#### 032 - Card Specialization/Upgrade System
-Transform cards through specialization choices (Wolf → Wolf Mage).
-
-#### 033 - Adventure Progress Tracker
-Save/load adventure state between sessions.
-
-#### 034 - Board Map UI
-Visual representation of adventure progress through boards.
-
-#### 035 - AI Story Generation Integration
-Generate contextual story branches using AI.
+Note the old "Future Backlog" numbers below (036-040) were never built out as individual stories; 036 was
+independently claimed by the Board State Architecture Revamp (`Docs/scrum/sprint-03/done/`). New work below
+starts at 041 to avoid repeating that collision.
 
 ---
 
-## Future Backlog
+## Sprints 05-16 - Duel-Loop Cleanup + Adventure Mode Build-Out
 
-*(Stories to be prioritized in future sprints)*
+*(vdate 2026-08-12)* Planned 2026-08-12 as a discussion, not yet started. See
+`Docs/game-design/adventure-mode.md` for the design this build-out targets, and Story 044 for the open design
+tensions that still need resolving before Sprint 08 onward can proceed with confidence.
 
-### Adventure Mode - Planned
-- 036 - Duel Queue for Adventure Mode (match with other adventurers)
-- 037 - Second Class Selection (Board 2 entry)
-- 038 - Endgame Challenges (post-12-win content)
-- 039 - Adventure Rewards/Unlocks
-- 040 - Leaderboard Integration
+| Sprint | Theme | Stories |
+|--------|-------|---------|
+| 05 | Turn-system consolidation & reconnection (tech debt from Sprints 01-03) | 041, 042 |
+| 06 | Deck selection & ability completeness | 024 (rescheduled), 043 |
+| 07 | Adventure Mode decisions & matchmaking spike | 044, 045 |
+| 08 | Run/map state machine | 033, 034 (rescheduled), 046 |
+| 09 | Type/classification content | 027, 028 (rescheduled), 047 |
+| 10 | Non-combat segment nodes | 029, 030, 031, 035 (rescheduled) |
+| 11 | Duel-result wiring | 048 |
+| 12 | Board 3 & run completion | 049, 050 |
+| 13 | Card specialization | 032 (rescheduled) |
+| 14 | Deck-mixing UX | 051 |
+| 15 | AI-generated mutation cards (stretch, cuttable) | 052 |
+| 16 | Matchmaking robustness & balance | 053, 054 |
+
+**Why 05-06 before Adventure Mode work starts:** both are technical debt found during the 2026-08-12 docs
+accuracy pass (`Docs/networking/turn-synchronization.md`, `Docs/networking/reconnection.md`) — building a
+multi-duel run loop on top of two conflicting turn systems and unwired reconnection would compound the problem.
+
+**What comes after Sprint 16:** not scoped into stories yet — deliberately left as themes, not sprints, until
+Sprint 16's balance pass shows what actually needs attention. In rough priority order: moving off peer-hosting
+(today the "host" is literally one player's own machine acting as the authoritative FishNet server — a fairness/
+cheat concern before this is genuinely competitive), building out the ability/effect depth already sitting
+unbuilt in `Docs/game-design/abilities.md` (Freeze, Silence, Taunt, Lifesteal, Shield, Summon, etc.), meta-
+progression (unlocks, leaderboards — depends on the hosting fix above to be trustworthy), content-authoring
+tooling at scale (the aspirational Balance View/CSV ideas in `Docs/game-design/card-data-manager.md`), and
+anti-cheat/telemetry.
 
 ---
 

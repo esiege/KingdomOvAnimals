@@ -1,116 +1,68 @@
 # Card System
 
-## Card Properties
+*Verified against source: 2026-08-12 (vdate)*
 
-### Core Stats
-| Property | Type | Description |
-|----------|------|-------------|
-| `cardName` | string | Display name of the card |
-| `manaCost` | int | Mana required to play the card |
-| `health` | int | Current health points |
-| `id` | string | Unique GUID for each card instance |
+A card is described by two objects: a `CardData` template (the ScriptableObject asset — art, base stats,
+abilities) and a `CardState` instance (the live, per-copy runtime state). See
+[architecture.md](../architecture.md#model) for the full picture.
 
-### State Flags
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `isInHand` | bool | true | Card is in player's hand |
-| `isActive` | bool | false | Card is currently selected/active |
-| `isTapped` | bool | false | Card has been used this turn |
-| `isFlipped` | bool | false | Card is face-down |
-| `isInPlay` | bool | false | Card is on the board |
-| `isHighlighted` | bool | false | Card is highlighted as playable/targetable |
+## CardData (template — `Assets/Scripts/Data/CardData.cs`)
 
-### Status Effects
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `hasSummoningSickness` | bool | true | Cannot attack on the turn it's played |
-| `isFrozen` | bool | false | Cannot act (frozen effect) |
-| `isBuried` | bool | false | Hidden/buried state |
-| `isDefending` | bool | false | In defensive stance |
+| Property | Description |
+|----------|--------------|
+| `id` | Unique string ID, used as the network-safe reference and `CardLibrary` lookup key |
+| `displayName` | Shown in `CardView` |
+| `health` | Base/max health |
+| `manaCost` | Mana required to play |
+| `artwork` | Card art sprite |
+| `offensiveAbility` | `AbilityData` used when this card attacks (hand flip or board attack) |
+| `defensiveAbility` | `AbilityData` used for its support action |
 
-## Card Abilities
+## CardState (runtime instance — `Assets/Scripts/Model/CardState.cs`)
 
-Each card can have two ability slots:
-- **Offensive Ability** (`offensiveAbility`) - Used to attack/harm opponents
-- **Support Ability** (`supportAbility`) - Used to help friendly targets
+| Field | Description |
+|-------|--------------|
+| `InstanceId` | Unique per-copy ID, links `CardState` to its `CardView` |
+| `CardDataId` | Looks up the `CardData` template via `CardLibrary` |
+| `OwnerId` | 0 or 1 |
+| `CurrentHealth` | May differ from `CardData.health` due to damage/healing |
+| `IsTapped` | Used its action this turn |
+| `HasSummoningSickness` | Just played, can't act until next turn |
+| `IsFrozen` | Can't act (status effect) |
+| `IsDefending` | Defensive stance flag |
+| `IsFlipped` | Face-down flag |
 
-## Card Views
+`CanAct` = valid && not tapped && no sickness && not frozen. Whether a card is "in hand" or "on board" is not a
+flag on `CardState` itself — it's positional: a card is wherever it appears in `PlayerBoardState.Hand` or
+`PlayerBoardState.Board[]`.
 
-Cards have two visual states:
-- **Full View** - Displayed when in hand (detailed card info)
-- **Condensed View** - Displayed when on the board (compact representation)
+## Rendering (`CardView`)
 
-Located at:
-- `Canvas/Full` - Full card view
-- `Canvas/Condensed` - Condensed board view
+One prefab renders both hand and board cards — no separate "Full" vs. "Condensed" prefabs. See
+[card-view.md](../controllers/card-view.md).
 
-## Visual Elements
-
-### Status Icons
-- `summoningSicknessIcon` - Shown when card has summoning sickness
-- `tappedIcon` - Shown when card is tapped
-- `flippedIcon` - Shown when card is face-down
-
-### Frames
-- `standardFrames` - Default card border appearance
-- `highlightedFrames` - Glowing border when card is playable/targetable
-
-## Card Lifecycle
+## Lifecycle
 
 ```
-1. Card in Deck
-       │
+1. Card ID in Deck (List<string> in PlayerBoardState.Deck)
+       │  DrawCard()
        ▼
-2. Drawn to Hand
-   - isInHand = true
-   - Shows "Full" view
-       │
+2. CardState created, added to Hand
+       │  CmdPlayCard
        ▼
-3. Played to Board
-   - isInHand = false
-   - isInPlay = true
-   - hasSummoningSickness = true
-   - Shows "Condensed" view
-   - Mana cost deducted
-       │
+3. Placed on Board[slotIndex], HasSummoningSickness = true, mana spent
+       │  next turn: PlayerBoardState.OnTurnStart()
        ▼
-4. Ready to Act (Next Turn)
-   - hasSummoningSickness = false
-   - Can use abilities
-       │
+4. HasSummoningSickness = false — can act
+       │  Cmd(Board/Flip)Ability
        ▼
-5. Uses Ability
-   - isTapped = true
-   - Cannot act again this turn
-       │
+5. IsTapped = true — reset to false at the next OnTurnStart()
+       │  CurrentHealth <= 0
        ▼
-6. Turn Ends
-   - isTapped = false (reset)
-       │
-       ▼
-7. Death (health <= 0)
-   - Removed from board
-   - GameObject destroyed
+6. Removed from Board[] via PlayerBoardState.RemoveCard(); CardView plays death animation and destroys
 ```
 
-## Card Prefab Structure
+There is currently no graveyard list in `PlayerBoardState` — dead cards are simply removed, not tracked.
 
-```
-Card.prefab
-├── Canvas/
-│   ├── Full/           # Hand view
-│   │   ├── CardImage
-│   │   ├── NameText
-│   │   ├── CostText
-│   │   └── HealthText
-│   └── Condensed/      # Board view
-│       ├── CardImage
-│       └── HealthText
-├── Abilities/
-│   ├── OffensiveAbility
-│   └── SupportAbility
-└── StatusIcons/
-    ├── SummoningSicknessIcon
-    ├── TappedIcon
-    └── FlippedIcon
-```
+---
+*Parent: [Game Design](./README.md)*

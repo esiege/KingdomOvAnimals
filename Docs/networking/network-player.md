@@ -1,82 +1,38 @@
 # NetworkPlayer
 
-Represents a single connected player in the network. Spawned by server, one per client. Contains all synced game state for that player.
+`Assets/Scripts/Network/NetworkPlayer.cs` — one instance per connected player. Per its own header comment:
+"Card play and ability logic has been moved to NetworkBoardState. NetworkPlayer is now identity-only plus basic
+stats."
 
-## Responsibilities
+## Synced State
 
-- Stores and synchronizes player health/mana
-- Links to local PlayerController for UI updates
-- Receives and validates client commands (ServerRpc)
-- Broadcasts state changes to all clients (ObserversRpc)
+| SyncVar | Initial (sentinel) | Notes |
+|---------|---------------------|-------|
+| `PlayerId` | -1 | 0 = host's perspective "Player", 1 = "Opponent". Set from `Owner.ClientId` for new connections |
+| `PlayerName` | `"__UNSET__"` | |
+| `IsReady` | -1 | Stored as `int` (-1 unset, 0 false, 1 true) — see code comment on why (FishNet `WriteFull` skips SyncVars equal to their initial value, which broke serialization counts with a plain `bool`) |
+| `CurrentHealth` / `MaxHealth` | -1 | Defaulted to 20/20 in `OnStartServer` for a new player |
+| `CurrentMana` / `MaxMana` | -1 | Defaulted to 1/1 in `OnStartServer` for a new player |
 
-## Synchronized State
+These mirror `PlayerBoardState.Health`/`Mana` but are a **separate** set of values on a separate object — not
+automatically kept in sync with `BoardState`. Don't assume reading `NetworkPlayer.CurrentHealth` gives you the
+same number as `BoardState.GetPlayer(id).Health` without checking who last wrote to which.
 
-All state uses FishNet SyncVars with change callbacks:
+## Server RPCs (basic stats only)
 
-| SyncVar | Type | Default | Description |
-|---------|------|---------|-------------|
-| `PlayerId` | int | 0 | Connection identifier (0=host, 1=client) |
-| `PlayerName` | string | "" | Display name |
-| `IsReady` | bool | false | Ready to start game |
-| `CurrentHealth` | int | 20 | Current HP |
-| `MaxHealth` | int | 20 | Maximum HP |
-| `CurrentMana` | int | 1 | Current mana pool |
-| `MaxMana` | int | 1 | Maximum mana pool |
+`CmdTakeDamage`, `CmdHeal`, `CmdSpendMana`, `CmdRefillMana`, `CmdIncreaseMaxMana` — all `[ServerRpc(RequireOwnership = false)]`.
+None of these are currently called from `NetworkBoardState`'s `Cmd*` methods, which mutate `PlayerBoardState`
+fields directly instead. Verify which system a given feature actually updates before relying on these.
 
-## Local References
+## Reconnection Hooks
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `LinkedPlayerController` | PlayerController | Scene controller this NetworkPlayer drives |
-| `OnStateChanged` | Action | Event for UI update triggers |
+`SetPendingState(DisconnectedPlayerState)` (called before spawn) and the deprecated `RestoreFromState` restore
+these SyncVars for a reconnecting player. `OnStartServer()` branches on whether pending state/ID was set
+(reconnect path) vs. a brand-new connection. See [Reconnection](./reconnection.md) for whether anything
+currently calls the reconnect path.
 
-## Server Commands (ServerRpc)
-
-These methods validate and execute player actions:
-
-| Command | Parameters | Description |
-|---------|------------|-------------|
-| `CmdPlayCard` | cardIndex, slotIndex | Play card from hand to board |
-| `CmdUseAbilityOnCard` | attackerSlot, targetSlot, isOffensive | Use board card ability |
-| `CmdUseFlipAbilityOnCard` | handIndex, targetSlot, isOffensive | Use hand card flip ability |
-| `CmdEndTurn` | none | End current turn |
-| `CmdRefillMana` | none | Refill mana at turn start |
-
-## Client Broadcasts (ObserversRpc)
-
-These methods synchronize state to all clients:
-
-| RPC | Purpose |
-|-----|---------|
-| `RpcExecuteCardPlay` | All clients execute card placement |
-| `RpcExecuteAbility` | All clients execute ability effect |
-
-## State Update Flow
-
-1. Client calls ServerRpc (e.g., `CmdPlayCard`)
-2. Server validates action (turn, mana, slot availability)
-3. Server updates SyncVars (mana deduction)
-4. Server calls ObserversRpc for visual execution
-5. All clients update their game state
-
-## Change Callbacks
-
-Each SyncVar has a corresponding `OnXChanged` callback:
-
-- `OnPlayerIdChanged` - Logs player ID assignment
-- `OnHealthChanged` - Updates PlayerController.currentHealth and UI
-- `OnManaChanged` - Updates PlayerController.currentMana and UI
-- etc.
-
-These callbacks fire on all clients whenever the server changes a SyncVar value.
-
-## Player Identification
-
-Each NetworkPlayer has a unique `ObjectId` (FishNet assigned). The current turn is tracked by storing `CurrentTurnObjectId` in NetworkGameManager. Clients check `IsLocalPlayerTurn` by comparing:
-
-```
-IsLocalPlayerTurn = (gameManager.CurrentTurnObjectId == this.ObjectId)
-```
+`ServerRestoreGameState(json)` is a no-op stub — `GameStateSnapshot` (JSON-based restore) was removed in Story
+036 in favor of `NetworkBoardState`'s own SyncVar.
 
 ---
 *Parent: [Networking System](./README.md)*

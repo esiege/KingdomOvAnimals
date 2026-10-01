@@ -26,11 +26,28 @@ namespace KOA.View
         [SerializeField] private Transform _myHandArea;
         [SerializeField] private Transform _opponentHandArea;
         
+        [Header("Player Avatars")]
+        [Tooltip("Collider for the local player's avatar (for opponent to target)")]
+        [SerializeField] private Collider2D _myPlayerAvatarZone;
+        
+        [Tooltip("Collider for the opponent's avatar (for local player to target)")]
+        [SerializeField] private Collider2D _opponentAvatarZone;
+        
         [Header("Prefabs")]
         [SerializeField] private GameObject _cardViewPrefab;
         
         [Header("References")]
         [SerializeField] private CardLibrary _cardLibrary;
+        
+        /// <summary>
+        /// Reference to CardLibrary for external access.
+        /// </summary>
+        public CardLibrary CardLibrary => _cardLibrary;
+        
+        /// <summary>
+        /// Collider for the opponent's avatar zone (for player targeting).
+        /// </summary>
+        public Collider2D OpponentAvatarZone => _opponentAvatarZone;
         
         /// <summary>
         /// All card views indexed by instance ID.
@@ -129,6 +146,7 @@ namespace KOA.View
                 return _cardViews[state.InstanceId];
             }
             
+            Debug.Log($"[BoardView] CreateCardView: Instantiating cardDataId={state.CardDataId}, instanceId={state.InstanceId}");
             var viewObj = Instantiate(_cardViewPrefab);
             var view = viewObj.GetComponent<CardView>();
             if (view == null)
@@ -140,9 +158,15 @@ namespace KOA.View
             
             view.Initialize(state, _cardLibrary);
             _cardViews[state.InstanceId] = view;
+            Debug.Log($"[BoardView] Created card view {state.InstanceId}, total views: {_cardViews.Count}");
             
             return view;
         }
+        
+        /// <summary>
+        /// Get all card views.
+        /// </summary>
+        public IReadOnlyDictionary<int, CardView> GetAllCardViews() => _cardViews;
         
         /// <summary>
         /// Get existing card view by instance ID.
@@ -218,22 +242,31 @@ namespace KOA.View
         public void UpdateHandLayout(int playerId)
         {
             var handArea = GetHandArea(playerId);
-            if (handArea == null) return;
+            if (handArea == null)
+            {
+                Debug.LogError($"[BoardView] UpdateHandLayout: handArea is null for player {playerId}");
+                return;
+            }
+            
+            Debug.Log($"[BoardView] UpdateHandLayout: player {playerId}, handArea at {handArea.position}");
             
             var handCards = new List<CardView>();
             foreach (var kvp in _cardViews)
             {
+                Debug.Log($"[BoardView] Checking card {kvp.Key}: IsInHand={kvp.Value.IsInHand}, OwnerId={kvp.Value.OwnerId}, BoardPos={kvp.Value.BoardPosition}");
                 if (kvp.Value.IsInHand && kvp.Value.OwnerId == playerId)
                 {
                     handCards.Add(kvp.Value);
                 }
             }
             
+            Debug.Log($"[BoardView] UpdateHandLayout: Found {handCards.Count} cards for player {playerId}'s hand");
+            
             // Sort by hand index
             handCards.Sort((a, b) => a.HandIndex.CompareTo(b.HandIndex));
             
-            // Position cards
-            float spacing = 120f; // Adjust as needed
+            // Position cards - use smaller spacing for 2D
+            float spacing = 1.5f; // World units between cards
             float startX = -(handCards.Count - 1) * spacing / 2f;
             
             for (int i = 0; i < handCards.Count; i++)
@@ -242,6 +275,7 @@ namespace KOA.View
                 card.transform.localPosition = new Vector3(startX + i * spacing, 0, 0);
                 card.transform.localRotation = Quaternion.identity;
                 card.transform.localScale = Vector3.one;
+                Debug.Log($"[BoardView] Positioned card {card.InstanceId} at local ({startX + i * spacing}, 0, 0), world {card.transform.position}");
             }
         }
         
@@ -257,6 +291,8 @@ namespace KOA.View
             if (state == null) return;
             
             Debug.Log($"[BoardView] RenderBoard: Turn {state.TurnNumber}, Current player {state.CurrentTurnPlayerId}");
+            Debug.Log($"[BoardView] Player 0 hand count: {state.GetPlayer(0).Hand.Count}");
+            Debug.Log($"[BoardView] Player 1 hand count: {state.GetPlayer(1).Hand.Count}");
             
             // Track which cards we've seen
             var seenInstanceIds = new HashSet<int>();
@@ -265,6 +301,7 @@ namespace KOA.View
             for (int playerId = 0; playerId < 2; playerId++)
             {
                 var player = state.GetPlayer(playerId);
+                Debug.Log($"[BoardView] Rendering player {playerId}: {player.Hand.Count} cards in hand, checking board slots");
                 
                 // Render board cards
                 for (int slot = 0; slot < 3; slot++)
@@ -288,27 +325,8 @@ namespace KOA.View
                     }
                 }
                 
-                // Render hand cards
-                for (int i = 0; i < player.Hand.Count; i++)
-                {
-                    var cardState = player.Hand[i];
-                    if (cardState != null && cardState.IsValid)
-                    {
-                        seenInstanceIds.Add(cardState.InstanceId);
-                        
-                        var view = GetCardView(cardState.InstanceId);
-                        if (view == null)
-                        {
-                            view = CreateCardView(cardState);
-                        }
-                        
-                        if (view != null)
-                        {
-                            view.UpdateFromState(cardState);
-                            PlaceCardInHand(view, playerId, i);
-                        }
-                    }
-                }
+                // Hand cards are rendered by HandView - don't duplicate here
+                // HandView subscribes to OnStateChanged and handles hand layout
             }
             
             // Destroy views for cards that no longer exist

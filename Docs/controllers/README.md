@@ -1,42 +1,40 @@
-# Controllers
+# Controllers / View / Input
 
-Core game logic controllers that manage gameplay mechanics.
+*Verified against source: 2026-08-12 (vdate)*
+
+> This folder used to document `EncounterController`, `PlayerController`, `HandController`,
+> `TargetingController`, and `CardController` — the pre-Story-030 architecture. **None of those classes exist
+> anymore.** This folder now documents their real, current replacements in `KOA.View`, `KOA.Controllers`, and
+> `KOA.Logic`. Game rules live in `NetworkBoardState` (see [Networking](../networking/README.md)) — everything
+> below is rendering and input only.
 
 ## Index
 
-- [EncounterController](./encounter-controller.md) - Main game orchestration
-- [PlayerController](./player-controller.md) - Individual player state
-- [HandController](./hand-controller.md) - Hand management and card interactions
-- [TargetingController](./targeting-controller.md) - Target validation
-- [CardController](./card-controller.md) - Individual card behavior
-- [EndTurnController](./end-turn-controller.md) - Turn ending UI
+- [BoardView](./board-view.md) — renders the board, owns visual perspective
+- [CardView](./card-view.md) — renders a single card (hand or board)
+- [HandView](./hand-view.md) — lays out one player's hand
+- [InputController](./input-controller.md) — mouse input → `NetworkBoardState.Cmd*` calls
+- [TargetingHelper](./targeting-helper.md) — pure target-list calculation
+- [EndTurnController](./end-turn-controller.md) — end-turn button
 
-## Controller Hierarchy
+## Data Flow
 
 ```
-EncounterController (Scene Root)
-├── PlayerController (Player)
-│   └── NetworkPlayer (runtime link)
-├── PlayerController (Opponent)
-│   └── NetworkPlayer (runtime link)
-├── HandController (Player Hand)
-├── HandController (Opponent Hand)
-└── TargetingController
+Player clicks/drags (InputController)
+       │
+       ▼
+NetworkBoardState.Cmd* (ServerRpc)         ← server validates & mutates BoardState
+       │
+       ▼
+NetworkBoardState events (OnStateChanged, OnCardPlayed, ...)
+       │
+       ▼
+BoardView.RenderBoard() / HandView.RenderHand()   ← re-render from state, no rules
 ```
 
-## Responsibilities
+There is no `PlayerController` — player state (`Health`, `Mana`, `Board`, `Hand`) lives in `PlayerBoardState`
+inside `BoardState` (see [architecture.md](../architecture.md#model)); connection-level identity/stats live in
+`NetworkPlayer` (see [Networking](../networking/README.md)).
 
-| Controller | Primary Function |
-|------------|------------------|
-| EncounterController | Turn flow, game initialization, player coordination |
-| PlayerController | Health, mana, deck, board management |
-| HandController | Card selection, drag-drop, ability activation |
-| TargetingController | Valid target calculation |
-| CardController | Individual card state and visuals |
-
-## Network Integration
-
-In multiplayer mode:
-- Controllers receive state changes from NetworkPlayer SyncVars
-- User actions send ServerRpc through NetworkPlayer
-- Visual updates triggered by ObserversRpc broadcasts
+---
+*Parent: [Documentation](../README.md)*

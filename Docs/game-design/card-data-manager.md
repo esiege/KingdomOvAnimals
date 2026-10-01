@@ -1,5 +1,12 @@
 # Card Data Manager
 
+> **Partially implemented, simpler than described below.** *(checked 2026-08-12, vdate)* The actual scene is
+> named **`CardManagement`** (`Assets/Scenes/CardManagement.unity`), not `DataManager`, and its scripts live in
+> `Assets/Scripts/UI/CardManagement/` (`CardManagementController`, `CardEditorUI`, `CardListItem`,
+> `AbilityEditorUI`, `AbilityListItem`, `DeckEditorUI`) — not `Assets/Scripts/DataManager/`. The rest of this
+> page (Balance View, CSV import/export, mana-curve charts) is design vision layered on top of that simpler,
+> real editor UI — verify against the scripts above before assuming a feature described below exists.
+
 A dedicated Unity scene for managing card and ability data through a visual interface.
 
 ## Overview

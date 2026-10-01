@@ -1,85 +1,43 @@
 # Targeting System
 
-## Overview
+*Verified against source: 2026-08-12 (vdate) — rewritten to match `InputController`'s actual current behavior;
+the previous version of this doc described a drag-destination scheme that isn't what's implemented.*
 
-The targeting system is a core piece of Kingdom Ov Animals and what makes it unique. Rather than separate "play" and "attack" actions, everything is driven by **where you drag a card to**.
+## Current Input Scheme
 
-## From Hand - Drag to Target
+Kingdom Ov Animals uses click, not a single unified drag gesture. **Left-click** drives offensive/play actions;
+**right-click** drives support actions — and they're not symmetric.
 
-When you have a card in your hand, you can drag it to one of three places, each with a different effect:
+### Left-click (offensive / play)
 
-| Drag To | Effect | Cost |
-|---------|--------|------|
-| **Empty space** | Play the unit | Mana cost |
-| **Friendly unit** | Use its defensive ability | Mana cost |
-| **Opponent unit** | Use its offensive ability | Mana cost |
+| You click/drag | Drop target | Effect |
+|-----------------|-------------|--------|
+| Hand card | Empty own board slot | Play the unit (mana cost, gets summoning sickness) |
+| Hand card | Enemy board card | Flip ability: deal the card's offensive-ability damage to that card, card stays in hand |
+| Hand card | Opponent avatar | Flip ability: deal offensive-ability damage to the opponent directly |
+| Board card (untapped, no sickness, not frozen) | Enemy board card | Attack that card |
+| Board card (untapped, no sickness, not frozen) | Opponent avatar | Attack the opponent directly |
 
-### Empty Space
-Dropping a card on an empty space will **play the unit** for its mana cost. The unit enters the board with **summoning sickness** and cannot act until your next turn.
+Using an ability from a board card taps it (one action per turn). Playing a card from hand gives it summoning
+sickness until your next turn.
 
-### Friendly Unit
-Dropping a card on a friendly unit will **use its defensive ability** (support ability) for its mana cost. This lets you buff, heal, or support your own units directly from hand.
+### Right-click (support)
 
-### Opponent Unit
-Dropping a card on an opponent's unit will **use its offensive ability** for its mana cost. This lets you deal damage or apply effects to enemies directly from hand.
-
-## On Board - Using Abilities
-
-After a unit is played by dropping it on an empty space, it will have **summoning sickness**. On subsequent turns, the unit will be able to **use its ability once per turn** - similar to an attack in MTG or Hearthstone.
-
-The key difference: rather than a generic attack, the unit can choose to use either:
-- **Offensive ability** - Target an opponent's unit
-- **Defensive ability** - Target a friendly unit
-
-Once a unit uses an ability, it becomes **tapped** and cannot act again until the next turn.
-
-## Flow Summary
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     CARD IN HAND                            │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│   Drag to Empty Space ──────▶ PLAY UNIT                     │
-│                               └─▶ Costs mana                │
-│                               └─▶ Gets summoning sickness   │
-│                                                             │
-│   Drag to Friendly Unit ────▶ USE DEFENSIVE ABILITY         │
-│                               └─▶ Costs mana                │
-│                               └─▶ Card stays in hand (?)    │
-│                                                             │
-│   Drag to Opponent Unit ────▶ USE OFFENSIVE ABILITY         │
-│                               └─▶ Costs mana                │
-│                               └─▶ Card stays in hand (?)    │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────┐
-│                     UNIT ON BOARD                           │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│   Turn 1 (Played) ──────────▶ SUMMONING SICKNESS            │
-│                               └─▶ Cannot act                │
-│                                                             │
-│   Turn 2+ ──────────────────▶ CAN USE ABILITY (once/turn)   │
-│                               └─▶ Offensive OR Defensive    │
-│                               └─▶ Becomes tapped            │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
+Right-clicking your own actionable board card enters support-targeting mode; left-clicking a friendly board
+card afterward uses that card's support ability. **There is currently no way to use a support ability from a
+hand card** — `NetworkBoardState.CmdUseSupportAbility` requires the source to be a board card that `CanAct`.
 
 ## What Makes This Unique
 
-In most card games like MTG or Hearthstone:
-- Playing a card and attacking are separate actions
-- Attacks are generic (creature vs creature combat)
-- Abilities are often separate from attacks
+Rather than separate "play" and "attack" phases, where you click/drop and *which* mouse button determines the
+action. A card has no generic attack stat — its offensive ability defines what happens when it attacks, and its
+defensive ability defines what its support action does.
 
-In Kingdom Ov Animals:
-- **One unified drag-and-drop system** handles everything
-- **Where you drop determines the action**
-- **Every unit has two distinct abilities** (offensive + defensive)
-- **Abilities replace generic attacks** - more strategic variety
-- **Hand cards can use abilities** before being played (at mana cost)
+## Not Yet Implemented
 
-This creates more decision points: Do you play the unit now? Or use its ability from hand first? Which ability fits the current board state better?
+- Taunt / forced targeting
+- Hand-card support abilities (see above)
+- Any visual distinction beyond the single targeting line drawn during a drag
+
+---
+*Parent: [Game Design](./README.md)*
